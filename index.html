@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Tags e Tempo - v8</title>
+    <title>Calculadora de Tags e Tempo - v9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -103,7 +103,7 @@
             margin-left: -0.5rem;
         }
 
-        .input-row, .settings-row {
+        .input-row, .settings-row, .project-input-row {
             display: grid;
             align-items: center;
             padding: 1rem 0;
@@ -112,6 +112,8 @@
         }
         .input-row { grid-template-columns: 1fr 80px 80px 100px; gap: 1rem; }
         .settings-row { grid-template-columns: 1fr 100px 100px; gap: 1rem; }
+        .project-input-row { grid-template-columns: 1fr 120px; gap: 1rem; }
+
 
         .calc-grid-header, .settings-grid-header {
             display: grid;
@@ -135,12 +137,12 @@
             gap: 1rem;
         }
         
-        .input-row:last-child, .settings-row:last-child { border-bottom: none; }
-        .input-row:hover, .settings-row:hover { background-color: rgba(255, 255, 255, 0.03); }
-        .input-row label, .settings-row label { font-size: 0.95rem; color: var(--text-secondary); transition: color 0.5s ease; }
+        .input-row:last-child, .settings-row:last-child, .project-input-row:last-child { border-bottom: none; }
+        .input-row:hover, .settings-row:hover, .project-input-row:hover { background-color: rgba(255, 255, 255, 0.03); }
+        .input-row label, .settings-row label, .project-input-row label { font-size: 0.95rem; color: var(--text-secondary); transition: color 0.5s ease; }
         .input-row .tags-per-item, .input-row .time-per-item { font-weight: 600; text-align: center; color: var(--accent-color); transition: color 0.5s ease; }
         
-        .input-row input[type="number"], .settings-row input[type="number"] {
+        .input-row input[type="number"], .settings-row input[type="number"], .project-input-row input[type="number"] {
             width: 100%;
             padding: 0.5rem;
             border: 1px solid var(--input-border);
@@ -150,7 +152,7 @@
             color: var(--text-primary);
             transition: all 0.3s ease;
         }
-        .input-row input[type="number"]:focus, .settings-row input[type="number"]:focus {
+        .input-row input[type="number"]:focus, .settings-row input[type="number"]:focus, .project-input-row input[type="number"]:focus {
             outline: none;
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 25%, transparent);
@@ -171,9 +173,10 @@
         
         .summary-value { font-size: 2.5rem; font-weight: 700; line-height: 1.1; color: var(--text-primary); text-shadow: 0 0 15px color-mix(in srgb, var(--accent-color) 50%, transparent); transition: all 0.5s ease; }
         .summary-label { display: block; font-size: 0.9rem; color: var(--text-secondary); }
+        .sub-value { font-size: 0.85rem; color: var(--text-secondary); }
         .license-name { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
-        .license-price { font-size: 1.75rem; font-weight: 700; color: var(--success-color); }
-        .project-total-price { font-size: 1.25rem; font-weight: 600; color: var(--text-secondary); }
+        .license-price { font-size: 1.25rem; font-weight: 700; color: var(--success-color); }
+        .project-total-price { font-size: 1.75rem; font-weight: 700; color: var(--text-primary); }
 
         .action-button { width: 100%; padding: 0.75rem; border: none; border-radius: 0.75rem; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
         .save-button { background-color: var(--success-color); box-shadow: 0 4px 20px -5px color-mix(in srgb, var(--success-color) 40%, transparent); }
@@ -239,6 +242,7 @@
                 </div>
                 
                 <div id="calculadora" class="tab-content active">
+                     <div id="calculator-project-inputs" class="glass-card mb-4"></div>
                     <form id="tags-form" class="glass-card !rounded-t-none">
                         <div class="calc-grid-header">
                             <span>Descrição do Objeto</span>
@@ -266,8 +270,11 @@
             <aside class="md:col-span-1">
                 <div class="summary-panel">
                      <div id="total-card" class="glass-card text-center">
-                        <span class="summary-label">Total de Tags (c/ reserva)</span>
+                        <span class="summary-label">Total de Tags</span>
                         <span class="summary-value" id="grand-total">0</span>
+                        <div class="text-sm sub-value mt-1">
+                            Projeto: <span id="base-tags">0</span> + Reserva: <span id="reserve-tags">0</span>
+                        </div>
                     </div>
                     <div id="time-card" class="glass-card text-center">
                         <span class="summary-label">Total de Horas</span>
@@ -275,12 +282,22 @@
                     </div>
                     <div id="license-card" class="glass-card text-center">
                         <span class="summary-label">Licença Recomendada</span>
-                        <div class="flex justify-between items-center mt-2">
+                        <div class="mt-2">
                             <span id="license-name" class="license-name">N/A</span>
-                            <span id="license-price" class="license-price">R$ 0,00</span>
                         </div>
-                         <div class="text-right mt-2">
-                            <span id="project-total-price" class="project-total-price"></span>
+                        <div class="flex justify-around items-center mt-3 text-sm">
+                            <div>
+                                <span class="summary-label">Licença</span>
+                                <span id="license-price" class="license-price block">R$ 0,00</span>
+                            </div>
+                             <div>
+                                <span class="summary-label">Serviços</span>
+                                <span id="services-price" class="license-price block">R$ 0,00</span>
+                            </div>
+                        </div>
+                         <div class="text-center mt-4 pt-2 border-t border-[var(--border-color)]">
+                             <span class="summary-label">Valor Total do Projeto</span>
+                            <span id="project-total-price" class="project-total-price">R$ 0,00</span>
                         </div>
                     </div>
                     <div id="chart-card" class="glass-card">
@@ -378,7 +395,7 @@
         };
 
         // --- DOM ELEMENTS ---
-        let grandTotalEl, totalHoursEl, licenseNameEl, licensePriceEl, projectTotalPriceEl, clearButton, tagsForm, calculatorFieldsContainer, settingsFieldsContainer, licenseSettingsContainer, projectSettingsContainer, saveSettingsButton, restoreDefaultsButton, themeSwitcher, sunIcon, moonIcon, ctx, tagsChart;
+        let grandTotalEl, baseTagsEl, reserveTagsEl, totalHoursEl, licenseNameEl, licensePriceEl, servicesPriceEl, projectTotalPriceEl, clearButton, tagsForm, calculatorFieldsContainer, settingsFieldsContainer, licenseSettingsContainer, projectSettingsContainer, calculatorProjectInputsContainer, saveSettingsButton, restoreDefaultsButton, themeSwitcher, sunIcon, moonIcon, ctx, tagsChart;
         
         // --- CHART ---
         const chartGroupColors = {
@@ -423,6 +440,16 @@
             calculatorFieldsContainer.innerHTML = html;
             tagsForm.addEventListener('input', calculateAndDisplayTotals);
         }
+        
+        function renderProjectInputs() {
+            let projectHtml = `<fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">Configurações Iniciais</legend>`;
+            projectHtml += `<div class="project-input-row"><label for="calc_reserve">Percentual de Reserva de Tags (%)</label><input type="number" min="0" id="calc_reserve" data-prop="reservePercentage" value="${database.projectSettings.reservePercentage}"></div>`;
+            projectHtml += `<div class="project-input-row"><label for="calc_screen_count">Número de Telas IHM</label><input type="number" min="0" id="calc_screen_count" data-prop="screenCount" value="${database.projectSettings.screenCount}"></div>`;
+            projectHtml += `<div class="project-input-row"><label for="calc_screen_size">Tamanho da Tela (polegadas)</label><input type="number" min="0" id="calc_screen_size" data-prop="screenSize" value="${database.projectSettings.screenSize}"></div>`;
+            projectHtml += `</fieldset>`;
+            calculatorProjectInputsContainer.innerHTML = projectHtml;
+            calculatorProjectInputsContainer.addEventListener('input', calculateAndDisplayTotals);
+        }
 
         function renderSettingsFields() {
             let tagHtml = `<div class="settings-grid-header"><span>Descrição do Objeto</span><span class="text-center">Tags</span><span class="text-center">Horas</span></div>`;
@@ -459,10 +486,7 @@
             licenseSettingsContainer.innerHTML = licenseHtml;
 
             let projectHtml = `<fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-4">Configurações Gerais do Projeto</legend>`;
-            projectHtml += `<div class="settings-row"><label for="setting_reserve">Percentual de Reserva de Tags (%)</label><input type="number" min="0" id="setting_reserve" data-prop="reservePercentage" value="${database.projectSettings.reservePercentage}"><span/></div>`;
             projectHtml += `<div class="settings-row"><label for="setting_hour_price">Valor da Hora de Serviço (R$)</label><input type="number" min="0" id="setting_hour_price" data-prop="hourPrice" value="${database.projectSettings.hourPrice}"><span/></div>`;
-            projectHtml += `<div class="settings-row"><label for="setting_screen_count">Número de Telas IHM</label><input type="number" min="0" id="setting_screen_count" data-prop="screenCount" value="${database.projectSettings.screenCount}"><span/></div>`;
-            projectHtml += `<div class="settings-row"><label for="setting_screen_size">Tamanho da Tela (polegadas)</label><input type="number" min="0" id="setting_screen_size" data-prop="screenSize" value="${database.projectSettings.screenSize}"><span/></div>`;
             projectHtml += `</fieldset>`;
             projectSettingsContainer.innerHTML = projectHtml;
         }
@@ -472,6 +496,8 @@
             let totalHours = 0;
             const groupTotals = {};
             const inputs = tagsForm.querySelectorAll('input[type="number"], input[type="checkbox"]');
+            
+            const reservePercentage = parseFloat(document.getElementById('calc_reserve')?.value) || database.projectSettings.reservePercentage;
 
             inputs.forEach(input => {
                 let quantity = 0;
@@ -498,10 +524,12 @@
                 }
             });
 
-            const reserve = database.projectSettings.reservePercentage / 100;
-            const finalTotalTags = Math.ceil(baseTotalTags * (1 + reserve));
+            const reserveTags = Math.ceil(baseTotalTags * (reservePercentage / 100));
+            const finalTotalTags = baseTotalTags + reserveTags;
 
             grandTotalEl.textContent = finalTotalTags;
+            baseTagsEl.textContent = baseTotalTags;
+            reserveTagsEl.textContent = reserveTags;
             totalHoursEl.textContent = totalHours.toFixed(1);
             updateChart(groupTotals);
 
@@ -511,7 +539,8 @@
 
             licenseNameEl.textContent = recommendedLicense.name;
             licensePriceEl.textContent = formatCurrency(recommendedLicense.price);
-            projectTotalPriceEl.textContent = `Total Projeto: ${formatCurrency(finalProjectPrice)}`;
+            servicesPriceEl.textContent = formatCurrency(totalServicesPrice);
+            projectTotalPriceEl.textContent = formatCurrency(finalProjectPrice);
         }
         
         function formatCurrency(value) {
@@ -560,8 +589,8 @@
                 }
             });
 
-            // Save project settings
-            const projectInputs = projectSettingsContainer.querySelectorAll('input[type="number"]');
+            // Save project settings from both tabs
+            const projectInputs = document.querySelectorAll('#project-settings-fields input, #calculator-project-inputs input');
             projectInputs.forEach(input => {
                 const prop = input.dataset.prop;
                 const newValue = parseFloat(input.value) || 0;
@@ -587,7 +616,7 @@
             let parsedData = savedData ? JSON.parse(savedData) : JSON.parse(JSON.stringify(defaultDatabase));
             
             if (!parsedData.projectSettings) {
-                parsedData.projectSettings = defaultDatabase.projectSettings;
+                parsedData.projectSettings = JSON.parse(JSON.stringify(defaultDatabase.projectSettings));
             }
             if (!parsedData.tags || !parsedData.licenses) {
                 parsedData = JSON.parse(JSON.stringify(defaultDatabase));
@@ -604,6 +633,7 @@
         }
         
         function rerenderAll() {
+            renderProjectInputs();
             renderCalculatorFields();
             renderSettingsFields();
             calculateAndDisplayTotals();
@@ -653,13 +683,17 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Assign DOM elements
             grandTotalEl = document.getElementById('grand-total');
+            baseTagsEl = document.getElementById('base-tags');
+            reserveTagsEl = document.getElementById('reserve-tags');
             totalHoursEl = document.getElementById('total-hours');
             licenseNameEl = document.getElementById('license-name');
             licensePriceEl = document.getElementById('license-price');
+            servicesPriceEl = document.getElementById('services-price');
             projectTotalPriceEl = document.getElementById('project-total-price');
             clearButton = document.getElementById('clear-button');
             tagsForm = document.getElementById('tags-form');
             calculatorFieldsContainer = document.getElementById('calculator-fields');
+            calculatorProjectInputsContainer = document.getElementById('calculator-project-inputs');
             settingsFieldsContainer = document.getElementById('settings-fields');
             licenseSettingsContainer = document.getElementById('license-settings-fields');
             projectSettingsContainer = document.getElementById('project-settings-fields');
@@ -681,7 +715,7 @@
             // Event Listeners
             clearButton.addEventListener('click', () => {
                 tagsForm.reset();
-                calculateAndDisplayTotals();
+                rerenderAll(); // Rerender to reset inputs to default values from DB
             });
             saveSettingsButton.addEventListener('click', saveSettings);
             restoreDefaultsButton.addEventListener('click', restoreDefaults);
