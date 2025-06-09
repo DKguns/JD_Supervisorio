@@ -268,7 +268,7 @@
             </button>
         </header>
 
-        <div class="grid md:grid-cols-3 gap-8">
+        <div class="grid md:grid-cols-3 gap-8 items-start">
             <main class="md:col-span-2">
                 <div class="tabs mb-2">
                     <button class="tab-button active" onclick="openTab(event, 'calculadora')">Calculadora</button>
@@ -298,56 +298,58 @@
             </main>
 
             <aside class="md:col-span-1">
-                <div class="summary-panel">
-                     <div id="total-card" class="glass-card text-center">
-                        <span class="summary-label">Total de Tags</span>
-                        <span class="summary-value" id="grand-total">0</span>
-                        <div class="text-sm sub-value mt-1">
-                            <span>Projeto: <span id="base-tags">0</span></span>
-                            <span class="block">Reserva: <span id="reserve-tags">0</span></span>
-                        </div>
-                    </div>
-                    <div id="time-card" class="glass-card text-center">
-                        <span class="summary-label">Total de Horas</span>
-                        <span class="summary-value" id="total-hours">0</span>
-                    </div>
-                    <div id="hardware-card" class="glass-card">
-                         <span class="summary-label text-center">Hardware</span>
-                         <div class="mt-2 space-y-2">
-                            <div class="hardware-item"><span>Computador:</span><span id="computer-name">N/A</span></div>
-                            <div class="hardware-item"><span>Telas:</span><span id="screens-desc">N/A</span></div>
-                            <div class="hardware-item"><span>Placa de Vídeo Extra:</span><span id="videocard-desc">N/A</span></div>
-                             <div class="hardware-item"><span>Adicional (Módulos):</span><span id="module-hardware-price">R$ 0,00</span></div>
-                            <div class="text-right mt-2 pt-2 border-t border-[var(--border-color)]">
-                                <span class="price-value" id="hardware-total-price">R$ 0,00</span>
-                            </div>
-                         </div>
-                    </div>
-                    <div id="license-card" class="glass-card text-center">
-                        <span class="summary-label">Licença e Serviços</span>
-                        <div class="mt-2">
-                            <span id="license-name" class="license-name">N/A</span>
-                        </div>
-                        <div class="flex justify-around items-center mt-3 text-sm">
-                            <div>
-                                <span class="summary-label">Licença</span>
-                                <span id="license-price" class="price-value block">R$ 0,00</span>
-                            </div>
-                             <div>
-                                <span class="summary-label">Serviços</span>
-                                <span id="services-price" class="price-value block">R$ 0,00</span>
+                <div class="pt-[52px]">
+                    <div class="summary-panel">
+                        <div id="total-card" class="glass-card text-center">
+                            <span class="summary-label">Total de Tags</span>
+                            <span class="summary-value" id="grand-total">0</span>
+                            <div class="text-sm sub-value mt-1">
+                                <span>Projeto: <span id="base-tags">0</span></span>
+                                <span class="block">Reserva: <span id="reserve-tags">0</span></span>
                             </div>
                         </div>
-                    </div>
-                     <div id="project-total-card" class="glass-card text-center">
-                         <span class="summary-label">Valor Total do Projeto</span>
-                        <span id="project-total-price" class="project-total-price !text-4xl">R$ 0,00</span>
-                    </div>
-                     <div id="chart-card" class="glass-card">
-                         <div id="chart-container"><canvas id="tagsChart"></canvas></div>
-                    </div>
-                    <div id="actions-card" class="glass-card !p-4">
-                        <button id="clear-button" class="action-button clear-button">Limpar Calculadora</button>
+                        <div id="time-card" class="glass-card text-center">
+                            <span class="summary-label">Total de Horas</span>
+                            <span class="summary-value" id="total-hours">0</span>
+                        </div>
+                        <div id="hardware-card" class="glass-card">
+                             <span class="summary-label text-center">Hardware</span>
+                             <div class="mt-2 space-y-2">
+                                <div class="hardware-item"><span>Computador:</span><span id="computer-name">N/A</span></div>
+                                <div class="hardware-item"><span>Telas:</span><span id="screens-desc">N/A</span></div>
+                                <div class="hardware-item"><span>Placa de Vídeo Extra:</span><span id="videocard-desc">N/A</span></div>
+                                 <div class="hardware-item"><span>Adicional (Módulos):</span><span id="module-hardware-price">R$ 0,00</span></div>
+                                <div class="text-right mt-2 pt-2 border-t border-[var(--border-color)]">
+                                    <span class="price-value" id="hardware-total-price">R$ 0,00</span>
+                                </div>
+                             </div>
+                        </div>
+                        <div id="license-card" class="glass-card text-center">
+                            <span class="summary-label">Licença e Serviços</span>
+                            <div class="mt-2">
+                                <span id="license-name" class="license-name">N/A</span>
+                            </div>
+                            <div class="flex justify-around items-center mt-3 text-sm">
+                                <div>
+                                    <span class="summary-label">Licença</span>
+                                    <span id="license-price" class="price-value block">R$ 0,00</span>
+                                </div>
+                                 <div>
+                                    <span class="summary-label">Serviços</span>
+                                    <span id="services-price" class="price-value block">R$ 0,00</span>
+                                </div>
+                            </div>
+                        </div>
+                         <div id="project-total-card" class="glass-card text-center">
+                             <span class="summary-label">Valor Total do Projeto</span>
+                            <span id="project-total-price" class="project-total-price !text-4xl">R$ 0,00</span>
+                        </div>
+                         <div id="chart-card" class="glass-card">
+                             <div id="chart-container"><canvas id="tagsChart"></canvas></div>
+                        </div>
+                        <div id="actions-card" class="glass-card !p-4">
+                            <button id="clear-button" class="action-button clear-button">Limpar Calculadora</button>
+                        </div>
                     </div>
                 </div>
             </aside>
@@ -628,7 +630,7 @@
             const screenModelSelect = document.getElementById('calc_screen_model');
 
             // Calculate from core items
-            document.querySelectorAll('#calculator-fields input').forEach(input => {
+            document.querySelectorAll('#calculator-fields-container input').forEach(input => {
                 let quantity = 0;
                 if(input.type === 'checkbox') {
                     quantity = input.checked ? 1 : 0;
