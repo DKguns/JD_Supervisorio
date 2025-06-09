@@ -118,6 +118,7 @@
         }
         .input-row { grid-template-columns: 1fr 80px 80px 100px; gap: 1rem; }
         .settings-row { grid-template-columns: 1fr 100px 100px; gap: 1rem; }
+        .module-settings-row { grid-template-columns: 1fr 80px 80px 80px; gap: 1rem; }
         .project-input-row { grid-template-columns: 1fr 120px; gap: 1rem; }
 
 
@@ -142,6 +143,10 @@
             grid-template-columns: 1fr 100px 100px;
             gap: 1rem;
         }
+         .module-settings-header {
+             grid-template-columns: 1fr 80px 80px 80px;
+             gap: 1rem;
+         }
         
         .input-row:last-child, .settings-row:last-child, .project-input-row:last-child { border-bottom: none; }
         .input-row:hover, .settings-row:hover, .project-input-row:hover { background-color: rgba(255, 255, 255, 0.03); }
@@ -272,6 +277,7 @@
                 <div id="calculadora" class="tab-content active">
                      <div id="calculator-project-inputs" class="glass-card mb-4"></div>
                     <form id="tags-form" class="glass-card !rounded-t-none">
+                        <div id="modules-fields" class="mb-6"></div>
                         <div class="calc-grid-header">
                             <span>Descrição do Objeto</span>
                             <span class="text-center">Tags</span>
@@ -285,6 +291,7 @@
                 <div id="cadastros" class="tab-content">
                     <div class="glass-card !rounded-t-none">
                          <div id="settings-fields"></div>
+                         <div class="mt-8" id="module-settings-fields"></div>
                          <div class="mt-8" id="license-settings-fields"></div>
                          <div class="mt-8" id="hardware-settings-fields"></div>
                          <div class="flex gap-4 mt-8">
@@ -315,6 +322,7 @@
                             <div class="hardware-item"><span>Computador:</span><span id="computer-name">N/A</span></div>
                             <div class="hardware-item"><span>Telas:</span><span id="screens-desc">N/A</span></div>
                             <div class="hardware-item"><span>Placa de Vídeo Extra:</span><span id="videocard-desc">N/A</span></div>
+                             <div class="hardware-item"><span>Adicional (Módulos):</span><span id="module-hardware-price">R$ 0,00</span></div>
                             <div class="text-right mt-2 pt-2 border-t border-[var(--border-color)]">
                                 <span class="price-value" id="hardware-total-price">R$ 0,00</span>
                             </div>
@@ -433,17 +441,29 @@
                 screens: [
                     { name: '24" Full HD', price: 1500 }, { name: '32" Full HD', price: 2000 }, { name: '40" Full HD', price: 3000 }, { name: '55" Full HD', price: 5000 }
                 ]
+            },
+            modules: {
+                'energia': { label: 'Energia', hardware: 3600, tags: 150, time: 50 },
+                'email': { label: 'Email', hardware: 1200, tags: 200, time: 150 },
+                'app_movel': { label: 'App Movel', hardware: 3500, tags: 50, time: 80 },
+                'indicadores': { label: 'Indicadores Avançados', hardware: 0, tags: 100, time: 220 },
+                'historico': { label: 'Histórico Avançados', hardware: 3000, tags: 200, time: 440 },
+                'erp': { label: 'Integração com ERP', hardware: 10000, tags: 50, time: 600 },
+                'epm': { label: 'EPM Portal Web', hardware: 18000, tags: 500, time: 440 },
+                'manutencao': { label: 'Modulo Manutenção Preditiva', hardware: 0, tags: 500, time: 800 },
+                'pdf': { label: 'Relatorios PDF Personalizados', hardware: 0, tags: 50, time: 100 },
+                'excel': { label: 'Relatorios Excel Personalizados', hardware: 0, tags: 50, time: 100 }
             }
         };
 
         // --- DOM ELEMENTS ---
-        let grandTotalEl, baseTagsEl, reserveTagsEl, totalHoursEl, licenseNameEl, licensePriceEl, servicesPriceEl, projectTotalPriceEl, computerNameEl, screensDescEl, videocardDescEl, hardwareTotalPriceEl, clearButton, tagsForm, calculatorFieldsContainer, settingsFieldsContainer, licenseSettingsContainer, hardwareSettingsContainer, calculatorProjectInputsContainer, saveSettingsButton, restoreDefaultsButton, themeSwitcher, sunIcon, moonIcon, ctx, tagsChart;
+        let grandTotalEl, baseTagsEl, reserveTagsEl, totalHoursEl, licenseNameEl, licensePriceEl, servicesPriceEl, projectTotalPriceEl, computerNameEl, screensDescEl, videocardDescEl, hardwareTotalPriceEl, moduleHardwarePriceEl, clearButton, tagsForm, calculatorFieldsContainer, settingsFieldsContainer, licenseSettingsContainer, hardwareSettingsContainer, moduleSettingsContainer, calculatorProjectInputsContainer, saveSettingsButton, restoreDefaultsButton, themeSwitcher, sunIcon, moonIcon, ctx, tagsChart;
         
         // --- CHART ---
         const chartGroupColors = {
             'Motores': '#3b82f6', 'Instrumentos': '#10b981',
             'Válvulas e Dampers': '#ef4444', 'Configurações e Controles': '#f97316',
-            'Outros Ajustes': '#a855f7'
+            'Outros Ajustes': '#a855f7', 'Módulos Opcionais': '#8b5cf6'
         };
 
         // --- FUNCTIONS ---
@@ -480,6 +500,25 @@
                 html += `</fieldset>`;
             }
             calculatorFieldsContainer.innerHTML = html;
+
+            // Render Modules
+            let moduleHtml = `<fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">Módulos Opcionais</legend>`;
+            for(const key in database.modules) {
+                const module = database.modules[key];
+                 moduleHtml += `<div class="project-input-row">
+                                <label for="module_${key}">${module.label}</label>
+                                <div class="flex justify-center">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="module_${key}" data-module-key="${key}">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                              </div>`;
+            }
+            moduleHtml += `</fieldset>`;
+            document.getElementById('modules-fields').innerHTML = moduleHtml;
+
+
             tagsForm.addEventListener('input', calculateAndDisplayTotals);
         }
         
@@ -520,6 +559,21 @@
                  tagHtml += `</fieldset>`;
             }
             settingsFieldsContainer.innerHTML = tagHtml;
+            
+            // Render Module Settings
+            let moduleHtml = `<div class="settings-grid-header module-settings-header"><span>Módulo Opcional</span><span class="text-center">Hardware (R$)</span><span class="text-center">Tags</span><span class="text-center">Horas</span></div>`;
+            moduleHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Módulos</legend>`;
+            for (const key in database.modules) {
+                const module = database.modules[key];
+                moduleHtml += `<div class="settings-row module-settings-row">
+                                <label for="setting_module_label_${key}">${module.label}</label>
+                                <input type="number" min="0" id="setting_module_hardware_${key}" data-type="modules" data-key="${key}" data-prop="hardware" value="${module.hardware}">
+                                <input type="number" min="0" id="setting_module_tags_${key}" data-type="modules" data-key="${key}" data-prop="tags" value="${module.tags}">
+                                <input type="number" min="0" step="0.1" id="setting_module_time_${key}" data-type="modules" data-key="${key}" data-prop="time" value="${module.time}">
+                               </div>`;
+            }
+            moduleHtml += `</fieldset>`;
+            moduleSettingsContainer.innerHTML = moduleHtml;
 
             // Render License Settings
             let licenseHtml = `<div class="settings-grid-header"><span>Pacote de Licença</span><span class="text-center">Tags</span><span class="text-center">Valor (R$)</span></div>`;
@@ -576,12 +630,12 @@
             const includeComputer = document.getElementById('calc_include_computer')?.checked;
             const screenModelSelect = document.getElementById('calc_screen_model');
 
-
+            // Calculate from core items
             inputs.forEach(input => {
                 let quantity = 0;
-                if(input.type === 'checkbox') {
+                if(input.type === 'checkbox' && !input.id.startsWith('module_')) {
                     quantity = input.checked ? 1 : 0;
-                } else {
+                } else if (input.type === 'number') {
                     quantity = parseFloat(input.value) || 0;
                 }
 
@@ -598,6 +652,23 @@
                         
                         if (!groupTotals[groupLabel]) groupTotals[groupLabel] = 0;
                         groupTotals[groupLabel] += itemTotalTags;
+                    }
+                }
+            });
+            
+            // Calculate from optional modules
+            let modulesHardwareCost = 0;
+            const moduleInputs = document.querySelectorAll('#modules-fields input[type="checkbox"]');
+            moduleInputs.forEach(input => {
+                if (input.checked) {
+                    const moduleKey = input.dataset.moduleKey;
+                    const moduleData = database.modules[moduleKey];
+                    if(moduleData) {
+                        baseTotalTags += moduleData.tags;
+                        totalHours += moduleData.time;
+                        modulesHardwareCost += moduleData.hardware;
+                        if (!groupTotals['Módulos Opcionais']) groupTotals['Módulos Opcionais'] = 0;
+                        groupTotals['Módulos Opcionais'] += moduleData.tags;
                     }
                 }
             });
@@ -634,12 +705,13 @@
                  if (screenModelSelect) screenModelSelect.disabled = true;
             }
 
-            const hardwareTotalCost = computerCost + videoCard.price + screensCost;
+            const hardwareTotalCost = computerCost + videoCard.price + screensCost + modulesHardwareCost;
             
             // Update Hardware Summary
             computerNameEl.textContent = computerNameText;
             screensDescEl.textContent = screensDescText;
             videocardDescEl.textContent = videoCard.name;
+            moduleHardwarePriceEl.textContent = formatCurrency(modulesHardwareCost);
             hardwareTotalPriceEl.textContent = formatCurrency(hardwareTotalCost);
 
             // Calculate License and Final Price
@@ -699,6 +771,17 @@
                 }
             });
             
+             // Save module settings
+            const moduleInputs = moduleSettingsContainer.querySelectorAll('input[type="number"]');
+            moduleInputs.forEach(input => {
+                const key = input.dataset.key;
+                const prop = input.dataset.prop;
+                const newValue = parseFloat(input.value) || 0;
+                if(database.modules[key]){
+                     database.modules[key][prop] = newValue;
+                }
+            });
+
             // Save hardware settings
             const hardwareInputs = hardwareSettingsContainer.querySelectorAll('input[type="number"]');
             hardwareInputs.forEach(input => {
@@ -753,6 +836,9 @@
             }
              if (typeof parsedData.projectSettings.includeComputer === 'undefined') {
                 parsedData.projectSettings.includeComputer = true;
+            }
+             if (!parsedData.modules) {
+                parsedData.modules = JSON.parse(JSON.stringify(defaultDatabase.modules));
             }
             if (!parsedData.tags || !parsedData.licenses) {
                 parsedData = JSON.parse(JSON.stringify(defaultDatabase));
@@ -831,6 +917,7 @@
             screensDescEl = document.getElementById('screens-desc');
             videocardDescEl = document.getElementById('videocard-desc');
             hardwareTotalPriceEl = document.getElementById('hardware-total-price');
+            moduleHardwarePriceEl = document.getElementById('module-hardware-price');
             clearButton = document.getElementById('clear-button');
             tagsForm = document.getElementById('tags-form');
             calculatorFieldsContainer = document.getElementById('calculator-fields');
@@ -838,6 +925,7 @@
             settingsFieldsContainer = document.getElementById('settings-fields');
             licenseSettingsContainer = document.getElementById('license-settings-fields');
             hardwareSettingsContainer = document.getElementById('hardware-settings-fields');
+            moduleSettingsContainer = document.getElementById('module-settings-fields');
             saveSettingsButton = document.getElementById('save-settings-button');
             restoreDefaultsButton = document.getElementById('restore-defaults-button');
             themeSwitcher = document.getElementById('theme-switcher');
