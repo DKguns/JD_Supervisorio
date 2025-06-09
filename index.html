@@ -3,2074 +3,1144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ferramenta de Orçamento Inteligente</title>
+    <title>Ferramenta de Cálculo de Supervisório</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Bento Aurora -->
+    <!-- Application Structure Plan: This version introduces project time estimation. The data structure for each item now includes a 'time' property. The "Cadastros" tab is updated with an input field to edit this time. The summary dashboard now features a new "Bento Grid" card to display the "Total de Horas Estimadas" in real-time. The calculator logic aggregates both tags and time, providing a more comprehensive project estimate. -->
+    <!-- Visualization & Content Choices: Report Info: Project Time -> Goal: Allow user input and display total -> Viz/Method: Added time input fields in the "Cadastros" tab and a new summary card in the dashboard. Justification: This is a major functional enhancement that provides a second key metric for project planning, directly addressing user needs. | Report Info: UI Layout -> Goal: Accommodate new information without clutter -> Viz/Method: The CSS grid for input rows was adjusted to include a new column for time, maintaining a clean and organized layout. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        /* Reset e Estilos Globais */
         :root {
-            /* Tema Claro (Padrão) - Nova Paleta Verde-Azulado */
-            --primary-color-light: #20c997; 
-            --primary-hover-color-light: #1baa80;
-            --primary-darker-light: #17a278; /* Para a barra do título */
-            --secondary-color-light: #6c757d; 
-            --background-color-light: #f4f6f9; /* Fundo geral um pouco mais suave */
-            --surface-color-light: #ffffff; 
-            --text-color-light: #212529; 
-            --text-muted-light: #6c757d; 
-            --border-color-light: #dee2e6; 
-            --fieldset-bg-light: transparent; 
-            --legend-color-light: var(--primary-darker-light); /* Cor do texto do legend */
-            --input-bg-light: var(--surface-color-light);
-            --input-border-focus-light: #52d9b3; /* Tom mais claro do primary para foco */
-            --info-success-bg-light: #d1e7dd;
-            --info-success-text-light: #0f5132;
-            --info-success-border-light: #badbcc;
-            --info-error-bg-light: #f8d7da;
-            --info-error-text-light: #721c24;
-            --info-error-border-light: #f5c6cb;
-            --table-header-bg-light: #e9ecef;
-            --table-row-hover-bg-light: #f1f3f5;
-
-
-            /* Tema Escuro - Nova Paleta Verde */
-            --primary-color-dark: #28a745; 
-            --primary-hover-color-dark: #1f8333;
-            --primary-darker-dark: #196a29; /* Para a barra do título */
-            --secondary-color-dark: #adb5bd; 
-            --background-color-dark: #1c1e22; /* Fundo escuro um pouco diferente */
-            --surface-color-dark: #2a2d30;   
-            --text-color-dark: #f8f9fa;      
-            --text-muted-dark: #adb5bd;
-            --border-color-dark: #45494e;    
-            --fieldset-bg-dark: transparent;
-            --legend-color-dark: var(--primary-darker-dark); /* Cor do texto do legend */
-            --input-bg-dark: #303438;
-            --input-border-focus-dark: #34c759; /* Tom mais claro do primary para foco */
-            --info-success-bg-dark: #143620;
-            --info-success-text-dark: #a3cfbb;
-            --info-success-border-dark: #2f6d42;
-            --info-error-bg-dark: #3e1b1f;
-            --info-error-text-dark: #f1b8bd;
-            --info-error-border-dark: #842029;
-            --table-header-bg-dark: #343a40;
-            --table-row-hover-bg-dark: #3a3f44;
-
-
-            /* Variáveis dinâmicas que mudam com o tema */
-            --primary-color: var(--primary-color-light);
-            --primary-hover-color: var(--primary-hover-color-light);
-            --primary-darker: var(--primary-darker-light);
-            --secondary-color: var(--secondary-color-light);
-            --background-color: var(--background-color-light);
-            --surface-color: var(--surface-color-light);
-            --text-color: var(--text-color-light);
-            --text-muted: var(--text-muted-light);
-            --border-color: var(--border-color-light);
-            --fieldset-bg: var(--fieldset-bg-light);
-            --legend-color: var(--legend-color-light);
-            --input-bg: var(--input-bg-light);
-            --input-border-focus: var(--input-border-focus-light);
-            --info-success-bg: var(--info-success-bg-light);
-            --info-success-text: var(--info-success-text-light);
-            --info-success-border: var(--info-success-border-light);
-            --info-error-bg: var(--info-error-bg-light);
-            --info-error-text: var(--info-error-text-light);
-            --info-error-border: var(--info-error-border-light);
-            --table-header-bg: var(--table-header-bg-light);
-            --table-row-hover-bg: var(--table-row-hover-bg-light);
-
-
-            --font-family: 'Roboto', sans-serif; 
-            --border-radius: 0.3rem; 
-            --box-shadow: 0 3px 5px rgba(0, 0, 0, 0.03); 
+            /* Light Theme */
+            --bg-color: #f4f7f9;
+            --card-bg-color: rgba(255, 255, 255, 0.7);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --accent-color: #14b8a6; /* New Teal Color */
+            --accent-hover: #0d9488;
+            --danger-color: #dc2626;
+            --success-color: #16a34a;
+            --legend-color: var(--text-primary);
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --aurora-start: var(--accent-color);
+            --aurora-end: #2563eb;
+            --select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%234a5568' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            --total-card-bg: var(--accent-color);
+            --total-card-text: #ffffff;
         }
-        
+
         body.dark-theme {
-            --primary-color: var(--primary-color-dark);
-            --primary-hover-color: var(--primary-hover-color-dark);
-            --primary-darker: var(--primary-darker-dark);
-            --secondary-color: var(--secondary-color-dark);
-            --background-color: var(--background-color-dark);
-            --surface-color: var(--surface-color-dark);
-            --text-color: var(--text-color-dark);
-            --text-muted: var(--text-muted-dark);
-            --border-color: var(--border-color-dark);
-            --fieldset-bg: var(--fieldset-bg-dark);
-            --legend-color: var(--legend-color-dark);
-            --input-bg: var(--input-bg-dark);
-            --input-border-focus: var(--input-border-focus-dark);
-            --info-success-bg: var(--info-success-bg-dark);
-            --info-success-text: var(--info-success-text-dark);
-            --info-success-border: var(--info-success-border-dark);
-            --info-error-bg: var(--info-error-bg-dark);
-            --info-error-text: var(--info-error-text-dark);
-            --info-error-border: var(--info-error-border-dark);
-            --table-header-bg: var(--table-header-bg-dark);
-            --table-row-hover-bg: var(--table-row-hover-bg-dark);
+            /* Dark Theme - More Grayscale */
+            --bg-color: #171717;
+            --card-bg-color: rgba(38, 38, 38, 0.6);
+            --border-color: rgba(255, 255, 255, 0.15);
+            --text-primary: #f5f5f5;
+            --text-secondary: #a3a3a3;
+            --accent-color: #e5e5e5;
+            --accent-hover: #ffffff;
+            --danger-color: #ef4444; /* Kept for semantic meaning */
+            --success-color: #22c55e; /* Kept for semantic meaning */
+            --legend-color: var(--text-primary);
+            --input-bg: #262626;
+            --input-border: #525252;
+            --aurora-start: #404040;
+            --aurora-end: #262626;
+            --select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a3a3a3' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            --total-card-bg: var(--accent-color);
+            --total-card-text: #171717;
         }
 
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        @keyframes aurora {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
         body {
-            font-family: var(--font-family);
-            margin: 0;
-            padding: 0;
-            background-color: var(--background-color); 
-            color: var(--text-color);
-            line-height: 1.6;
-            font-size: 16px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        .container {
-            width: 100%; 
-            max-width: 1400px; 
-            margin: 1rem auto; 
-            padding: 1rem; 
-            background-color: transparent; 
-            box-shadow: none;
-            border: none;
-            border-radius: 0;
-            box-sizing: border-box;
-        }
-        body.dark-theme .container {
-           
-        }
-
-        /* Cabeçalhos */
-        h1 {
-            text-align: center;
-            font-size: 2rem; 
-            margin-bottom: 2rem; 
-            font-weight: 500;
-            color: var(--text-color); 
-        }
-        h2 { 
-            font-size: 1.5rem; 
-            margin-bottom: 1.25rem;
-            padding-bottom: 0.6rem;
-            border-bottom: 2px solid var(--primary-color);
-            font-weight: 500;
-            color: var(--primary-color);
-        }
-        h3, h4 { 
-            font-size: 1.25rem; 
-            margin-top: 1rem; 
-            margin-bottom: 0.75rem;
-            font-weight: 500;
-            color: var(--text-color);
-        }
-        h4 {
-           font-size: 1rem;
-           color: var(--text-muted);
-           margin-top: 1.25rem;
-        }
-
-
-        /* Abas */
-        .tab-buttons {
-            display: flex;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .tab-buttons button {
-            background-color: transparent;
-            color: var(--text-muted);
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 0.75rem 1rem; 
-            font-size: 0.95rem; 
-            font-weight: 500;
-            transition: color 0.3s ease, border-bottom-color 0.3s ease;
-            border-bottom: 2px solid transparent; 
-            margin-right: 0.5rem;
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
-        }
-        .tab-buttons button:hover {
-            color: var(--primary-color);
-        }
-        .tab-buttons button.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-        }
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.4s ease-out;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Formulários */
-        fieldset {
-            margin-bottom: 2rem; 
-            padding-top: 0.75rem; 
-            border: 1px solid var(--border-color);
-            border-top: 4px solid var(--primary-darker); 
-            border-radius: var(--border-radius);
-            background-color: var(--surface-color); 
-            position: relative; 
-            box-shadow: var(--box-shadow); 
-            transition: background-color 0.3s ease, border-color 0.3s ease, border-top-color 0.3s ease;
-        }
-        fieldset > div:not(.no-padding), fieldset > form > div:not(.no-padding), fieldset > form > .clp-options-container,
-        fieldset > #motoresAdicionadosContainer, fieldset > #listaKitsCadastrados, .form-row, #instrumentosAdicionadosContainer {
-            padding-left: 1.25rem;
-            padding-right: 1.25rem;
-        }
-        fieldset > :last-child:not(legend) { 
-             padding-bottom: 1.25rem;
-        }
-         fieldset > legend + * { 
-            padding-top: 0.5rem; 
-        }
-
-
-        legend { 
-            font-weight: 500; 
-            font-size: 0.9rem; 
-            padding: 0.3rem 0.8rem; 
-            color: #fff; 
-            background-color: var(--primary-darker); 
-            border-radius: var(--border-radius) var(--border-radius) 0 0; 
-            text-transform: uppercase; 
-            letter-spacing: 0.75px; 
-            display: inline-block; 
-            position: absolute;
-            top: 0; 
-            left: 1rem; 
-            transform: translateY(-50%); 
-            box-shadow: 0 2px 3px rgba(0,0,0,0.07);
-            transition: color 0.3s ease, background-color 0.3s ease;
-        }
-        body.dark-theme legend {
-             background-color: var(--primary-darker);
-             color: var(--text-color-dark);
-        }
-
-        
-        .form-row { 
-            display: flex;
-            flex-wrap: wrap; 
-            gap: 1rem; 
-            margin-bottom: 0.75rem; 
-        }
-        .form-row .form-group {
-            flex: 1; 
-            min-width: 150px; 
-            margin-bottom: 0; 
-        }
-        .form-row .form-group.full-width { 
-            flex-basis: 100%;
-            min-width: 100%;
-        }
-        .form-row .form-group.checkbox-item { 
-            display: flex;
-            align-items: center;
-            flex-basis: auto; 
-            min-width: auto;
-            margin-top: 1.2rem; 
-        }
-         .form-row .form-group.checkbox-item input[type="checkbox"] {
-            margin-right: 0.4rem;
-            transform: scale(0.9);
-        }
-         .form-row .form-group.checkbox-item label {
-            margin-bottom: 0;
-            font-size: 0.85em;
-        }
-
-        /* Grupo de Sensores / Opções de Instrumento */
-        .sensor-group, .instrumento-options-group {
-            flex-basis: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem; 
-            padding: 0.75rem 0; 
-            border-top: 1px dotted var(--border-color);
-            margin-top: 0.5rem;
-        }
-        .sensor-group .checkbox-item, .instrumento-options-group .checkbox-item {
-            margin-top: 0.2rem; 
-            flex-grow: 1;
-        }
-
-
-        .form-row label, 
-        .form-group label { 
-            display: block;
-            margin-bottom: 0.3rem; 
-            font-weight: 400; 
-            color: var(--text-muted); 
-            font-size: 0.875em; 
-        }
-
-        input[type="text"],
-        input[type="number"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 0.6rem 0.75rem; 
-            margin-bottom: 0; 
-            border: 1px solid var(--border-color); 
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            border-radius: var(--border-radius);
-            box-sizing: border-box;
-            font-size: 0.9rem; 
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, color 0.3s ease;
-        }
-        input[type="text"]::placeholder,
-        input[type="number"]::placeholder,
-        textarea::placeholder {
-            color: var(--text-muted);
-            opacity: 0.7;
-        }
-        
-        .clp-options-container { 
-            margin-top: 1rem; 
-            padding-top: 0; 
-        }
-        .clp-options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
-            gap: 0.4rem 1rem;  
-        }
-
-        .form-group-checkbox-horizontal { 
-            display: flex;
-            align-items: center; 
-            margin-bottom: 0.5rem; 
-            flex-wrap: wrap; 
-        }
-
-        .form-group-checkbox-horizontal .checkbox-label-wrapper {
-            display: flex; 
-            align-items: center;
-            margin-right: 0.75rem; 
-            margin-bottom: 0.2rem; 
-        }
-        
-        .form-group-checkbox-horizontal input[type="checkbox"] { 
-            margin-right: 0.4rem;
-            vertical-align: middle;
-            flex-shrink: 0;
-            transform: scale(0.85); 
-            cursor: pointer;
-        }
-        .form-group-checkbox-horizontal .main-checkbox-label { 
-            font-weight: 400; 
-            font-size: 0.875em; 
-            margin-bottom: 0; 
-            cursor: pointer; 
-            color: var(--text-muted); 
-        }
-        
-        .conditional-input { 
-            display: none; 
-            padding: 0; 
-            background-color: transparent; 
-            border: none; 
-            margin-top: 0; 
-            margin-left: 0; 
-            display: flex; 
-            flex-wrap: wrap;
-            gap: 0.5rem; 
-        }
-        
-        .conditional-input .qty-row { 
-            display: flex;
-            align-items: center;
-            margin-bottom: 0;  
-            margin-right: 0.5rem; 
-        }
-         .conditional-input .qty-row:last-child {
-            margin-right: 0;
-        }
-
-
-        .conditional-input .qty-row label { 
-            font-size: 0.8em; 
-            margin-bottom: 0;
-            margin-right: 0.3rem; 
-            flex-shrink: 0; 
-            color: var(--text-muted);
-            text-align: left;
-            font-weight: 400; 
-        }
-         .conditional-input .qty-row label[for="clp_di_safety_qty"],
-         .conditional-input .qty-row label[for="clp_do_safety_qty"] { flex-basis: auto; } 
-         .conditional-input .qty-row label[for="clp_controle_eixo_qty"] { flex-basis: auto; }
-         .conditional-input .qty-row label[for="clp_entrada_rapida_qty"] { flex-basis: auto;}
-         .conditional-input .qty-row label[for="clp_saida_rapida_qty"] { flex-basis: auto;}
-
-
-        .conditional-input .qty-row input[type="number"] { 
-            width: 55px; 
-            padding: 0.3rem; 
-            font-size: 0.8em; 
-            margin-bottom: 0;
-            border: 1px solid var(--border-color); 
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            border-radius: calc(var(--border-radius) - 2px); 
-            box-sizing: border-box;
-        }
-        
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--input-border-focus); 
-            box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb, 32, 201, 151), 0.15); 
-            outline: none;
-        }
-        body.dark-theme input[type="text"]:focus,
-        body.dark-theme input[type="number"]:focus,
-        body.dark-theme select:focus,
-        body.dark-theme textarea:focus {
-             box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb-dark, 40, 167, 69), 0.25); 
-        }
-
-        select {
-            appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236c757d%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 0.65em; 
-            padding-right: 2.25rem;
-        }
-        body.dark-theme select { 
-             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23adb5bd%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-        }
-        textarea {
-            min-height: 80px; 
-            resize: vertical;
-            margin-bottom: 0; 
-        }
-        .form-group { 
-            margin-bottom: 1rem; 
-        }
-
-        /* Seção de Motores e Kits Cadastrados */
-        #motoresAdicionadosContainer, #listaKitsCadastrados, #instrumentosAdicionadosContainer {
-            margin-top: 1.5rem;
-            padding-bottom: 0.5rem; 
-        }
-        .motor-item, .kit-item, .instrumento-item { 
-            background-color: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-left: 3px solid var(--primary-color); 
-            border-radius: var(--border-radius);
-            padding: 0.75rem 1rem;
-            margin-bottom: 0.75rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap; 
-            gap: 0.5rem;
-            font-size: 0.875em; 
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-        .motor-item span, .kit-item-info span, .instrumento-item span { 
-            margin-right: 0.75rem;
-            color: var(--text-muted);
-        }
-        .motor-item strong, .kit-item-info strong, .instrumento-item strong {
-            color: var(--text-color);
-            font-weight: 500;
-        }
-        .motor-item .motor-sensors, .instrumento-item .instrumento-options {
-            flex-basis: 100%;
-            font-size: 0.9em;
-            color: var(--text-muted);
-            margin-top: -0.25rem;
-            padding-left: 0.25rem;
-        }
-        .motor-item .remove-motor-btn, .kit-item .remove-btn, .kit-item .edit-btn, .instrumento-item .remove-instrumento-btn {
-            background-color: transparent;
-            border: 1px solid; 
-            padding: 0.2rem 0.5rem;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 0.8em;
-            margin-left: 0.5rem; 
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-        .motor-item .remove-motor-btn, .kit-item .remove-btn, .instrumento-item .remove-instrumento-btn {
-             color: var(--error-color);
-             border-color: var(--error-color);
-        }
-        .kit-item .edit-btn {
-            color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-         .motor-item .remove-motor-btn:hover, .kit-item .remove-btn:hover, .instrumento-item .remove-instrumento-btn:hover {
-            background-color: var(--error-color);
-            color: #fff;
-        }
-        .kit-item .edit-btn:hover {
-            background-color: var(--primary-color);
-            color: #fff;
-        }
-
-
-        /* Botões */
-        .button-container {
-            text-align: right;
-            margin-top: 1.5rem;
-        }
-        button.button-primary, button.button-gerar, button.button-add, button.button-secondary {
-            color: #fff; 
-            padding: 0.65rem 1.25rem; 
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 0.95rem; 
-            font-weight: 500;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05); 
-        }
-         button.button-primary, button.button-gerar, button.button-add {
-            background-color: var(--primary-color);
-        }
-        button.button-secondary {
-             background-color: var(--secondary-color);
-        }
-
-        button.button-primary:hover, button.button-gerar:hover, button.button-add:hover {
-            background-color: var(--primary-hover-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-        }
-         button.button-secondary:hover {
-            background-color: #5a6268; 
-             box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-        }
-        button.button-primary:active, button.button-gerar:active, button.button-add:active, button.button-secondary:active {
-            transform: translateY(1px);
-            box-shadow: none;
-        }
-        
-        /* Botão de Tema */
-        .theme-switcher {
+        .aurora-background {
             position: fixed;
-            top: 1rem;
-            right: 1rem;
-            background-color: var(--surface-color);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            padding: 0.4rem 0.6rem; 
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            z-index: 1000;
-            font-size: 0.85em; 
-            box-shadow: var(--box-shadow);
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
-        .theme-switcher:hover {
-            background-color: var(--primary-color);
-            color: #fff;
-            border-color: var(--primary-hover-color);
-        }
-
-
-        /* Seção de Resultados e Listas */
-        #resultadoOrcamento, #listaKitsCadastrados {
-            margin-top: 1.5rem;
-            padding: 1.25rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            background-color: var(--surface-color); 
-        }
-        #resultadoOrcamento h3, #listaKitsCadastrados h3 {
-            margin-top: 0;
-            color: var(--primary-color); 
-        }
-        .info-message {
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border-radius: var(--border-radius);
-            font-size: 0.9375rem;
-            border: 1px solid transparent;
-        }
-        .info-message.error {
-            background-color: var(--info-error-bg);
-            color: var(--info-error-text);
-            border-color: var(--info-error-border);
-        }
-        .info-message.success {
-            background-color: var(--info-success-bg);
-            color: var(--info-success-text);
-            border-color: var(--info-success-border);
-        }
-        
-        /* Tabela para Kits de Acionamento Pré-Definidos */
-        .kits-table-container {
-            margin-top: 1rem;
-            overflow-x: auto; 
-        }
-        .kits-table {
+            top: 0;
+            left: 0;
             width: 100%;
-            border-collapse: collapse;
-            font-size: 0.875em;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(125deg, var(--aurora-start), var(--bg-color) 40%, var(--aurora-end));
+            background-size: 200% 200%;
+            animation: aurora 15s ease infinite;
+            opacity: 0.15;
+            transition: background 0.5s ease;
         }
-        .kits-table th, .kits-table td {
-            border: 1px solid var(--border-color);
-            padding: 0.5rem 0.75rem;
-            text-align: left;
-            white-space: nowrap; 
-        }
-        .kits-table th {
-            background-color: var(--table-header-bg);
-            font-weight: 500;
-            color: var(--text-color);
-        }
-        .kits-table tr:hover {
-            background-color: var(--table-row-hover-bg);
-        }
-        .kits-table input[type="number"] {
-            width: 70px; 
-            padding: 0.3rem;
-            font-size: 0.9em;
-        }
-        .kits-table .action-column {
-            width: 80px; 
-            text-align: center;
-        }
-         .kits-table .action-column button {
-            padding: 0.2rem 0.4rem;
-            font-size: 0.8em;
-         }
 
-         /* IO Dashboard Cards */
-         .io-dashboard-grid {
+        .main-container {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .glass-card {
+            background: var(--card-bg-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+        }
+
+        legend {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--legend-color);
+            transition: color 0.5s ease;
+            padding: 0 0.5rem;
+            margin-left: -0.5rem;
+        }
+
+        .input-row, .settings-row, .project-input-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.5s ease;
+        }
+        .input-row { grid-template-columns: 1fr 80px 80px 100px; gap: 1rem; }
+        .settings-row { grid-template-columns: 1fr 100px 100px; gap: 1rem; }
+        .module-settings-row { grid-template-columns: 1fr 80px 80px 80px; gap: 1rem; }
+        .project-input-row { grid-template-columns: 1fr; gap: 0.5rem; }
+        .two-col-row { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .vc-settings-row { grid-template-columns: 1fr 1fr 100px; gap: 1rem; }
+
+
+        .calc-grid-header, .settings-grid-header {
+            display: grid;
+            align-items: center;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.5s ease;
+        }
+        .calc-grid-header {
+            grid-template-columns: 1fr 80px 80px 100px;
             gap: 1rem;
-            margin-bottom: 1rem;
+        }
+        .settings-grid-header {
+            grid-template-columns: 1fr 100px 100px;
+            gap: 1rem;
+        }
+         .module-settings-header {
+             grid-template-columns: 1fr 80px 80px 80px;
+             gap: 1rem;
          }
-         .io-card {
-            background-color: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-left: 4px solid var(--primary-color);
-            border-radius: var(--border-radius);
-            padding: 1rem;
+        
+        .input-row:last-child, .settings-row:last-child, .project-input-row:last-child { border-bottom: none; }
+        .input-row:hover, .settings-row:hover, .project-input-row:hover { background-color: rgba(255, 255, 255, 0.03); }
+        .input-row label, .settings-row label, .project-input-row label { font-size: 0.95rem; color: var(--text-secondary); transition: color 0.5s ease; }
+        .input-row .tags-per-item, .input-row .time-per-item { font-weight: 600; text-align: center; color: var(--accent-color); transition: color 0.5s ease; }
+        
+        input[type="number"], input[type="text"], select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--input-border);
+            border-radius: 0.5rem;
             text-align: center;
-            box-shadow: var(--box-shadow);
-         }
-         .io-card h4 {
-            margin: 0 0 0.5rem 0;
-            font-size: 0.9em;
-            font-weight: 500;
-            color: var(--text-muted);
-         }
-         .io-card .io-count {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-color);
-            display: block;
-         }
-          .io-card .io-source {
-            font-size: 0.75em;
-            color: var(--text-muted);
-            margin: 0.25rem 0 0 0;
-          }
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        select { 
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: var(--select-arrow);
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.25em 1.25em;
+            padding-left: 0.75rem;
+            padding-right: 2.5rem;
+            text-align: left; 
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 25%, transparent);
+        }
 
+        .summary-panel {
+            position: sticky;
+            top: 2rem;
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr 1fr;
+        }
+        #total-card { grid-column: 1 / span 1; }
+        #time-card { grid-column: 2 / span 1; }
+        #hardware-card, #travel-card { grid-column: 1 / -1; }
+        #license-card { grid-column: 1 / -1; }
+        #chart-card { grid-column: 1 / -1; }
+        #actions-card { grid-column: 1 / -1; }
+        
+        .summary-value { font-size: 2.5rem; font-weight: 700; line-height: 1.1; color: var(--text-primary); text-shadow: 0 0 15px color-mix(in srgb, var(--accent-color) 50%, transparent); transition: all 0.5s ease; }
+        .summary-label { display: block; font-size: 0.9rem; color: var(--text-secondary); }
+        .sub-value { font-size: 0.85rem; color: var(--text-secondary); }
+        .license-name { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+        .price-value { font-size: 1.25rem; font-weight: 700; color: var(--success-color); }
+        .project-total-price { font-size: 1.75rem; font-weight: 700; color: var(--total-card-text); }
+        .hardware-item, .travel-item { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 0.25rem 0; }
+        #project-total-card {
+            background-color: var(--total-card-bg);
+            transition: background-color 0.5s ease;
+        }
+        #project-total-card .summary-label {
+            color: var(--total-card-text);
+            opacity: 0.8;
+        }
+        #project-total-card .project-total-price {
+            color: var(--total-card-text);
+        }
 
+        .action-button { width: 100%; padding: 0.75rem; border: none; border-radius: 0.75rem; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .save-button { background-color: var(--success-color); box-shadow: 0 4px 20px -5px color-mix(in srgb, var(--success-color) 40%, transparent); }
+        .clear-button { background-color: var(--danger-color); box-shadow: 0 4px 20px -5px color-mix(in srgb, var(--danger-color) 40%, transparent); }
+        .action-button:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        
+        #chart-container { position: relative; height: 240px; }
+
+        .tab-button { padding: 0.75rem 1.5rem; border: none; background: transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; transition: all 0.3s ease; position: relative; }
+        .tab-button.active { color: var(--text-primary); }
+        .tab-button::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 0; height: 2px; background-color: var(--accent-color); transition: width 0.3s ease; }
+        .tab-button.active::after { width: 40%; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        #theme-switcher {
+            background: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #theme-switcher:hover { transform: scale(1.1); box-shadow: 0 0 15px color-mix(in srgb, var(--accent-color) 30%, transparent); }
+        #theme-switcher svg { width: 1.25rem; height: 1.25rem; color: var(--text-secondary); }
+
+        .main-title {
+            transition: color 0.5s ease;
+        }
+        body:not(.dark-theme) .main-title {
+            background: linear-gradient(to right, #14b8a6, #0f766e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        /* Toggle Switch */
+        .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--input-border); transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--success-color); }
+        input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
-<body>
-    <button class="theme-switcher" id="themeSwitcherButton" onclick="toggleTheme()">Mudar Tema</button>
+<body class="dark-theme">
+    <div class="aurora-background"></div>
+    <div class="main-container">
+        <header class="text-center mb-12 relative">
+            <h1 class="main-title text-5xl font-bold">Ferramenta de Cálculo de Supervisório</h1>
+            <p class="text-lg text-slate-400 mt-4">Estime com precisão as tags, horas e módulos necessários para seu projeto de supervisório.</p>
+            <button id="theme-switcher" class="absolute top-0 right-0">
+                <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>
+                <svg id="moon-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25c0 5.385 4.365 9.75 9.75 9.75 2.572 0 4.92-.99 6.697-2.643z" /></svg>
+            </button>
+        </header>
 
-    <div class="container">
-        <h1>Ferramenta de Orçamento Inteligente</h1>
+        <div class="grid md:grid-cols-3 gap-8 items-start">
+            <main class="md:col-span-2">
+                <div class="tabs mb-2">
+                    <button class="tab-button active" onclick="openTab(event, 'calculadora')">Calculadora</button>
+                    <button class="tab-button" onclick="openTab(event, 'cadastros')">Cadastros</button>
+                </div>
+                
+                <div id="calculadora" class="tab-content active">
+                    <form id="tags-form" class="space-y-4">
+                        <div id="calculator-project-inputs"></div>
+                        <div id="modules-container"></div>
+                        <div id="calculator-fields-container" class="space-y-4"></div>
+                    </form>
+                </div>
 
-        <div class="tab-buttons">
-            <button class="tab-link active" onclick="openTab(event, 'ConfigProjeto')">Configurar Projeto</button>
-            <button class="tab-link" onclick="openTab(event, 'CadastroKits')">Cadastrar Kits</button>
-            <button class="tab-link" onclick="openTab(event, 'OrcamentoDetalhado')">Orçamento Detalhado</button>
+                <div id="cadastros" class="tab-content">
+                    <div class="glass-card !rounded-t-none">
+                         <div id="settings-fields"></div>
+                         <div class="mt-8" id="module-settings-fields"></div>
+                         <div class="mt-8" id="license-settings-fields"></div>
+                         <div class="mt-8" id="hardware-settings-fields"></div>
+                         <div class="flex gap-4 mt-8">
+                            <button id="save-settings-button" class="action-button save-button">Salvar Alterações</button>
+                            <button id="restore-defaults-button" class="action-button clear-button">Restaurar Padrões</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <aside class="md:col-span-1">
+                 <div class="pt-[52px]">
+                    <h2 class="text-xl font-bold mb-2 text-center text-[var(--text-secondary)]">Dashboard</h2>
+                    <div class="summary-panel">
+                        <div id="total-card" class="glass-card text-center">
+                            <span class="summary-label">Total de Tags</span>
+                            <span class="summary-value" id="grand-total">0</span>
+                            <div class="text-sm sub-value mt-1">
+                                <span>Projeto: <span id="base-tags">0</span></span>
+                                <span class="block">Reserva: <span id="reserve-tags">0</span></span>
+                            </div>
+                        </div>
+                        <div id="time-card" class="glass-card text-center">
+                            <span class="summary-label">Total de Horas</span>
+                            <span class="summary-value" id="total-hours">0</span>
+                        </div>
+                        <div id="hardware-card" class="glass-card">
+                             <span class="summary-label text-center">Hardware</span>
+                             <div class="mt-2 space-y-2">
+                                <div class="hardware-item"><span>Computador:</span><span id="computer-name">N/A</span></div>
+                                <div class="hardware-item"><span>Telas:</span><span id="screens-desc">N/A</span></div>
+                                <div class="hardware-item"><span>Placa de Vídeo Extra:</span><span id="videocard-desc">N/A</span></div>
+                                 <div class="hardware-item"><span>Adicional (Módulos):</span><span id="module-hardware-price">R$ 0,00</span></div>
+                                <div class="text-right mt-2 pt-2 border-t border-[var(--border-color)]">
+                                    <span class="price-value" id="hardware-total-price">R$ 0,00</span>
+                                </div>
+                             </div>
+                        </div>
+                        <div id="travel-card" class="glass-card">
+                             <span class="summary-label text-center">Despesas de Viagem</span>
+                             <div class="mt-2 space-y-2">
+                                <div class="travel-item"><span>Deslocamento:</span><span id="travel-cost">R$ 0,00</span></div>
+                                <div class="travel-item"><span>Hospedagem:</span><span id="lodging-cost">R$ 0,00</span></div>
+                                <div class="travel-item"><span>Alimentação:</span><span id="food-cost">R$ 0,00</span></div>
+                                <div class="text-right mt-2 pt-2 border-t border-[var(--border-color)]">
+                                    <span class="price-value" id="travel-total-price">R$ 0,00</span>
+                                </div>
+                             </div>
+                        </div>
+                        <div id="license-card" class="glass-card text-center">
+                            <span class="summary-label">Licença e Serviços</span>
+                            <div class="mt-2">
+                                <span id="license-name" class="license-name">N/A</span>
+                            </div>
+                            <div class="flex justify-around items-center mt-3 text-sm">
+                                <div>
+                                    <span class="summary-label">Licença</span>
+                                    <span id="license-price" class="price-value block">R$ 0,00</span>
+                                </div>
+                                 <div>
+                                    <span class="summary-label">Serviços</span>
+                                    <span id="services-price" class="price-value block">R$ 0,00</span>
+                                </div>
+                            </div>
+                        </div>
+                         <div id="project-total-card" class="glass-card text-center">
+                             <span class="summary-label">Valor Total do Projeto</span>
+                            <span id="project-total-price" class="project-total-price !text-4xl">R$ 0,00</span>
+                        </div>
+                         <div id="chart-card" class="glass-card">
+                             <div id="chart-container"><canvas id="tagsChart"></canvas></div>
+                        </div>
+                        <div id="actions-card" class="glass-card !p-4">
+                            <button id="pdf-button" class="action-button save-button mb-2">Gerar Orçamento em PDF</button>
+                            <button id="clear-button" class="action-button clear-button">Limpar Calculadora</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
         </div>
-
-        <div id="ConfigProjeto" class="tab-content active">
-            <h2>Configuração do Projeto</h2>
-            <form id="formProjeto">
-                <fieldset>
-                    <legend>CLP (Controlador Lógico Programável)</legend>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="clp_marca">Marca:</label>
-                            <select id="clp_marca" name="clp_marca">
-                                <option value="">Selecione a Marca</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="clp_familia">Família:</label>
-                            <select id="clp_familia" name="clp_familia">
-                                <option value="">Selecione primeiro a Marca</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group"> 
-                        <label for="clp_protocolo_inversor">Protocolo Comunicação (Inversores):</label>
-                        <select id="clp_protocolo_inversor" name="clp_protocolo_inversor">
-                            <option value="">Nenhum / Não aplicável</option>
-                            <option value="io_link">IO-Link</option>
-                            <option value="profinet">Profinet</option>
-                            <option value="modbus_rtu">Modbus RTU</option>
-                            <option value="profibus_dp">Profibus DP</option>
-                            <option value="canopen">CANopen</option>
-                            <option value="ethernet_ip">EtherNet/IP</option> 
-                        </select>
-                    </div>
-
-                    <div class="clp-options-container">
-                        <div class="clp-options-grid">
-                            <div class="form-group-checkbox-horizontal">
-                                <div class="checkbox-label-wrapper">
-                                    <input type="checkbox" id="clp_safety" name="clp_safety">
-                                    <label for="clp_safety" class="main-checkbox-label">Safety Integrado</label>
-                                </div>
-                                <div id="clp_safety_qty_div" class="conditional-input">
-                                    <div class="qty-row">
-                                        <label for="clp_di_safety_qty">DI Safety:</label>
-                                        <input type="number" id="clp_di_safety_qty" name="clp_di_safety_qty" min="0" placeholder="Qtd" disabled>
-                                    </div>
-                                    <div class="qty-row">
-                                        <label for="clp_do_safety_qty">DO Safety:</label>
-                                        <input type="number" id="clp_do_safety_qty" name="clp_do_safety_qty" min="0" placeholder="Qtd" disabled>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group-checkbox-horizontal">
-                                <div class="checkbox-label-wrapper">
-                                    <input type="checkbox" id="clp_controle_eixo" name="clp_controle_eixo">
-                                    <label for="clp_controle_eixo" class="main-checkbox-label">Controle de Eixo(s)</label>
-                                </div>
-                                <div id="clp_controle_eixo_qty_div" class="conditional-input">
-                                    <div class="qty-row">
-                                        <label for="clp_controle_eixo_qty">Qtd. Eixos:</label>
-                                        <input type="number" id="clp_controle_eixo_qty" name="clp_controle_eixo_qty" min="0" placeholder="Qtd" disabled>
-                                    </div>
-                                </div>
-                            </div>
-                       
-                            <div class="form-group-checkbox-horizontal">
-                                 <div class="checkbox-label-wrapper">
-                                    <input type="checkbox" id="clp_entrada_rapida" name="clp_entrada_rapida">
-                                    <label for="clp_entrada_rapida" class="main-checkbox-label">Entrada(s) Rápida(s)</label>
-                                </div>
-                                <div id="clp_entrada_rapida_qty_div" class="conditional-input">
-                                    <div class="qty-row">
-                                        <label for="clp_entrada_rapida_qty">Qtd. Ent. Rápidas:</label>
-                                        <input type="number" id="clp_entrada_rapida_qty" name="clp_entrada_rapida_qty" min="0" placeholder="Qtd" disabled>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group-checkbox-horizontal">
-                                <div class="checkbox-label-wrapper">
-                                    <input type="checkbox" id="clp_saida_rapida" name="clp_saida_rapida">
-                                    <label for="clp_saida_rapida" class="main-checkbox-label">Saída(s) Rápida(s)</label>
-                                </div>
-                                <div id="clp_saida_rapida_qty_div" class="conditional-input">
-                                   <div class="qty-row">
-                                        <label for="clp_saida_rapida_qty">Qtd. Saí. Rápidas:</label>
-                                        <input type="number" id="clp_saida_rapida_qty" name="clp_saida_rapida_qty" min="0" placeholder="Qtd" disabled>
-                                   </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend>IHM (Interface Homem-Máquina)</legend>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="ihm_marca">Marca:</label>
-                            <select id="ihm_marca" name="ihm_marca">
-                                <option value="">Selecione a Marca</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="ihm_familia">Família:</label>
-                            <select id="ihm_familia" name="ihm_familia">
-                                <option value="">Selecione primeiro a Marca</option>
-                            </select>
-                        </div>
-                    </div>
-                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="ihm_polegadas">Polegadas:</label>
-                            <select id="ihm_polegadas" name="ihm_polegadas">
-                                <option value="">Selecione</option>
-                                <option value="4">4"</option>
-                                <option value="7">7"</option>
-                                <option value="9">9"</option>
-                                <option value="10">10"</option>
-                                <option value="12">12"</option>
-                                <option value="15">15"</option>
-                                <option value="outro">Outro</option>
-                            </select>
-                        </div>
-                        <div class="form-group checkbox-item">
-                            <input type="checkbox" id="ihm_espelhamento" name="ihm_espelhamento">
-                            <label for="ihm_espelhamento">Com Espelhamento</label>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend>Acionamentos (Motores)</legend>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="motor_nome">Nome do Motor:</label>
-                            <input type="text" id="motor_nome" name="motor_nome" placeholder="Ex: Bomba Principal">
-                        </div>
-                        <div class="form-group">
-                            <label for="motor_tag">TAG:</label>
-                            <input type="text" id="motor_tag" name="motor_tag" placeholder="Ex: MTR-001">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="motor_cv">Potência (CV):</label>
-                            <select id="motor_cv" name="motor_cv">
-                                </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="motor_tensao">Tensão:</label>
-                             <select id="motor_tensao" name="motor_tensao">
-                                <option value="220_tri">220V Trifásico</option>
-                                <option value="380_tri">380V Trifásico</option>
-                                <option value="440_tri">440V Trifásico</option>
-                            </select>
-                        </div>
-                         <div class="form-group">
-                            <label for="motor_tipo_acionamento">Tipo de Acionamento:</label>
-                            <select id="motor_tipo_acionamento" name="motor_tipo_acionamento">
-                                <option value="partida_direta">Partida Direta</option>
-                                <option value="softstarter">Softstarter</option>
-                                <option value="inversor">Inversor de Frequência</option>
-                            </select>
-                        </div>
-                        <div class="form-group checkbox-item">
-                            <input type="checkbox" id="motor_reversao" name="motor_reversao">
-                            <label for="motor_reversao">Com Reversão</label>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="sensor-group">
-                             <div class="form-group checkbox-item">
-                                <input type="checkbox" id="motor_sensor_embuchamento" name="motor_sensor_embuchamento">
-                                <label for="motor_sensor_embuchamento">Fim de Curso Embuchamento (1 DI)</label>
-                            </div>
-                             <div class="form-group checkbox-item">
-                                <input type="checkbox" id="motor_sensor_velocidade" name="motor_sensor_velocidade">
-                                <label for="motor_sensor_velocidade">Vigia de Velocidade (1 DI)</label>
-                            </div>
-                             <div class="form-group checkbox-item">
-                                <input type="checkbox" id="motor_sensor_fca_fcr" name="motor_sensor_fca_fcr">
-                                <label for="motor_sensor_fca_fcr">Fins de Curso Avanço/Retorno (2 DI)</label>
-                            </div>
-                             <div class="form-group checkbox-item">
-                                <input type="checkbox" id="motor_atuador_solenoide" name="motor_atuador_solenoide">
-                                <label for="motor_atuador_solenoide">Bobinas Solenoides Avanço/Retorno (2 DO)</label>
-                            </div>
-                        </div>
-                    </div>
-                     <div class="button-container" style="text-align: left; margin-bottom: 1rem; margin-top:0.5rem; padding-left: 1.25rem;">
-                        <button type="button" class="button-add" onclick="adicionarMotor()">Adicionar Motor</button>
-                    </div>
-
-                    <div id="motoresAdicionadosContainer">
-                        <h4>Motores Configurados:</h4>
-                        <div id="listaMotores">
-                            <p>Nenhum motor adicionado ainda.</p>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend>Instrumentos</legend>
-                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="instrumento_tipo_medicao">Tipo de Medição:</label>
-                            <select id="instrumento_tipo_medicao" name="instrumento_tipo_medicao">
-                                <option value="">Selecione o Tipo</option>
-                                <option value="temperatura">Temperatura</option>
-                                <option value="pressao">Pressão</option>
-                                <option value="depressao">Depressão</option>
-                                <option value="nivel">Nível</option>
-                                <option value="vazao">Vazão</option>
-                                <option value="umidade">Umidade</option>
-                                <option value="analisador">Analisador</option>
-                                <option value="outro">Outro</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="instrumento_tag">TAG do Instrumento:</label>
-                            <input type="text" id="instrumento_tag" name="instrumento_tag" placeholder="Ex: TT-101, PT-205">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                         <div class="form-group">
-                            <label for="instrumento_sinal">Tipo de Sinal:</label>
-                            <select id="instrumento_sinal" name="instrumento_sinal">
-                                <option value="">Selecione o Sinal</option>
-                                <option value="4_20ma">4-20 mA</option>
-                                <option value="0_10v">0-10 V</option>
-                                <option value="pt100">PT100</option>
-                                <option value="termo_j">Termopar Tipo J</option>
-                                <option value="termo_k">Termopar Tipo K</option>
-                                <option value="digital_npn">Digital NPN</option>
-                                <option value="digital_pnp">Digital PNP</option>
-                                <option value="pulso">Pulso</option>
-                                <option value="outro_sinal">Outro</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="instrumento-options-group">
-                            <div class="form-group checkbox-item">
-                                <input type="checkbox" id="instrumento_malha_pi" name="instrumento_malha_pi">
-                                <label for="instrumento_malha_pi">Malha de Controle PI</label>
-                            </div>
-                            <div class="form-group checkbox-item">
-                                <input type="checkbox" id="instrumento_alarme_baixo" name="instrumento_alarme_baixo">
-                                <label for="instrumento_alarme_baixo">Alarme Baixo (1 DI)</label>
-                            </div>
-                            <div class="form-group checkbox-item">
-                                <input type="checkbox" id="instrumento_alarme_alto" name="instrumento_alarme_alto">
-                                <label for="instrumento_alarme_alto">Alarme Alto (1 DI)</label>
-                            </div>
-                        </div>
-                    </div>
-                     <div class="button-container" style="text-align: left; margin-bottom: 1rem; margin-top:0.5rem; padding-left: 1.25rem;">
-                        <button type="button" class="button-add" onclick="adicionarInstrumento()">Adicionar Instrumento</button>
-                    </div>
-                     <div id="instrumentosAdicionadosContainer">
-                        <h4>Instrumentos Configurados:</h4>
-                        <div id="listaInstrumentos">
-                            <p>Nenhum instrumento adicionado ainda.</p>
-                        </div>
-                    </div>
-                </fieldset>
-                 <div class="button-container" style="margin-top: 2rem;">
-                    <button type="button" class="button-gerar" onclick="gerarOrcamento()">
-                        Gerar Orçamento
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <div id="CadastroKits" class="tab-content">
-            <h2>Cadastro de Kits</h2>
-            <fieldset>
-                <legend>Kits Genéricos</legend>
-                <form id="formCadastroKit">
-                     <input type="hidden" id="kit_id_edicao" value=""> 
-                    <div class="form-group">
-                        <label for="kit_tipo">Tipo de Componente:</label>
-                        <select id="kit_tipo" name="kit_tipo">
-                            <option value="geral">Geral / Outro</option>
-                            <option value="instrumento">Instrumento</option>
-                            <option value="material_montagem">Material de Montagem</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="kit_nome">Nome/Modelo do Kit:</label>
-                        <input type="text" id="kit_nome" name="kit_nome" placeholder="Ex: Sensor de Nível Ultrassônico, Cabo de Comando" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="kit_descricao">Descrição (Opcional):</label>
-                        <textarea id="kit_descricao" name="kit_descricao" rows="2" placeholder="Detalhes do kit, especificações..."></textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="kit_valor">Valor (R$):</label>
-                            <input type="number" id="kit_valor" name="kit_valor" placeholder="0.00" step="0.01" min="0" required>
-                        </div>
-                         <div class="form-group">
-                            <label for="kit_icms">ICMS (%):</label>
-                            <input type="number" id="kit_icms" name="kit_icms" placeholder="0" step="0.01" min="0" max="100">
-                        </div>
-                        <div class="form-group">
-                            <label for="kit_ipi">IPI (%):</label>
-                            <input type="number" id="kit_ipi" name="kit_ipi" placeholder="0" step="0.01" min="0" max="100">
-                        </div>
-                        <div class="form-group">
-                            <label for="kit_tempo_montagem">Tempo de Montagem (h):</label>
-                            <input type="number" id="kit_tempo_montagem" name="kit_tempo_montagem" placeholder="0" step="0.1" min="0">
-                        </div>
-                    </div>
-                    <div class="button-container">
-                         <button type="button" class="button-primary" id="btnSalvarKit" onclick="salvarKit()">
-                            Adicionar Kit Genérico
-                        </button>
-                         <button type="button" class="button-secondary" id="btnCancelarEdicaoKit" onclick="cancelarEdicaoKit()" style="display:none; margin-right: 0.5rem;">
-                            Cancelar
-                        </button>
-                    </div>
-                </form>
-            </fieldset>
-
-            <fieldset class="no-padding"> 
-                <legend>Acionamentos de Motores (Kits Pré-Definidos)</legend>
-                <div id="kitsAcionamentoContainer" class="kits-table-container">
-                    <table class="kits-table" id="tabelaKitsAcionamento">
-                        <thead>
-                            <tr>
-                                <th>Tipo Acionamento</th>
-                                <th>Potência (CV)</th>
-                                <th>Tensão</th>
-                                <th>Valor Base (R$)</th>
-                                <th>ICMS (%)</th>
-                                <th>IPI (%)</th>
-                                <th>Tempo Mont. (h)</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                     <div class="button-container" style="padding: 0 1.25rem 1.25rem;"> <button type="button" class="button-primary" onclick="salvarAlteracoesKits('Acionamento')">Salvar Alterações nos Acionamentos</button>
-                    </div>
-                </div>
-            </fieldset>
-
-             <fieldset class="no-padding"> 
-                <legend>CLPs (Kits Pré-Definidos)</legend>
-                <div id="kitsClpContainer" class="kits-table-container">
-                    <table class="kits-table" id="tabelaKitsClp">
-                        <thead>
-                            <tr>
-                                <th>Marca</th>
-                                <th>Família</th>
-                                <th>Valor Base (R$)</th>
-                                <th>ICMS (%)</th>
-                                <th>IPI (%)</th>
-                                <th>Tempo Mont. (h)</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                     <div class="button-container" style="padding: 0 1.25rem 1.25rem;"> <button type="button" class="button-primary" onclick="salvarAlteracoesKits('CLP')">Salvar Alterações nos CLPs</button>
-                    </div>
-                </div>
-            </fieldset>
-
-            <fieldset class="no-padding"> 
-                <legend>IHMs (Kits Pré-Definidos)</legend>
-                <div id="kitsIhmContainer" class="kits-table-container">
-                    <table class="kits-table" id="tabelaKitsIhm">
-                        <thead>
-                            <tr>
-                                <th>Marca</th>
-                                <th>Família</th>
-                                <th>Polegadas</th>
-                                <th>Valor Base (R$)</th>
-                                <th>ICMS (%)</th>
-                                <th>IPI (%)</th>
-                                <th>Tempo Mont. (h)</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                     <div class="button-container" style="padding: 0 1.25rem 1.25rem;"> <button type="button" class="button-primary" onclick="salvarAlteracoesKits('IHM')">Salvar Alterações nas IHMs</button>
-                    </div>
-                </div>
-            </fieldset>
-            
-            <fieldset class="no-padding"> 
-                <legend>Cartões de I/O (Kits Pré-Definidos)</legend>
-                <div id="kitsIoContainer" class="kits-table-container">
-                    <table class="kits-table" id="tabelaKitsIo">
-                        <thead>
-                            <tr>
-                                <th>Tipo de Cartão</th>
-                                <th>Pontos</th>
-                                <th>Valor Base (R$)</th>
-                                <th>ICMS (%)</th>
-                                <th>IPI (%)</th>
-                                <th>Tempo Mont. (h)</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                     <div class="button-container" style="padding: 0 1.25rem 1.25rem;"> <button type="button" class="button-primary" onclick="salvarAlteracoesKits('IO')">Salvar Alterações nos Cartões de I/O</button>
-                    </div>
-                </div>
-            </fieldset>
-
-            <fieldset>
-                <legend>Outros Kits Cadastrados</legend>
-                <div id="listaKitsCadastrados">
-                    <h3>Kits Genéricos/Outros:</h3>
-                    <div id="kitsListContainer">
-                        <p>Nenhum kit genérico cadastrado ainda.</p>
-                    </div>
-                </div>
-            </fieldset>
-        </div>
-        
-        <div id="OrcamentoDetalhado" class="tab-content">
-            <h2>Orçamento Detalhado</h2>
-            <div class="form-group">
-                 <label for="valor_hora_montagem">Valor Hora Montagem (R$):</label>
-                 <input type="number" id="valor_hora_montagem" name="valor_hora_montagem" value="75.00" step="0.01" min="0" onchange="gerarOrcamento()">
-            </div>
-            <div id="resultadoOrcamentoContainer">
-                 <div id="resultadoOrcamento">
-                    <p>Configure o projeto e os motores, depois clique em "Gerar Orçamento" na aba "Configurar Projeto" para ver os resultados aqui.</p>
-                </div>
-            </div>
-            <fieldset>
-                <legend>Relatório de I/Os</legend>
-                 <div class="io-dashboard-grid">
-                    <div class="io-card">
-                        <h4>Entradas Digitais (DI)</h4>
-                        <span class="io-count" id="total_di_count">0</span>
-                        <p class="io-source">Motores & Instrumentos</p>
-                    </div>
-                    <div class="io-card">
-                        <h4>Saídas Digitais (DO)</h4>
-                        <span class="io-count" id="total_do_count">0</span>
-                        <p class="io-source">Motores & Instrumentos</p>
-                    </div>
-                    <div class="io-card">
-                        <h4>Entradas Analógicas (AI)</h4>
-                        <span class="io-count" id="total_ai_count">0</span>
-                        <p class="io-source">Motores & Instrumentos</p>
-                    </div>
-                    <div class="io-card">
-                        <h4>Saídas Analógicas (AO)</h4>
-                        <span class="io-count" id="total_ao_count">0</span>
-                        <p class="io-source">Motores & Instrumentos</p>
-                    </div>
-                </div>
-                <div class="form-group"> 
-                    <label for="relatorio_ios_base">Outras I/Os / Observações Manuais:</label>
-                    <textarea id="relatorio_ios_base" name="relatorio_ios_base" rows="4" placeholder="Descreva outras I/Os ou observações..."></textarea>
-                </div>
-            </fieldset>
-        </div>
-
+        <footer class="text-center mt-12 text-sm text-[var(--text-secondary)]">
+            <p>Versão 12.0 - by Diego Karloh</p>
+        </footer>
     </div>
 
     <script>
-        // --- Lógica das Abas ---
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-                tabcontent[i].classList.remove("active");
-            }
-            tablinks = document.getElementsByClassName("tab-link");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            const currentTab = document.getElementById(tabName);
-            if (currentTab) {
-                 currentTab.style.display = "block";
-                 currentTab.classList.add("active");
-            }
-            if (evt && evt.currentTarget) {
-                evt.currentTarget.className += " active";
-            }
-        }
+        // --- DATA ---
+        let database = {};
 
-        // --- Dados e Lógica para Selects Dinâmicos (Configuração do Projeto) ---
-        const dadosMarcasFamilias = {
-            clp: {
-                "Siemens": ["S7-1200", "S7-1500", "S7-300", "LOGO!"],
-                "Rockwell": ["MicroLogix", "CompactLogix", "ControlLogix", "SLC 500"],
-                "Schneider": ["Modicon M221", "Modicon M241", "Modicon M251", "Modicon M340"],
-                "WEG": ["CLIC-02", "PLC300", "PLC400"],
-                "Delta": ["DVP Series", "AS Series", "AH Series"]
+        const defaultDatabase = {
+            projectSettings: {
+                companyName: '',
+                projectName: '',
+                city: '',
+                state: '',
+                distance: 0,
+                lodgingCount: 0,
+                foodDays: 0,
+                kmPrice: 0.75,
+                lodgingPrice: 350,
+                foodPrice: 100,
+                reservePercentage: 10,
+                screenCount: 0,
+                screenModelIndex: 0,
+                hourPrice: 150,
+                includeComputer: false,
             },
-            ihm: {
-                "Siemens": ["Basic Panels", "Comfort Panels", "Mobile Panels"],
-                "Rockwell": ["PanelView 5000", "PanelView Plus", "VersaView"],
-                "Schneider": ["Magelis STO/STU", "Magelis GTO", "Magelis Easy GXU"],
-                "WEG": ["MT600iE Series", "MT800iE Series", "cMT Series"],
-                "Pro-face": ["GP4000 Series", "SP5000 Series", "LT4000M Series"]
+            tags: {
+                'motores': {
+                    label: 'Motores',
+                    items: {
+                        'motor_hidr_inversor': { label: 'Motor c/ unid. hidráulica e inversor', tags: 24, time: 2.5 },
+                        'motor_hidr_direta': { label: 'Motor c/ unid. hidráulica e partida direta', tags: 22, time: 2 },
+                        'motor_direta_sensor': { label: 'Motor c/ partida direta e sensor', tags: 18, time: 1.5 },
+                        'motor_direta_simples': { label: 'Motor com partida direta simples', tags: 17, time: 1 },
+                        'motor_inversor_simples': { label: 'Motor com partida inversor simples', tags: 20, time: 1.5 },
+                        'motor_inversor_reversao': { label: 'Motor c/ partida inversor e reversão', tags: 21, time: 2 }
+                    }
+                },
+                'instrumentos': {
+                    label: 'Instrumentos',
+                    items: {
+                        'instr_digital': { label: 'Instrumentação Digital', tags: 2, time: 0.25 },
+                        'instr_analogico': { label: 'Instrumentação Analógica', tags: 4, time: 0.5 }
+                    }
+                },
+                'valvulas': {
+                    label: 'Válvulas e Dampers',
+                    items: {
+                        'valvula_descarga_fundo': { label: 'Válvula descarga fundo', tags: 4, time: 0.75 },
+                        'sensor_valvula_incendio': { label: 'Config. por sensor válvula incêndio', tags: 3, time: 1 },
+                        'damper': { label: 'Damper', tags: 4, time: 0.5 },
+                        'valvulas_geral': { label: 'Válvulas (Geral)', tags: 4, time: 0.5 }
+                    }
+                },
+                'controles': {
+                    label: 'Configurações e Controles',
+                    items: {
+                        'cfg_descarga_fundo': { label: 'Config. padrão válvula descarga', tags: 10, time: 2, max: 1 },
+                        'cfg_soprador_fuligem': { label: 'Config. padrão soprador de fuligem', tags: 6, time: 3, max: 1 },
+                        'cfg_valvula_incendio': { label: 'Config. padrão válvula incêndio', tags: 3, time: 2, max: 1 },
+                        'cfg_controle_2_elementos': { label: 'Controle dois elementos', tags: 9, time: 4, max: 1 },
+                        'cfg_valvula_modulante': { label: 'Válvula modulante nível (PID)', tags: 16, time: 3, max: 1 },
+                        'cfg_pi_exaustor': { label: 'Configurações PI exaustor', tags: 12, time: 2.5, max: 1 },
+                        'cfg_pi_combustao': { label: 'Configurações PI combustão', tags: 14, time: 2.5, max: 1 },
+                        'cfg_acendimento_auto': { label: 'Acendimento Automático', tags: 42, time: 8, max: 1 },
+                        'cfg_silo_cavaco': { label: 'Operação silo Cavaco', tags: 10, time: 4, max: 1 }
+                    }
+                },
+                'ajustes': {
+                    label: 'Outros Ajustes',
+                    items: {
+                        'ajuste_alarme': { label: 'Configurações alarme', tags: 5, time: 1 },
+                        'ajuste_receitas': { label: 'Ajuste padrão (nº de receitas)', tags: 4, time: 1.5 },
+                        'ajuste_motores_receita': { label: 'Motores que fazem parte da receita', tags: 3, time: 0.5 },
+                        'ajuste_partida_direta': { label: 'Nº de partidas direta (Dados Placa)', tags: 3, time: 0.25 },
+                        'ajuste_unid_hidraulica': { label: 'Nº de partidas com unid. hidráulica', tags: 10, time: 0.5 },
+                        'ajuste_patio_movel': { label: 'Configurações pátio móvel', tags: 3, time: 2 },
+                        'tags_adicionais': { label: 'Tags Adicionais', tags: 1, time: 0.1 }
+                    }
+                }
+            },
+            licenses: {
+                'Lite': [ { tags: 100, price: 2000 }, { tags: 250, price: 3500 }, { tags: 500, price: 5500 }, { tags: 750, price: 6500 }, { tags: 950, price: 8000 } ],
+                'Server': [ { tags: 1000, price: 16000 }, { tags: 2500, price: 22000 }, { tags: 5000, price: 32000 }, { tags: 10000, price: 45000 } ]
+            },
+            hardware: {
+                computers: [
+                    { name: 'PC Básico (i5)', spec: 'I5, 16GB RAM, SSD 512GB + 1TB HDD', tagsLimit: 750, screenLimit: 2, price: 7500 },
+                    { name: 'PC Avançado (i7)', spec: 'I7, 32GB RAM, SSD 512GB + 2TB HDD', tagsLimit: Infinity, screenLimit: Infinity, price: 13500 }
+                ],
+                videoCards: [
+                    { name: "Placa 4 Saídas", screens: 4, price: 6500 }, { name: "Placa 6 Saídas", screens: 6, price: 10500 }, { name: "Placa 8 Saídas", screens: 8, price: 22000 }, { name: "Placa 10 Saídas", screens: 10, price: 35000 }
+                ],
+                screens: [
+                    { name: '24" Full HD', price: 1500 }, { name: '32" Full HD', price: 2000 }, { name: '40" Full HD', price: 3000 }, { name: '55" Full HD', price: 5000 }
+                ]
+            },
+            modules: {
+                'energia': { label: 'Energia', hardware: 3600, tags: 150, time: 50 },
+                'email': { label: 'Email', hardware: 1200, tags: 200, time: 150 },
+                'app_movel': { label: 'App Movel', hardware: 3500, tags: 50, time: 80 },
+                'indicadores': { label: 'Indicadores Avançados', hardware: 0, tags: 100, time: 220 },
+                'historico': { label: 'Histórico Avançados', hardware: 3000, tags: 200, time: 440 },
+                'erp': { label: 'Integração com ERP', hardware: 10000, tags: 50, time: 600 },
+                'epm': { label: 'EPM Portal Web', hardware: 18000, tags: 500, time: 440 },
+                'manutencao': { label: 'Modulo Manutenção Preditiva', hardware: 0, tags: 500, time: 800 },
+                'pdf': { label: 'Relatorios PDF Personalizados', hardware: 0, tags: 50, time: 100 },
+                'excel': { label: 'Relatorios Excel Personalizados', hardware: 0, tags: 50, time: 100 }
             }
         };
-        const potenciasCV = ["0.75", "1", "1.5", "2", "3", "5", "7.5", "10", "15", "20", "25", "30", "40", "50", "60", "75", "100"];
-        const tensoesMotor = [
-            { value: "220_tri", text: "220V Trifásico" },
-            { value: "380_tri", text: "380V Trifásico" },
-            { value: "440_tri", text: "440V Trifásico" }
-        ];
-        const polegadasIHM = ["4", "7", "9", "10", "12", "15"];
 
+        // --- DOM ELEMENTS ---
+        let grandTotalEl, baseTagsEl, reserveTagsEl, totalHoursEl, licenseNameEl, licensePriceEl, servicesPriceEl, projectTotalPriceEl, computerNameEl, screensDescEl, videocardDescEl, hardwareTotalPriceEl, moduleHardwarePriceEl, travelCostEl, lodgingCostEl, foodCostEl, travelTotalPriceEl, clearButton, pdfButton, tagsForm, calculatorFieldsContainer, settingsFieldsContainer, licenseSettingsContainer, hardwareSettingsContainer, moduleSettingsContainer, calculatorProjectInputsContainer, saveSettingsButton, restoreDefaultsButton, themeSwitcher, sunIcon, moonIcon, ctx, tagsChart, modulesContainer;
+        
+        // --- CHART ---
+        const chartGroupColors = {
+            'Motores': '#3b82f6', 'Instrumentos': '#10b981',
+            'Válvulas e Dampers': '#ef4444', 'Configurações e Controles': '#f97316',
+            'Outros Ajustes': '#a855f7', 'Módulos Opcionais': '#8b5cf6'
+        };
 
-        function popularSelectPotencia(selectId){
-            const select = document.getElementById(selectId);
-            if(!select) return;
-            const firstOptionIsPlaceholder = select.options[0] && select.options[0].value === "";
-            select.innerHTML = firstOptionIsPlaceholder ? `<option value="">${select.options[0].textContent}</option>` : '';
-
-            potenciasCV.forEach(cv => {
-                const option = document.createElement('option');
-                option.value = cv;
-                option.textContent = cv + " CV";
-                select.appendChild(option);
-            });
-        }
-
-
-        function popularMarcas(tipoComponente, selectId) {
-            const selectMarca = document.getElementById(selectId);
-            if (!selectMarca) return;
-            selectMarca.innerHTML = '<option value="">Selecione a Marca</option>';
-            const marcas = Object.keys(dadosMarcasFamilias[tipoComponente] || {});
-            marcas.forEach(marca => {
-                const option = document.createElement('option');
-                option.value = marca;
-                option.textContent = marca;
-                selectMarca.appendChild(option);
-            });
-        }
-
-        function popularFamilias(tipoComponente, marcaSelecionada, selectFamiliaId) {
-            const selectFamilia = document.getElementById(selectFamiliaId);
-            if (!selectFamilia) return;
-            selectFamilia.innerHTML = '<option value="">Selecione primeiro a Marca</option>';
-            if (marcaSelecionada && dadosMarcasFamilias[tipoComponente] && dadosMarcasFamilias[tipoComponente][marcaSelecionada]) {
-                selectFamilia.innerHTML = '<option value="">Selecione a Família</option>';
-                const familias = dadosMarcasFamilias[tipoComponente][marcaSelecionada];
-                familias.forEach(familia => {
-                    const option = document.createElement('option');
-                    option.value = familia;
-                    option.textContent = familia;
-                    selectFamilia.appendChild(option);
-                });
-            }
-        }
-
-        // --- Lógica para Checkboxes Condicionais CLP ---
-        function setupConditionalInput(checkboxId, inputDivId) {
-            const checkbox = document.getElementById(checkboxId);
-            const inputDiv = document.getElementById(inputDivId);
-            if (checkbox && inputDiv) {
-                const inputFields = inputDiv.querySelectorAll('input[type="number"]');
-
-                const updateState = () => {
-                    const isChecked = checkbox.checked;
-                    inputDiv.style.display = isChecked ? 'flex' : 'none';
-                    inputFields.forEach(field => {
-                        field.disabled = !isChecked;
-                        if (!isChecked) {
-                            field.value = '';
-                        }
-                    });
-                };
-                
-                updateState(); 
-                
-                checkbox.addEventListener('change', updateState);
-                 
-                const label = document.querySelector(`label[for="${checkboxId}"]`);
-                if (label) {
-                    label.addEventListener('click', function(event) {
-                        if(event.target === label) { 
-                            checkbox.checked = !checkbox.checked;
-                            const changeEvent = new Event('change', { bubbles: true });
-                            checkbox.dispatchEvent(changeEvent);
-                        }
-                    });
-                }
-            }
+        // --- FUNCTIONS ---
+        function openTab(evt, tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            if(evt) evt.currentTarget.classList.add('active');
+            else document.querySelector(`[onclick="openTab(event, '${tabName}')"]`).classList.add('active');
         }
         
-        // --- Lógica para Acionamentos (Motores) ---
-        let motoresConfigurados = [];
-        let proximoMotorId = 0;
-
-        function adicionarMotor() {
-            const nome = document.getElementById('motor_nome').value.trim();
-            const tag = document.getElementById('motor_tag').value.trim();
-            const cv = document.getElementById('motor_cv').value;
-            const tensao = document.getElementById('motor_tensao').value;
-            const tipoAcionamento = document.getElementById('motor_tipo_acionamento').value;
-            const reversao = document.getElementById('motor_reversao').checked;
-            const sensorEmbuchamento = document.getElementById('motor_sensor_embuchamento').checked;
-            const sensorVelocidade = document.getElementById('motor_sensor_velocidade').checked;
-            const sensorFcaFcr = document.getElementById('motor_sensor_fca_fcr').checked;
-            const atuadorSolenoide = document.getElementById('motor_atuador_solenoide').checked;
-
-            if (!nome || !tag ) { 
-                exibirMensagemTemporaria("Preencha Nome e TAG do motor.", "error", document.getElementById('formProjeto').querySelector('fieldset legend:contains("Acionamentos")').closest('fieldset')); 
-                return;
-            }
-
-            const motor = { id: proximoMotorId++, nome, tag, cv, tensao, tipoAcionamento, reversao, sensorEmbuchamento, sensorVelocidade, sensorFcaFcr, atuadorSolenoide };
-            motoresConfigurados.push(motor);
-            renderizarMotores();
-            atualizarDashboardIOs();
-            
-            document.getElementById('motor_nome').value = '';
-            document.getElementById('motor_tag').value = '';
-            document.getElementById('motor_cv').value = '0.75'; 
-            document.getElementById('motor_tensao').value = '220_tri';
-            document.getElementById('motor_tipo_acionamento').value = 'partida_direta';
-            document.getElementById('motor_reversao').checked = false;
-            document.getElementById('motor_sensor_embuchamento').checked = false;
-            document.getElementById('motor_sensor_velocidade').checked = false;
-            document.getElementById('motor_sensor_fca_fcr').checked = false;
-            document.getElementById('motor_atuador_solenoide').checked = false;
-            document.getElementById('motor_nome').focus();
-            exibirMensagemTemporaria("Motor adicionado!", "success", "motoresAdicionadosContainer");
-        }
-
-        function removerMotor(id) {
-            motoresConfigurados = motoresConfigurados.filter(motor => motor.id !== id);
-            renderizarMotores();
-            atualizarDashboardIOs();
-        }
-
-        function renderizarMotores() {
-            const listaMotoresDiv = document.getElementById('listaMotores');
-            if (motoresConfigurados.length === 0) {
-                listaMotoresDiv.innerHTML = "<p>Nenhum motor adicionado ainda.</p>";
-                return;
-            }
-            listaMotoresDiv.innerHTML = '';
-            motoresConfigurados.forEach(motor => {
-                const div = document.createElement('div');
-                div.className = 'motor-item';
-                let sensoresHtml = [];
-                if(motor.sensorEmbuchamento) sensoresHtml.push("FC Emb.");
-                if(motor.sensorVelocidade) sensoresHtml.push("V. Vel.");
-                if(motor.sensorFcaFcr) sensoresHtml.push("FCs Av/Rt");
-                if(motor.atuadorSolenoide) sensoresHtml.push("Sol. Av/Rt");
-                let sensoresDisplay = sensoresHtml.length > 0 ? `<div class="motor-sensors">Sensores: ${sensoresHtml.join(', ')}</div>` : '';
-
-                div.innerHTML = `
-                    <div>
-                        <span>TAG: <strong>${motor.tag}</strong></span>
-                        <span>Nome: <strong>${motor.nome}</strong></span>
-                        <span>CV: <strong>${motor.cv}</strong></span>
-                        <span>Tensão: <strong>${motor.tensao.replace('_tri', 'V Tri')}</strong></span>
-                        <span>Acion.: <strong>${motor.tipoAcionamento.replace(/_/g, ' ')}</strong></span>
-                        <span>Reversão: <strong>${motor.reversao ? 'Sim' : 'Não'}</strong></span>
-                    </div>
-                    <div> <button class="remove-motor-btn" onclick="removerMotor(${motor.id})">Remover</button> </div>
-                    ${sensoresDisplay}
-                `;
-                listaMotoresDiv.appendChild(div);
-            });
-        }
-        
-        document.getElementById('clp_protocolo_inversor')?.addEventListener('change', atualizarDashboardIOs);
-
-        // --- Lógica para Instrumentos ---
-        let instrumentosConfigurados = [];
-        let proximoInstrumentoId = 0;
-
-        function adicionarInstrumento() {
-            const tipoMedicao = document.getElementById('instrumento_tipo_medicao').value;
-            const tag = document.getElementById('instrumento_tag').value.trim();
-            const tipoSinal = document.getElementById('instrumento_sinal').value;
-            const malhaPI = document.getElementById('instrumento_malha_pi').checked;
-            const alarmeBaixo = document.getElementById('instrumento_alarme_baixo').checked;
-            const alarmeAlto = document.getElementById('instrumento_alarme_alto').checked;
-
-            if (!tipoMedicao || !tag || !tipoSinal) {
-                exibirMensagemTemporaria("Preencha Tipo, TAG e Sinal do instrumento.", "error", document.getElementById('formProjeto').querySelector('fieldset legend:contains("Instrumentos")').closest('fieldset'));
-                return;
-            }
-            const instrumento = { id: proximoInstrumentoId++, tipoMedicao, tag, tipoSinal, malhaPI, alarmeBaixo, alarmeAlto };
-            instrumentosConfigurados.push(instrumento);
-            renderizarInstrumentos();
-            atualizarDashboardIOs();
-
-            document.getElementById('instrumento_tipo_medicao').value = '';
-            document.getElementById('instrumento_tag').value = '';
-            document.getElementById('instrumento_sinal').value = '';
-            document.getElementById('instrumento_malha_pi').checked = false;
-            document.getElementById('instrumento_alarme_baixo').checked = false;
-            document.getElementById('instrumento_alarme_alto').checked = false;
-            document.getElementById('instrumento_tipo_medicao').focus();
-            exibirMensagemTemporaria("Instrumento adicionado!", "success", "instrumentosAdicionadosContainer");
-        }
-
-        function removerInstrumento(id) {
-            instrumentosConfigurados = instrumentosConfigurados.filter(inst => inst.id !== id);
-            renderizarInstrumentos();
-            atualizarDashboardIOs();
-        }
-
-        function renderizarInstrumentos() {
-            const listaInstrumentosDiv = document.getElementById('listaInstrumentos');
-            if (instrumentosConfigurados.length === 0) {
-                listaInstrumentosDiv.innerHTML = "<p>Nenhum instrumento adicionado ainda.</p>";
-                return;
-            }
-            listaInstrumentosDiv.innerHTML = '';
-            instrumentosConfigurados.forEach(inst => {
-                const div = document.createElement('div');
-                div.className = 'instrumento-item'; 
-                let opcoesHtml = [];
-                if (inst.malhaPI) opcoesHtml.push("Malha PI");
-                if (inst.alarmeBaixo) opcoesHtml.push("Al. Baixo");
-                if (inst.alarmeAlto) opcoesHtml.push("Al. Alto");
-                let opcoesDisplay = opcoesHtml.length > 0 ? `<div class="instrumento-options">Opções: ${opcoesHtml.join(', ')}</div>` : '';
-
-                div.innerHTML = `
-                    <div>
-                        <span>TAG: <strong>${inst.tag}</strong></span>
-                        <span>Tipo: <strong>${inst.tipoMedicao.charAt(0).toUpperCase() + inst.tipoMedicao.slice(1)}</strong></span>
-                        <span>Sinal: <strong>${inst.tipoSinal.replace('_','-')}</strong></span>
-                    </div>
-                    <div>
-                        <button class="remove-instrumento-btn" onclick="removerInstrumento(${inst.id})">Remover</button>
-                    </div>
-                    ${opcoesDisplay}
-                `;
-                listaInstrumentosDiv.appendChild(div);
-            });
-        }
-        
-        function atualizarDashboardIOs() {
-            const protocoloCLP = document.getElementById('clp_protocolo_inversor').value;
-            
-            // Cálculos para motores
-            let motorDI = 0, motorDO = 0, motorAO = 0;
-            if (!protocoloCLP || protocoloCLP === "") {
-                motoresConfigurados.forEach(motor => {
-                    if (motor.tipoAcionamento === 'partida_direta' || motor.tipoAcionamento === 'softstarter') {
-                        motorDI++; motorDO++;
-                        if (motor.reversao) motorDO++;
-                    } else if (motor.tipoAcionamento === 'inversor') {
-                        motorDI++; motorDO++; motorAO++;
-                        if (motor.reversao) motorDI++;
-                    }
-                    if (motor.sensorEmbuchamento) motorDI++;
-                    if (motor.sensorVelocidade) motorDI++;
-                    if (motor.sensorFcaFcr) motorDI += 2;
-                    if (motor.atuadorSolenoide) motorDO += 2;
-                });
-            }
-
-            // Cálculos para instrumentos
-            let instAI = 0, instDI = 0;
-            instrumentosConfigurados.forEach(inst => {
-                if (['4_20ma', '0_10v', 'pt100', 'termo_j', 'termo_k'].includes(inst.tipoSinal)) {
-                    instAI++;
-                }
-                if (inst.alarmeBaixo) instDI++;
-                if (inst.alarmeAlto) instDI++;
-            });
-
-            // Atualiza os cards do dashboard
-            document.getElementById('total_di_count').textContent = motorDI + instDI;
-            document.getElementById('total_do_count').textContent = motorDO;
-            document.getElementById('total_ai_count').textContent = instAI; 
-            document.getElementById('total_ao_count').textContent = motorAO; 
-        }
-
-
-        // --- Lógica para Cadastro de Kits ---
-        let kitsCadastrados = []; 
-        let kitsAcionamentoPreDefinidos = [];
-        let kitsClpPreDefinidos = [];
-        let kitsIhmPreDefinidos = [];
-        let kitsIoPreDefinidos = [];
-        let editandoKitId = null; 
-
-        function preCadastrarTodosOsKits() {
-            preCadastrarKitsAcionamento();
-            preCadastrarKitsClp();
-            preCadastrarKitsIhm();
-            preCadastrarKitsIo();
-        }
-
-        function preCadastrarKitsAcionamento() {
-            const tiposAcionamento = ['partida_direta', 'softstarter', 'inversor'];
-            const icmsPadrao = 18; 
-            const ipiPadrao = 5;  
-            
-            kitsAcionamentoPreDefinidos = []; 
-
-            tiposAcionamento.forEach(tipo => {
-                tensoesMotor.forEach(tensaoObj => {
-                    let valorBase;
-                    let tempoBase;
-                    if (tipo === 'partida_direta') { valorBase = 200; tempoBase = 0.5; }
-                    else if (tipo === 'softstarter') { valorBase = 450; tempoBase = 1.0; }
-                    else { valorBase = 700; tempoBase = 1.5; } 
-
-                    if(tensaoObj.value === '380_tri') valorBase *= 1.05;
-                    else if(tensaoObj.value === '440_tri') valorBase *= 1.10;
-
-                    potenciasCV.forEach((cv, index) => {
-                        const fatorPotencia = Math.pow(1.2 + (index * 0.02) , index * 0.3 + 1); 
-                        let valorFinal = Math.round((valorBase * fatorPotencia) / 10) * 10; 
-                        if (parseFloat(cv) > 20) valorFinal = Math.round(valorBase * fatorPotencia / 50) * 50; 
-                        if (parseFloat(cv) > 50) valorFinal = Math.round(valorBase * fatorPotencia / 100) * 100;
-
-                        const tempo = Math.round((tempoBase + (index * 0.1) + (parseFloat(cv)/20 * 0.2) ) * 10) / 10; 
-
-                        kitsAcionamentoPreDefinidos.push({
-                            id: `acionamento_${tipo}_${cv.replace('.', '_')}_${tensaoObj.value}`, 
-                            tipo: tipo,
-                            potenciaCV: cv,
-                            tensao: tensaoObj.value,
-                            nome: `${tipo.replace(/_/g, ' ')} ${cv}CV ${tensaoObj.text.split(' ')[0]}`,
-                            valor: valorFinal,
-                            icms: icmsPadrao,
-                            ipi: ipiPadrao,
-                            tempoMontagem: tempo,
-                            isPreDefinido: true 
-                        });
-                    });
-                });
-            });
-            renderizarKitsAcionamentoPreDefinidos();
-        }
-        
-        function preCadastrarKitsClp() {
-             const icmsPadrao = 18; 
-             const ipiPadrao = 10;
-             kitsClpPreDefinidos = [];
-             Object.keys(dadosMarcasFamilias.clp).forEach((marca, marcaIndex) => {
-                dadosMarcasFamilias.clp[marca].forEach((familia, familiaIndex) => {
-                    kitsClpPreDefinidos.push({
-                        id: `clp_${marca}_${familia}`.replace(/\s+/g, '_').toLowerCase(),
-                        tipo: 'clp', marca: marca, familia: familia,
-                        nome: `${marca} ${familia}`,
-                        valor: 1000 + (marcaIndex * 500) + (familiaIndex * 350), 
-                        icms: icmsPadrao, ipi: ipiPadrao, tempoMontagem: 1.5 + (familiaIndex * 0.5), isPreDefinido: true
-                    });
-                });
-            });
-            renderizarKitsClpPreDefinidos();
-        }
-
-         function preCadastrarKitsIhm() {
-             const icmsPadrao = 18; 
-             const ipiPadrao = 10;
-             kitsIhmPreDefinidos = [];
-             Object.keys(dadosMarcasFamilias.ihm).forEach((marca, marcaIndex) => {
-                dadosMarcasFamilias.ihm[marca].forEach((familia, familiaIndex) => {
-                     polegadasIHM.forEach((pol, polIndex) => {
-                        kitsIhmPreDefinidos.push({
-                            id: `ihm_${marca}_${familia}_${pol}`.replace(/\s+/g, '_').toLowerCase(),
-                            tipo: 'ihm', marca: marca, familia: familia, polegadas: pol,
-                            nome: `${marca} ${familia} ${pol}"`,
-                            valor: 600 + (familiaIndex * 150) + (polIndex * 200),
-                            icms: icmsPadrao, ipi: ipiPadrao, tempoMontagem: 0.5 + (polIndex * 0.2), isPreDefinido: true
-                        });
-                     });
-                });
-            });
-            renderizarKitsIhmPreDefinidos();
-        }
-        
-        function preCadastrarKitsIo() {
-            const icmsPadrao = 18; 
-            const ipiPadrao = 15;
-            kitsIoPreDefinidos = [
-                { tipo: 'DI', pontos: 16, nome: 'Cartão 16 Entradas Digitais', valor: 350, tempo: 0.2 },
-                { tipo: 'DO', pontos: 16, nome: 'Cartão 16 Saídas Digitais', valor: 400, tempo: 0.2 },
-                { tipo: 'DI/DO', pontos: '16/16', nome: 'Cartão Misto 16DI/16DO', valor: 650, tempo: 0.3 },
-                { tipo: 'AI', pontos: 4, nome: 'Cartão 4 Entradas Analógicas', valor: 700, tempo: 0.2 },
-                { tipo: 'AO', pontos: 4, nome: 'Cartão 4 Saídas Analógicas', valor: 850, tempo: 0.2 },
-                { tipo: 'AI/AO', pontos: '4/2', nome: 'Cartão Misto 4AI/2AO', valor: 950, tempo: 0.3 },
-            ].map(k => ({
-                ...k,
-                id: `io_${k.tipo.replace('/','')}_${k.pontos}`.replace('/','_'),
-                icms: icmsPadrao, ipi: ipiPadrao, tempoMontagem: k.tempo, isPreDefinido: true
-            }));
-            renderizarKitsIoPreDefinidos();
-        }
-
-        function renderizarLinhaKitPredefinido(tbody, kit) {
-            const row = tbody.insertRow();
-            if(kit.tipo === 'clp') {
-                row.insertCell().textContent = kit.marca;
-                row.insertCell().textContent = kit.familia;
-            } else if(kit.tipo === 'ihm') {
-                row.insertCell().textContent = kit.marca;
-                row.insertCell().textContent = kit.familia;
-                row.insertCell().textContent = kit.polegadas + '"';
-            } else if (['DI','DO','AI','AO','DI/DO','AI/AO'].includes(kit.tipo)) {
-                 row.insertCell().textContent = kit.tipo;
-                 row.insertCell().textContent = kit.pontos;
-            }
-             else { // acionamento
-                row.insertCell().textContent = kit.tipo.replace(/_/g, ' ');
-                row.insertCell().textContent = kit.potenciaCV + " CV";
-                row.insertCell().textContent = kit.tensao.replace('_tri', 'V Tri');
-            }
-
-            row.insertCell().textContent = kit.nome; 
-
-             ['valor', 'icms', 'ipi', 'tempoMontagem'].forEach(field => {
-                const cell = row.insertCell();
-                const input = document.createElement('input');
-                input.type = 'number';
-                input.step = (field === 'tempoMontagem') ? '0.1' : '0.01';
-                if (field === 'icms' || field === 'ipi') input.max = '100';
-                input.min = '0';
-                input.value = kit[field].toFixed((field === 'tempoMontagem') ? 1 : 2);
-                input.dataset.kitid = kit.id;
-                input.dataset.field = field;
-                input.addEventListener('change', (e) => atualizarKitPreDefinido(e, kit.tipo));
-                cell.appendChild(input);
-            });
-            
-            const acaoCell = row.insertCell();
-            acaoCell.className = 'action-column';
-             acaoCell.innerHTML = `<span style="font-size:0.8em; color:var(--text-muted)">(Editável)</span>`;
-        }
-
-        function renderizarKitsAcionamentoPreDefinidos() {
-            const tbody = document.getElementById('tabelaKitsAcionamento').getElementsByTagName('tbody')[0];
-            if (!tbody) return;
-            tbody.innerHTML = ''; 
-            kitsAcionamentoPreDefinidos.forEach(kit => renderizarLinhaKitPredefinido(tbody, kit));
-        }
-
-        function renderizarKitsClpPreDefinidos() {
-            const tbody = document.getElementById('tabelaKitsClp').getElementsByTagName('tbody')[0];
-            if (!tbody) return;
-            tbody.innerHTML = ''; 
-            kitsClpPreDefinidos.forEach(kit => renderizarLinhaKitPredefinido(tbody, kit));
-        }
-        
-        function renderizarKitsIhmPreDefinidos() {
-            const tbody = document.getElementById('tabelaKitsIhm').getElementsByTagName('tbody')[0];
-            if (!tbody) return;
-            tbody.innerHTML = ''; 
-            kitsIhmPreDefinidos.forEach(kit => renderizarLinhaKitPredefinido(tbody, kit));
-        }
-
-        function renderizarKitsIoPreDefinidos() {
-            const tbody = document.getElementById('tabelaKitsIo').getElementsByTagName('tbody')[0];
-            if (!tbody) return;
-            tbody.innerHTML = ''; 
-            kitsIoPreDefinidos.forEach(kit => renderizarLinhaKitPredefinido(tbody, kit));
-        }
-
-        function atualizarKitPreDefinido(event, tipoKit) {
-            const input = event.target;
-            const kitId = input.dataset.kitid;
-            const field = input.dataset.field;
-            let value = parseFloat(input.value);
-            
-            let kitArray;
-            if(tipoKit === 'clp') kitArray = kitsClpPreDefinidos;
-            else if(tipoKit === 'ihm') kitArray = kitsIhmPreDefinidos;
-            else if(['DI','DO','AI','AO','DI/DO','AI/AO'].includes(tipoKit)) kitArray = kitsIoPreDefinidos;
-            else kitArray = kitsAcionamentoPreDefinidos;
-
-            if (isNaN(value) || value < 0) {
-                exibirMensagemTemporaria("Valor inválido.", "error", input.closest('.kits-table-container'));
-                const kitOriginal = kitArray.find(k => k.id === kitId);
-                if(kitOriginal) input.value = kitOriginal[field].toFixed(field === 'tempoMontagem' ? 1 : 2);
-                return;
-            }
-            
-            const kitIndex = kitArray.findIndex(k => k.id === kitId);
-            if (kitIndex > -1) {
-                kitArray[kitIndex][field] = value;
-            }
-        }
-        
-        function salvarAlteracoesKits(tipo) {
-            exibirMensagemTemporaria(`Alterações nos kits de ${tipo} foram aplicadas (salvas na sessão atual).`, "success", `kits${tipo}Container`);
-        }
-
-
-        function salvarKit() { 
-            const nomeKit = document.getElementById('kit_nome').value.trim();
-            const tipoKit = document.getElementById('kit_tipo').value;
-            const descricaoKit = document.getElementById('kit_descricao').value.trim();
-            const valorKitInput = document.getElementById('kit_valor');
-            const valorKit = parseFloat(valorKitInput.value);
-            const icmsKit = parseFloat(document.getElementById('kit_icms').value) || 0;
-            const ipiKit = parseFloat(document.getElementById('kit_ipi').value) || 0;
-            const tempoMontagemKit = parseFloat(document.getElementById('kit_tempo_montagem').value) || 0;
-
-            if (!nomeKit || !tipoKit) {
-                exibirMensagemTemporaria("Preencha Nome e Tipo do kit.", "error", "formCadastroKit");
-                return;
-            }
-            if (isNaN(valorKit) || valorKit < 0) {
-                 exibirMensagemTemporaria("Valor inválido.", "error", "formCadastroKit");
-                 return;
-            }
-            
-            const kitData = {
-                nome: nomeKit, tipo: tipoKit, potenciaCV: '', 
-                descricao: descricaoKit, valor: valorKit, icms: icmsKit, ipi: ipiKit, tempoMontagem: tempoMontagemKit,
-                isPreDefinido: false
-            };
-
-            if (editandoKitId !== null) { 
-                const kitIndex = kitsCadastrados.findIndex(k => k.id === editandoKitId);
-                if (kitIndex > -1) {
-                    kitsCadastrados[kitIndex] = { ...kitsCadastrados[kitIndex], ...kitData };
-                    exibirMensagemTemporaria("Kit atualizado!", "success", "formCadastroKit");
-                }
-            } else { 
-                const novoKit = { id: Date.now(), ...kitData };
-                kitsCadastrados.push(novoKit);
-                exibirMensagemTemporaria("Kit adicionado!", "success", "formCadastroKit");
-            }
-            
-            renderizarKits();
-            resetFormularioKit();
-        }
-        
-        function resetFormularioKit() {
-            document.getElementById('formCadastroKit').reset();
-            document.getElementById('kit_id_edicao').value = '';
-            document.getElementById('btnSalvarKit').textContent = 'Adicionar Kit Genérico';
-            document.getElementById('btnCancelarEdicaoKit').style.display = 'none';
-            editandoKitId = null;
-            document.getElementById('kit_nome').focus();
-        }
-
-        function editarKit(id) {
-            const kit = kitsCadastrados.find(k => k.id === id);
-            if (kit && !kit.isPreDefinido) { 
-                document.getElementById('kit_id_edicao').value = kit.id;
-                document.getElementById('kit_tipo').value = kit.tipo;
-                document.getElementById('kit_nome').value = kit.nome;
-                document.getElementById('kit_descricao').value = kit.descricao;
-                document.getElementById('kit_valor').value = kit.valor.toFixed(2);
-                document.getElementById('kit_icms').value = kit.icms !== undefined ? kit.icms.toFixed(2) : '0';
-                document.getElementById('kit_ipi').value = kit.ipi !== undefined ? kit.ipi.toFixed(2) : '0';
-                document.getElementById('kit_tempo_montagem').value = kit.tempoMontagem !== undefined ? kit.tempoMontagem.toFixed(1) : '0';
-                
-                document.getElementById('btnSalvarKit').textContent = 'Salvar Alterações';
-                document.getElementById('btnCancelarEdicaoKit').style.display = 'inline-block';
-                editandoKitId = id;
-                document.getElementById('kit_nome').focus();
-                document.getElementById('formCadastroKit').scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        function cancelarEdicaoKit(){
-            resetFormularioKit();
-        }
-
-
-        function renderizarKits() { // Renderiza apenas kits genéricos
-            const containerKits = document.getElementById('kitsListContainer');
-            const kitsGenericos = kitsCadastrados.filter(k => !k.isPreDefinido);
-
-            if (kitsGenericos.length === 0) {
-                containerKits.innerHTML = "<p>Nenhum kit genérico cadastrado ainda.</p>";
-                return;
-            }
-
-            containerKits.innerHTML = '';
-            kitsGenericos.forEach(kit => {
-                const divKit = document.createElement('div');
-                divKit.className = 'kit-item';
-                let kitDetails = `<strong>${kit.nome}</strong> (R$ ${kit.valor.toFixed(2).replace('.',',')})`;
-                kitDetails += ` <small style="color: var(--text-muted);">- ${kit.tipo.replace(/_/g, ' ')}</small>`;
-                
-                divKit.innerHTML = `
-                    <div class="kit-item-info">
-                        ${kitDetails}
-                        ${kit.descricao ? `<br><small style="color: var(--text-muted);"><em>${kit.descricao}</em></small>` : ''}
-                        <br><small style="color: var(--text-muted);">ICMS: ${kit.icms !== undefined ? kit.icms.toFixed(2) : '0.00'}% | IPI: ${kit.ipi !== undefined ? kit.ipi.toFixed(2) : '0.00'}% | Montagem: ${kit.tempoMontagem !== undefined ? kit.tempoMontagem.toFixed(1) : '0.0'}h</small>
-                    </div>
-                    <div>
-                        <button class="edit-btn" onclick="editarKit(${kit.id})">Editar</button>
-                        <button class="remove-btn" onclick="removerKit(${kit.id})">Remover</button>
-                    </div>
-                `;
-                containerKits.appendChild(divKit);
-            });
-        }
-        
-        function removerKit(id) {
-            kitsCadastrados = kitsCadastrados.filter(kit => kit.id !== id);
-            renderizarKits(); 
-            exibirMensagemTemporaria("Kit removido.", "success", "listaKitsCadastrados", true);
-            if (editandoKitId === id) { 
-                resetFormularioKit();
-            }
-        }
-
-        // --- Lógica para Gerar Orçamento (Configuração do Projeto) ---
-        function gerarOrcamento() {
-            openTab(null, 'OrcamentoDetalhado'); 
-            const form = document.getElementById('formProjeto');
-            const resultadoDiv = document.getElementById('resultadoOrcamento');
-            
-            const clpMarca = form.clp_marca.value;
-            const clpFamilia = form.clp_familia.value;
-            const clpProtocolo = form.clp_protocolo_inversor.value; 
-            const ihmMarca = form.ihm_marca.value;
-            const ihmFamilia = form.ihm_familia.value;
-            const ihmPolegadas = form.ihm_polegadas?.value; 
-            const ihmEspelhamento = form.ihm_espelhamento?.checked; 
-            
-            const clpSafety = form.clp_safety.checked;
-            const clpDiSafetyQty = clpSafety ? parseInt(form.clp_di_safety_qty.value) || 0 : 0;
-            const clpDoSafetyQty = clpSafety ? parseInt(form.clp_do_safety_qty.value) || 0 : 0;
-            const clpControleEixo = form.clp_controle_eixo.checked;
-            const clpControleEixoQty = clpControleEixo ? parseInt(form.clp_controle_eixo_qty.value) || 0 : 0;
-            const clpEntradaRapida = form.clp_entrada_rapida.checked;
-            const clpEntradaRapidaQty = clpEntradaRapida ? parseInt(form.clp_entrada_rapida_qty.value) || 0 : 0;
-            const clpSaidaRapida = form.clp_saida_rapida.checked;
-            const clpSaidaRapidaQty = clpSaidaRapida ? parseInt(form.clp_saida_rapida_qty.value) || 0 : 0;
-
-            if (!clpMarca && !ihmMarca && motoresConfigurados.length === 0 && instrumentosConfigurados.length === 0 && !clpSafety && !clpControleEixo && !clpEntradaRapida && !clpSaidaRapida && !clpProtocolo) {
-                 resultadoDiv.innerHTML = `<p class="info-message error">Por favor, preencha pelo menos um campo na aba "Configurar Projeto" para gerar o orçamento.</p>`;
-                 return;
-            }
-
-            let custoTotalMaterial = 0;
-            let tempoMontagemTotal = 0;
-            let htmlOrcamentoItens = [];
-            const todosOsKitsDisponiveis = [...kitsCadastrados, ...kitsAcionamentoPreDefinidos, ...kitsClpPreDefinidos, ...kitsIhmPreDefinidos, ...kitsIoPreDefinidos]; 
-
-            // --- Custo CLP ---
-            if (clpMarca && clpFamilia) {
-                const kitCLP = todosOsKitsDisponiveis.find(k => k.tipo === 'clp' && k.marca === clpMarca && k.familia === clpFamilia);
-                if (kitCLP) {
-                    custoTotalMaterial += kitCLP.valor * (1 + (kitCLP.icms/100) + (kitCLP.ipi/100));
-                    tempoMontagemTotal += kitCLP.tempoMontagem;
-                    htmlOrcamentoItens.push(`<li><strong>CLP:</strong> ${kitCLP.nome} - Custo Mat. (c/ imp.): R$ ${(kitCLP.valor * (1 + (kitCLP.icms/100) + (kitCLP.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${kitCLP.tempoMontagem}h</li>`);
-                } else {
-                     htmlOrcamentoItens.push(`<li><strong>CLP:</strong> ${clpMarca} ${clpFamilia} - <em style="color: var(--error-color);">Kit não cadastrado</em></li>`);
-                }
-                 if (clpProtocolo) { 
-                     htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Protocolo Inversores: ${clpProtocolo.replace(/_/g, ' ')}</em></li>`); 
-                }
-                if (clpSafety && (clpDiSafetyQty > 0 || clpDoSafetyQty > 0)) {
-                     const kitSafety = todosOsKitsDisponiveis.find(k => k.tipo === 'geral' && k.nome.toLowerCase().includes('safety')); 
-                     if(kitSafety) {
-                        const custoItemSafety = kitSafety.valor * (clpDiSafetyQty + clpDoSafetyQty);
-                        custoTotalMaterial += custoItemSafety * (1 + (kitSafety.icms/100) + (kitSafety.ipi/100));
-                        tempoMontagemTotal += kitSafety.tempoMontagem * (clpDiSafetyQty + clpDoSafetyQty);
-                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Safety: ${clpDiSafetyQty} DI, ${clpDoSafetyQty} DO (Kit: ${kitSafety.nome}) - Custo Adic.: R$ ${(custoItemSafety * (1 + (kitSafety.icms/100) + (kitSafety.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${ (kitSafety.tempoMontagem * (clpDiSafetyQty + clpDoSafetyQty)).toFixed(1)}h</em></li>`);
-                     } else {
-                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Safety Integrado: ${clpDiSafetyQty} DI, ${clpDoSafetyQty} DO (<em style="color: var(--error-color);">Kit não cadastrado</em>)</em></li>`);
-                     }
-                }
-                 if (clpControleEixo && clpControleEixoQty > 0) { 
-                     const kitEixo = todosOsKitsDisponiveis.find(k => k.tipo === 'geral' && k.nome.toLowerCase().includes('eixo'));
-                     if(kitEixo){
-                        custoTotalMaterial += kitEixo.valor * clpControleEixoQty * (1 + (kitEixo.icms/100) + (kitEixo.ipi/100));
-                        tempoMontagemTotal += kitEixo.tempoMontagem * clpControleEixoQty;
-                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Controle de Eixo: ${clpControleEixoQty} (Kit: ${kitEixo.nome}) - Custo Adic.: R$ ${(kitEixo.valor * clpControleEixoQty * (1+(kitEixo.icms/100)+(kitEixo.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${(kitEixo.tempoMontagem * clpControleEixoQty).toFixed(1)}h</em></li>`);
-                     } else {
-                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Controle de Eixo: ${clpControleEixoQty} eixo(s) (<em style="color: var(--error-color);">Kit não cadastrado</em>)</em></li>`);
-                     }
-                }
-            }
-
-            // --- Custo IHM ---
-            if (ihmMarca && ihmFamilia) {
-                const kitIHM = kitsIhmPreDefinidos.find(k => k.marca === ihmMarca && k.familia === ihmFamilia && k.polegadas == ihmPolegadas);
-                 if (kitIHM) {
-                    custoTotalMaterial += kitIHM.valor * (1 + (kitIHM.icms/100) + (kitIHM.ipi/100));
-                    tempoMontagemTotal += kitIHM.tempoMontagem;
-                    htmlOrcamentoItens.push(`<li><strong>IHM:</strong> ${kitIHM.nome} ${ihmEspelhamento ? 'c/ Espelhamento' : ''} - Custo Mat. (c/ imp.): R$ ${(kitIHM.valor * (1 + (kitIHM.icms/100) + (kitIHM.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${kitIHM.tempoMontagem}h</li>`);
-                } else {
-                     htmlOrcamentoItens.push(`<li><strong>IHM:</strong> ${ihmMarca} ${ihmFamilia} ${ihmPolegadas ? '('+ihmPolegadas+'")' : ''} ${ihmEspelhamento ? 'c/ Espelhamento' : ''} - <em style="color: var(--error-color);">Kit não cadastrado</em></li>`);
-                }
-                 if (ihmEspelhamento) {
-                     const kitEspelhamento = todosOsKitsDisponiveis.find(k => k.tipo === 'geral' && k.nome.toLowerCase().includes('espelhamento ihm'));
-                     if(kitEspelhamento){
-                        custoTotalMaterial += kitEspelhamento.valor * (1 + (kitEspelhamento.icms/100) + (kitEspelhamento.ipi/100));
-                        tempoMontagemTotal += kitEspelhamento.tempoMontagem;
-                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Espelhamento IHM (Kit: ${kitEspelhamento.nome}) - Custo Adic.: R$ ${(kitEspelhamento.valor * (1+(kitEspelhamento.icms/100)+(kitEspelhamento.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${kitEspelhamento.tempoMontagem.toFixed(1)}h</em></li>`);
-                     } else {
-                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Espelhamento de IHM (<em style="color: var(--error-color);">Kit não cadastrado</em>)</em></li>`);
-                     }
-                }
-            }
-            
-            // --- Custo Motores ---
-            if (motoresConfigurados.length > 0) {
-                htmlOrcamentoItens.push(`<li><strong>Acionamentos (${motoresConfigurados.length}):</strong></li>`);
-                motoresConfigurados.forEach(motor => {
-                    const tipoAcionamentoKit = motor.tipoAcionamento; 
-                    const potenciaKit = motor.cv; 
-                    const tensaoMotor = motor.tensao;
-
-                    const kitMotor = kitsAcionamentoPreDefinidos.find(k => 
-                        k.tipo === tipoAcionamentoKit && 
-                        k.potenciaCV == potenciaKit &&
-                        k.tensao === tensaoMotor
-                    );
-
-                    if (kitMotor) {
-                        custoTotalMaterial += kitMotor.valor * (1 + (kitMotor.icms/100) + (kitMotor.ipi/100));
-                        tempoMontagemTotal += kitMotor.tempoMontagem;
-                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Motor ${motor.tag || motor.nome} (${motor.cv}CV ${tensaoMotor.replace('_tri','V')}, ${motor.tipoAcionamento.replace(/_/g,' ')}):</em> ${kitMotor.nome} - Custo Mat. (c/ imp.): R$ ${(kitMotor.valor * (1 + (kitMotor.icms/100) + (kitMotor.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${kitMotor.tempoMontagem}h</li>`);
+        function renderCalculatorFields() {
+            let itemsHtml = '';
+            for (const groupKey in database.tags) {
+                itemsHtml += `<div class="glass-card">`;
+                const group = database.tags[groupKey];
+                itemsHtml += `<fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">${group.label}</legend>`;
+                itemsHtml += `<div class="calc-grid-header"><span>Descrição do Objeto</span><span class="text-center">Tags</span><span class="text-center">Horas</span><span class="text-center">Qtd.</span></div>`;
+                for (const itemKey in group.items) {
+                    const item = group.items[itemKey];
+                    itemsHtml += `<div class="input-row">
+                                <label for="calc_${itemKey}">${item.label}</label>
+                                <span class="tags-per-item">${item.tags}</span>
+                                <span class="time-per-item">${item.time}h</span>
+                                <div class="flex justify-center">`;
+                    if (item.max === 1) {
+                        itemsHtml += `<label class="toggle-switch">
+                                    <input type="checkbox" id="calc_${itemKey}" data-group="${group.label}" data-item-key="${itemKey}">
+                                    <span class="slider"></span>
+                                </label>`;
                     } else {
-                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Motor ${motor.tag || motor.nome} (${motor.cv}CV ${tensaoMotor.replace('_tri','V')}, ${motor.tipoAcionamento.replace(/_/g,' ')}):</em> <em style="color: var(--error-color);">Kit de acionamento não encontrado</em></li>`);
+                        itemsHtml += `<input type="number" min="0" class="w-20" id="calc_${itemKey}" data-group="${group.label}" data-item-key="${itemKey}" placeholder="Qtd.">`;
                     }
-                });
-            }
-
-            // --- Custo Instrumentos ---
-             instrumentosConfigurados.forEach(instrumento => {
-                let kitInstrumento = todosOsKitsDisponiveis.find(k => k.tipo === 'instrumento' && (k.nome.toLowerCase().includes(instrumento.tag.toLowerCase()) || k.nome.toLowerCase().includes(instrumento.tipoMedicao.toLowerCase()) ) );
-                
-                if (kitInstrumento) {
-                    custoTotalMaterial += kitInstrumento.valor * (1 + (kitInstrumento.icms/100) + (kitInstrumento.ipi/100));
-                    tempoMontagemTotal += kitInstrumento.tempoMontagem;
-                    htmlOrcamentoItens.push(`<li><strong>Instrumento (${instrumento.tag}):</strong> ${kitInstrumento.nome} - Custo Mat. (c/ imp.): R$ ${(kitInstrumento.valor * (1 + (kitInstrumento.icms/100) + (kitInstrumento.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${kitInstrumento.tempoMontagem}h</li>`);
-                } else {
-                     htmlOrcamentoItens.push(`<li><strong>Instrumento (${instrumento.tag}):</strong> ${instrumento.tipoMedicao} ${instrumento.tipoSinal.replace('_','-')} - <em style="color: var(--error-color);">Kit não cadastrado</em></li>`);
+                    itemsHtml += `</div></div>`;
                 }
-                 if(instrumento.malhaPI) {
-                    htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Opção: Malha de Controle PI (Custo/Tempo a definir via Kit)</em></li>`);
+                itemsHtml += `</fieldset></div>`;
+            }
+            calculatorFieldsContainer.innerHTML = itemsHtml;
+
+            // Render Modules
+            let moduleHtml = `<div class="glass-card"><fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">Módulos Opcionais</legend>`;
+            for(const key in database.modules) {
+                const module = database.modules[key];
+                 moduleHtml += `<div class="project-input-row !grid-cols-2">
+                                <label for="module_${key}">${module.label}</label>
+                                <div class="flex justify-end">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="module_${key}" data-module-key="${key}">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                              </div>`;
+            }
+            moduleHtml += `</fieldset></div>`;
+            modulesContainer.innerHTML = moduleHtml;
+        }
+        
+        function renderProjectInputs() {
+            let projectHtml = `<div class="glass-card"><fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">Configurações Iniciais do Projeto</legend>`;
+            projectHtml += `<div class="project-input-row"><label for="calc_company_name">Nome da Empresa</label><input class="!text-left" type="text" id="calc_company_name" data-prop="companyName" value="${database.projectSettings.companyName}"></div>`;
+            projectHtml += `<div class="project-input-row"><label for="calc_project_name">Nome do Projeto</label><input class="!text-left" type="text" id="calc_project_name" data-prop="projectName" value="${database.projectSettings.projectName}"></div>`;
+            projectHtml += `<div class="project-input-row two-col-row"><div class="flex flex-col"><label for="calc_city">Cidade</label><input class="!text-left" type="text" id="calc_city" data-prop="city" value="${database.projectSettings.city}"></div><div class="flex flex-col"><label for="calc_state">Estado</label><input class="!text-left" type="text" id="calc_state" data-prop="state" value="${database.projectSettings.state}"></div></div>`;
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_reserve">Percentual de Reserva de Tags (%)</label><input type="number" min="0" id="calc_reserve" data-prop="reservePercentage" value="${database.projectSettings.reservePercentage}"></div>`;
+            projectHtml += `<hr class="my-2 border-[var(--border-color)]">`
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_distance">Distância até Cliente (KM) (Calcula ida e volta)</label><input type="number" min="0" id="calc_distance" data-prop="distance" value="${database.projectSettings.distance}"></div>`;
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_lodging">Número de Hospedagens</label><input type="number" min="0" id="calc_lodging" data-prop="lodgingCount" value="${database.projectSettings.lodgingCount}"></div>`;
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_food">Número de Diárias (Alimentação)</label><input type="number" min="0" id="calc_food" data-prop="foodDays" value="${database.projectSettings.foodDays}"></div>`;
+            projectHtml += `<hr class="my-2 border-[var(--border-color)]">`
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_screen_count">Número de Monitores</label><input type="number" min="0" id="calc_screen_count" data-prop="screenCount" value="${database.projectSettings.screenCount}"></div>`;
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_screen_model">Modelo da Tela</label><select id="calc_screen_model" data-prop="screenModelIndex">`;
+            database.hardware.screens.forEach((screen, index) => {
+                const selected = index === database.projectSettings.screenModelIndex ? 'selected' : '';
+                projectHtml += `<option value="${index}" ${selected}>${screen.name}</option>`;
+            });
+            projectHtml += `</select></div>`;
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_include_computer">Incluir Computador?</label><div class="flex justify-end"><label class="toggle-switch">
+                                    <input type="checkbox" id="calc_include_computer" data-prop="includeComputer" ${database.projectSettings.includeComputer ? 'checked' : ''}>
+                                    <span class="slider"></span>
+                                </label></div></div>`;
+            projectHtml += `</fieldset></div>`;
+            calculatorProjectInputsContainer.innerHTML = projectHtml;
+        }
+
+        function renderSettingsFields() {
+            // Render Tag Settings
+            let tagHtml = `<div class="settings-grid-header"><span>Descrição do Objeto</span><span class="text-center">Tags</span><span class="text-center">Horas</span></div>`;
+            for (const groupKey in database.tags) {
+                const group = database.tags[groupKey];
+                tagHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">${group.label}</legend>`;
+                for (const itemKey in group.items) {
+                    const item = group.items[itemKey];
+                     tagHtml += `
+                        <div class="settings-row">
+                            <label for="setting_tags_${itemKey}">${item.label}</label>
+                            <input type="number" min="0" id="setting_tags_${itemKey}" data-group-key="${groupKey}" data-item-key="${itemKey}" data-prop="tags" value="${item.tags}">
+                            <input type="number" min="0" step="0.1" id="setting_time_${itemKey}" data-group-key="${groupKey}" data-item-key="${itemKey}" data-prop="time" value="${item.time}">
+                        </div>`;
+                }
+                 tagHtml += `</fieldset>`;
+            }
+            settingsFieldsContainer.innerHTML = tagHtml;
+            
+            // Render Module Settings
+            let moduleHtml = `<div class="settings-grid-header module-settings-header"><span>Módulo Opcional</span><span class="text-center">Hardware (R$)</span><span class="text-center">Tags</span><span class="text-center">Horas</span></div>`;
+            moduleHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Módulos</legend>`;
+            for (const key in database.modules) {
+                const module = database.modules[key];
+                moduleHtml += `<div class="settings-row module-settings-row">
+                                <label for="setting_module_label_${key}">${module.label}</label>
+                                <input type="number" min="0" id="setting_module_hardware_${key}" data-type="modules" data-key="${key}" data-prop="hardware" value="${module.hardware}">
+                                <input type="number" min="0" id="setting_module_tags_${key}" data-type="modules" data-key="${key}" data-prop="tags" value="${module.tags}">
+                                <input type="number" min="0" step="0.1" id="setting_module_time_${key}" data-type="modules" data-key="${key}" data-prop="time" value="${module.time}">
+                               </div>`;
+            }
+            moduleHtml += `</fieldset>`;
+            moduleSettingsContainer.innerHTML = moduleHtml;
+
+            // Render License Settings
+            let licenseHtml = `<div class="settings-grid-header"><span>Pacote de Licença</span><span class="text-center">Tags</span><span class="text-center">Valor (R$)</span></div>`;
+            for(const type in database.licenses) {
+                licenseHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">${type}</legend>`;
+                database.licenses[type].forEach((license, index) => {
+                    licenseHtml += `
+                        <div class="settings-row">
+                            <label for="license_${type}_${index}">Pacote ${type} ${index + 1}</label>
+                            <input type="number" min="0" id="license_tags_${type}_${index}" data-type="${type}" data-index="${index}" data-prop="tags" value="${license.tags}">
+                            <input type="number" min="0" id="license_price_${type}_${index}" data-type="${type}" data-index="${index}" data-prop="price" value="${license.price}">
+                        </div>
+                    `;
+                });
+                licenseHtml += `</fieldset>`;
+            }
+            licenseSettingsContainer.innerHTML = licenseHtml;
+            
+            // Render Hardware Settings
+            let hardwareHtml = `<div class="settings-grid-header" style="grid-template-columns: 1fr 100px; gap: 1rem;"><span>Item</span><span class="text-center">Valor (R$)</span></div>`;
+            hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Custos Gerais e de Viagem</legend>`;
+            hardwareHtml += `<div class="settings-row"><label for="setting_hour_price">Valor da Hora de Serviço (R$)</label><input type="number" min="0" id="setting_hour_price" data-prop="hourPrice" value="${database.projectSettings.hourPrice}"></div>`;
+            hardwareHtml += `<div class="settings-row"><label for="setting_km_price">Valor do KM Rodado (R$)</label><input type="number" min="0" id="setting_km_price" data-prop="kmPrice" value="${database.projectSettings.kmPrice}"></div>`;
+            hardwareHtml += `<div class="settings-row"><label for="setting_lodging_price">Valor da Hospedagem (Diária)</label><input type="number" min="0" id="setting_lodging_price" data-prop="lodgingPrice" value="${database.projectSettings.lodgingPrice}"></div>`;
+            hardwareHtml += `<div class="settings-row"><label for="setting_food_price">Valor da Alimentação (Diária)</label><input type="number" min="0" id="setting_food_price" data-prop="foodPrice" value="${database.projectSettings.foodPrice}"></div>`;
+            hardwareHtml += `</fieldset>`;
+
+            hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Computadores</legend>`;
+            database.hardware.computers.forEach((computer, index) => {
+                 hardwareHtml += `<div class="settings-row vc-settings-row" style="grid-template-columns: 0.5fr 1.5fr 100px"><label>${computer.name}</label><input type="text" value="${computer.spec}" class="!text-left px-2" id="computer_spec_${index}" data-type="computers" data-index="${index}" data-prop="spec"><input type="number" min="0" id="computer_price_${index}" data-type="computers" data-index="${index}" data-prop="price" value="${computer.price}"></div>`;
+            });
+            hardwareHtml += `</fieldset>`;
+            
+            hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Placas de Vídeo</legend>`;
+            database.hardware.videoCards.forEach((vc, index) => {
+                 hardwareHtml += `<div class="settings-row vc-settings-row"><label>${vc.screens} Saídas</label><input type="text" value="${vc.name}" id="vc_name_${index}" class="!text-left px-2" data-type="videoCards" data-index="${index}" data-prop="name"><input type="number" min="0" id="vc_price_${index}" data-type="videoCards" data-index="${index}" data-prop="price" value="${vc.price}"></div>`;
+            });
+            hardwareHtml += `</fieldset>`;
+
+            hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Telas</legend>`;
+            database.hardware.screens.forEach((screen, index) => {
+                 hardwareHtml += `<div class="settings-row"><label for="screen_name_${index}">${screen.name}</label><input type="number" min="0" id="screen_price_${index}" data-type="screens" data-index="${index}" data-prop="price" value="${screen.price}"><span/></div>`;
+            });
+            hardwareHtml += `</fieldset>`;
+            hardwareSettingsContainer.innerHTML = hardwareHtml;
+
+        }
+
+        function calculateAndDisplayTotals() {
+            let baseTotalTags = 0;
+            let totalHours = 0;
+            const groupTotals = {};
+            
+            // Get values from Project Settings
+            const projectInputs = document.querySelectorAll('#calculator-project-inputs input, #calculator-project-inputs select');
+            let tempProjectSettings = {};
+             projectInputs.forEach(input => {
+                const prop = input.dataset.prop;
+                if (input.type === 'checkbox') {
+                    tempProjectSettings[prop] = input.checked;
+                } else if(input.type === 'text') {
+                     tempProjectSettings[prop] = input.value;
+                } else {
+                    tempProjectSettings[prop] = parseFloat(input.value) || 0;
                 }
             });
 
+            const reservePercentage = tempProjectSettings.reservePercentage;
+            const screenCount = tempProjectSettings.screenCount;
+            const screenModelIndex = tempProjectSettings.screenModelIndex;
+            const includeComputer = tempProjectSettings.includeComputer;
+            const distance = tempProjectSettings.distance;
+            const lodgingCount = tempProjectSettings.lodgingCount;
+            const foodDays = tempProjectSettings.foodDays;
 
-            let htmlFinal = "<h3>Resumo do Orçamento Estimado:</h3><ul>" + htmlOrcamentoItens.join('') + "</ul>";
-            htmlFinal += `<hr>`;
-            htmlFinal += `<p><strong>Custo Total Material (com impostos): R$ ${custoTotalMaterial.toFixed(2).replace('.',',')}</strong></p>`;
-            htmlFinal += `<p><strong>Tempo Estimado Montagem: ${tempoMontagemTotal.toFixed(1).replace('.',',')} horas</strong></p>`;
-            
-            const valorHoraMontagem = parseFloat(document.getElementById('valor_hora_montagem')?.value) || 75; 
-            const custoMaoDeObra = tempoMontagemTotal * valorHoraMontagem;
-            htmlFinal += `<p><strong>Custo Estimado Mão de Obra (Montagem @ R$ ${valorHoraMontagem.toFixed(2).replace('.',',')}/h): R$ ${custoMaoDeObra.toFixed(2).replace('.',',')}</strong></p>`;
-            htmlFinal += `<p style="font-size: 1.2em; font-weight: bold;"><strong>CUSTO TOTAL GERAL ESTIMADO: R$ ${(custoTotalMaterial + custoMaoDeObra).toFixed(2).replace('.',',')}</strong></p>`;
-            htmlFinal += `<p class="info-message success">Este é um orçamento preliminar. Verifique os kits cadastrados para precisão.</p>`;
+            const screenModelSelect = document.getElementById('calc_screen_model');
 
-            resultadoDiv.innerHTML = htmlFinal;
-            resultadoDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+            // Calculate from core items
+            document.querySelectorAll('#calculator-fields-container input').forEach(input => {
+                let quantity = 0;
+                if(input.type === 'checkbox') {
+                    quantity = input.checked ? 1 : 0;
+                } else if (input.type === 'number') {
+                    quantity = parseFloat(input.value) || 0;
+                }
 
-        function exibirMensagemTemporaria(mensagem, tipo = "info", elementoReferenciaId, antes = false) {
-            const elementoReferencia = typeof elementoReferenciaId === 'string' ? document.getElementById(elementoReferenciaId) : elementoReferenciaId;
-            if (!elementoReferencia) return;
-
-            const parentNodeForMessage = (elementoReferencia.tagName === 'FIELDSET' || antes) ? elementoReferencia : (elementoReferencia.parentNode || document.body);
-            
-            const mensagensAntigas = parentNodeForMessage.querySelectorAll(`.info-message-temp.${tipo}`);
-            mensagensAntigas.forEach(msg => msg.remove());
-
-            const divMensagem = document.createElement('div');
-            divMensagem.className = `info-message ${tipo} info-message-temp`; 
-            divMensagem.textContent = mensagem;
-            divMensagem.style.marginTop = '10px';
-            divMensagem.style.marginBottom = '10px';
-            
-            if (antes && elementoReferencia.parentNode) {
-                 elementoReferencia.parentNode.insertBefore(divMensagem, elementoReferencia);
-            } else if (elementoReferencia.tagName === 'FORM') {
-                 (elementoReferencia.parentNode || document.body).insertBefore(divMensagem, elementoReferencia.nextSibling);
-            } else if (elementoReferencia.firstChild && elementoReferencia.id !== 'kitsAcionamentoContainer' && elementoReferencia.id !== 'listaKitsCadastrados' && elementoReferencia.id !== 'instrumentosAdicionadosContainer') { 
-                 (elementoReferencia.closest('fieldset') || elementoReferencia.parentNode || document.body).insertBefore(divMensagem, (elementoReferencia.closest('fieldset') || elementoReferencia).nextSibling);
-
-            } else if (elementoReferencia.id === 'kitsAcionamentoContainer' || elementoReferencia.id === 'listaKitsCadastrados' || elementoReferencia.id === 'instrumentosAdicionadosContainer' ) {
-                 (elementoReferencia.parentNode || document.body).insertBefore(divMensagem, elementoReferencia);
-            }
-             else {
-                elementoReferencia.appendChild(divMensagem);
-            }
-
-
-            setTimeout(() => {
-                divMensagem.style.transition = 'opacity 0.5s ease';
-                divMensagem.style.opacity = '0';
-                setTimeout(() => {
-                    if (divMensagem.parentNode) {
-                        divMensagem.parentNode.removeChild(divMensagem);
+                if (quantity > 0) {
+                    const itemKey = input.dataset.itemKey;
+                    const groupLabel = input.dataset.group;
+                    const groupKey = Object.keys(database.tags).find(key => database.tags[key].label === groupLabel);
+                    
+                    if (groupKey && database.tags[groupKey].items[itemKey]) {
+                        const itemData = database.tags[groupKey].items[itemKey];
+                        const itemTotalTags = quantity * (itemData.tags || 0);
+                        baseTotalTags += itemTotalTags;
+                        totalHours += quantity * (itemData.time || 0);
+                        
+                        if (!groupTotals[groupLabel]) groupTotals[groupLabel] = 0;
+                        groupTotals[groupLabel] += itemTotalTags;
                     }
-                }, 500);
-            }, 3000);
+                }
+            });
+            
+            // Calculate from optional modules
+            let modulesHardwareCost = 0;
+            const moduleInputs = document.querySelectorAll('#modules-container input[type="checkbox"]');
+            moduleInputs.forEach(input => {
+                if (input.checked) {
+                    const moduleKey = input.dataset.moduleKey;
+                    const moduleData = database.modules[moduleKey];
+                    if(moduleData) {
+                        baseTotalTags += moduleData.tags;
+                        totalHours += moduleData.time;
+                        modulesHardwareCost += moduleData.hardware;
+                        if (!groupTotals['Módulos Opcionais']) groupTotals['Módulos Opcionais'] = 0;
+                        groupTotals['Módulos Opcionais'] += moduleData.tags;
+                    }
+                }
+            });
+
+            const reserveTags = Math.ceil(baseTotalTags * (reservePercentage / 100));
+            const finalTotalTags = baseTotalTags + reserveTags;
+
+            // Update Tags and Time Summary
+            grandTotalEl.textContent = finalTotalTags;
+            baseTagsEl.textContent = baseTotalTags;
+            reserveTagsEl.textContent = reserveTags;
+            totalHoursEl.textContent = totalHours.toFixed(1);
+            updateChart(groupTotals);
+
+            // Calculate Hardware
+            const computer = database.hardware.computers.find(c => finalTotalTags <= c.tagsLimit && screenCount <= c.screenLimit) || database.hardware.computers[1];
+            const computerCost = includeComputer ? computer.price : 0;
+            const computerNameText = includeComputer ? computer.name : "Fornecido pelo Cliente";
+            
+            let videoCard = { price: 0, name: 'N/A' };
+            if (screenCount > 2) {
+                videoCard = database.hardware.videoCards.find(vc => screenCount <= vc.screens) || database.hardware.videoCards[database.hardware.videoCards.length - 1];
+            }
+
+            let screensCost = 0;
+            let screensDescText = 'N/A (Cliente já possui)';
+            if (screenCount > 0) {
+                const screen = database.hardware.screens[screenModelIndex];
+                screensCost = screen.price * screenCount;
+                screensDescText = `${screenCount}x ${screen.name}`;
+                if (screenModelSelect) screenModelSelect.disabled = false;
+            } else {
+                 if (screenModelSelect) screenModelSelect.disabled = true;
+            }
+
+            const hardwareTotalCost = computerCost + videoCard.price + screensCost + modulesHardwareCost;
+            
+            // Update Hardware Summary
+            computerNameEl.textContent = computerNameText;
+            screensDescEl.textContent = screensDescText;
+            videocardDescEl.textContent = videoCard.name;
+            moduleHardwarePriceEl.textContent = formatCurrency(modulesHardwareCost);
+            hardwareTotalPriceEl.textContent = formatCurrency(hardwareTotalCost);
+            
+            // Calculate Travel Expenses
+            const travelCost = distance * 2 * database.projectSettings.kmPrice;
+            const lodgingCost = lodgingCount * database.projectSettings.lodgingPrice;
+            const foodCost = foodDays * database.projectSettings.foodPrice;
+            const travelTotalCost = travelCost + lodgingCost + foodCost;
+
+            // Update Travel Summary
+            travelCostEl.textContent = formatCurrency(travelCost);
+            lodgingCostEl.textContent = formatCurrency(lodgingCost);
+            foodCostEl.textContent = formatCurrency(foodCost);
+            travelTotalPriceEl.textContent = formatCurrency(travelTotalCost);
+
+            // Calculate License and Final Price
+            const recommendedLicense = calculateRecommendedLicense(finalTotalTags);
+            const totalServicesPrice = totalHours * database.projectSettings.hourPrice;
+            const finalProjectPrice = recommendedLicense.price + totalServicesPrice + hardwareTotalCost + travelTotalCost;
+
+            licenseNameEl.textContent = recommendedLicense.name;
+            licensePriceEl.textContent = formatCurrency(recommendedLicense.price);
+            servicesPriceEl.textContent = formatCurrency(totalServicesPrice);
+            projectTotalPriceEl.textContent = formatCurrency(finalProjectPrice);
+        }
+        
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
         }
 
-        // --- Lógica para o botão de Tema ---
-        function rgbStringToCssVar(rgbString) { 
-            if (!rgbString) return '0, 123, 255'; 
-            const match = rgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-            return match ? `${match[1]}, ${match[2]}, ${match[3]}` : '0, 123, 255';
+        function calculateRecommendedLicense(totalTags) {
+            if (totalTags === 0) {
+                return { name: 'N/A', price: 0 };
+            }
+
+            const allLicenses = [...database.licenses.Lite, ...database.licenses.Server].sort((a,b) => a.tags - b.tags);
+            const suitableLicense = allLicenses.find(l => l.tags >= totalTags);
+
+            if (!suitableLicense) {
+                const largestLicense = allLicenses[allLicenses.length - 1];
+                return { name: `Acima de ${largestLicense.tags} Tags`, price: largestLicense.price };
+            }
+            
+            const type = database.licenses.Lite.includes(suitableLicense) ? 'Lite' : 'Server';
+            return { name: `${type} - ${suitableLicense.tags} Tags`, price: suitableLicense.price };
+        }
+
+        function saveSettings() {
+            // Save tag and time settings
+            const settingsInputs = settingsFieldsContainer.querySelectorAll('input[type="number"], input[type="text"]');
+            settingsInputs.forEach(input => {
+                const groupKey = input.dataset.groupKey;
+                const itemKey = input.dataset.itemKey;
+                const prop = input.dataset.prop;
+                const newValue = input.type === 'text' ? input.value : (parseFloat(input.value) || 0);
+                if (database.tags[groupKey] && database.tags[groupKey].items[itemKey]) {
+                    database.tags[groupKey].items[itemKey][prop] = newValue;
+                }
+            });
+
+            // Save license settings
+            const licenseInputs = licenseSettingsContainer.querySelectorAll('input[type="number"]');
+            licenseInputs.forEach(input => {
+                const type = input.dataset.type;
+                const index = input.dataset.index;
+                const prop = input.dataset.prop;
+                const newValue = parseInt(input.value) || 0;
+                if(database.licenses[type] && database.licenses[type][index]) {
+                    database.licenses[type][index][prop] = newValue;
+                }
+            });
+            
+             // Save module settings
+            const moduleInputs = moduleSettingsContainer.querySelectorAll('input');
+            moduleInputs.forEach(input => {
+                const key = input.dataset.key;
+                const prop = input.dataset.prop;
+                 const newValue = input.type === 'text' ? input.value : (parseFloat(input.value) || 0);
+                if(database.modules[key]){
+                     database.modules[key][prop] = newValue;
+                }
+            });
+
+            // Save hardware settings
+            const hardwareInputs = hardwareSettingsContainer.querySelectorAll('input, select');
+            hardwareInputs.forEach(input => {
+                const type = input.dataset.type;
+                const index = input.dataset.index;
+                const prop = input.dataset.prop;
+                const newValue = input.type === 'text' ? input.value : (parseFloat(input.value) || 0);
+
+                if(database.hardware[type] && database.hardware[type][index]){
+                     database.hardware[type][index][prop] = newValue;
+                } else if (prop === 'hourPrice' || prop === 'kmPrice' || prop === 'lodgingPrice' || prop === 'foodPrice') {
+                    database.projectSettings[prop] = newValue;
+                }
+            });
+            
+            // Save project settings from calculator tab
+            const projectInputs = document.querySelectorAll('#calculator-project-inputs input, #calculator-project-inputs select');
+            projectInputs.forEach(input => {
+                const prop = input.dataset.prop;
+                if (input.type === 'checkbox') {
+                    database.projectSettings[prop] = input.checked;
+                } else if (input.type === 'text') {
+                    database.projectSettings[prop] = input.value;
+                } else {
+                    const newValue = parseFloat(input.value) || 0;
+                    database.projectSettings[prop] = newValue;
+                }
+            });
+
+            localStorage.setItem('database', JSON.stringify(database));
+            alert('Configurações salvas com sucesso!');
+            rerenderAll();
+        }
+        
+        function restoreDefaults() {
+            if (confirm('Tem certeza que deseja restaurar os valores padrão? Todas as suas alterações serão perdidas.')) {
+                localStorage.removeItem('database');
+                loadData();
+                rerenderAll();
+                alert('Valores padrão restaurados.');
+            }
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem('database');
+            let parsedData = savedData ? JSON.parse(savedData) : JSON.parse(JSON.stringify(defaultDatabase));
+            
+            // Migration for old data structures and new fields
+             database = {
+                ...JSON.parse(JSON.stringify(defaultDatabase)),
+                ...parsedData,
+                projectSettings: {
+                    ...JSON.parse(JSON.stringify(defaultDatabase.projectSettings)),
+                    ...(parsedData.projectSettings || {})
+                },
+                tags: parsedData.tags || JSON.parse(JSON.stringify(defaultDatabase.tags)),
+                licenses: parsedData.licenses || JSON.parse(JSON.stringify(defaultDatabase.licenses)),
+                hardware: parsedData.hardware || JSON.parse(JSON.stringify(defaultDatabase.hardware)),
+                modules: parsedData.modules || JSON.parse(JSON.stringify(defaultDatabase.modules)),
+             };
+
+             for (const key in defaultDatabase.hardware.videoCards) {
+                if(database.hardware.videoCards[key] && !database.hardware.videoCards[key].name) {
+                     database.hardware.videoCards[key].name = defaultDatabase.hardware.videoCards[key].name;
+                }
+            }
+        }
+        
+        function rerenderAll() {
+            renderProjectInputs();
+            renderCalculatorFields();
+            renderSettingsFields();
+            calculateAndDisplayTotals();
+        }
+
+        function initializeChart() {
+            if (!ctx) return;
+            tagsChart = new Chart(ctx, {
+                type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: document.body.classList.contains('dark-theme') ? '#f5f5f5' : '#4a5568', font: { family: "'Inter', sans-serif" }, padding: 15, boxWidth: 12, usePointStyle: true, pointStyle: 'circle' }}}}
+            });
+        }
+
+        function updateChart(groupTotals) {
+            if (!tagsChart) return;
+            const labels = Object.keys(groupTotals);
+            const data = Object.values(groupTotals);
+            tagsChart.data.labels = labels;
+            tagsChart.data.datasets[0].data = data;
+            tagsChart.data.datasets[0].backgroundColor = labels.map(label => chartGroupColors[label] || '#9ca3af');
+            tagsChart.update();
+        }
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-theme');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                document.body.classList.remove('dark-theme');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+            if(tagsChart) {
+                tagsChart.options.plugins.legend.labels.color = theme === 'dark' ? '#f5f5f5' : '#4a5568';
+                tagsChart.update();
+            }
         }
 
         function toggleTheme() {
-            const body = document.body;
-            body.classList.toggle('dark-theme');
-            const themeSwitcherButton = document.getElementById('themeSwitcherButton');
+            const currentTheme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        }
+        
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
             
-            const isDarkMode = body.classList.contains('dark-theme');
-            const primaryColorVar = isDarkMode ? '--primary-color-dark' : '--primary-color-light';
+            // Get current project settings from inputs
+            const companyName = document.getElementById('calc_company_name').value || 'N/A';
+            const projectName = document.getElementById('calc_project_name').value || 'N/A';
+            const city = document.getElementById('calc_city').value || 'N/A';
+            const state = document.getElementById('calc_state').value || 'N/A';
+
+            const finalTotalTags = grandTotalEl.textContent;
+            const baseTagsValue = baseTagsEl.textContent;
+            const reserveTagsValue = reserveTagsEl.textContent;
+            const totalHoursValue = totalHoursEl.textContent;
+
+            const hardwareTotal = hardwareTotalPriceEl.textContent;
+            const travelTotal = travelTotalPriceEl.textContent;
+            const licenseName = licenseNameEl.textContent;
+            const licenseCost = licensePriceEl.textContent;
+            const servicesCost = servicesPriceEl.textContent;
+            const projectTotal = projectTotalPriceEl.textContent;
+
+            const chartBase64 = tagsChart ? tagsChart.toBase64Image() : null;
+
+            // --- PDF STYLING ---
+            const primaryColor = '#14b8a6';
+            const secondaryColor = '#4a5568';
+            const pageW = doc.internal.pageSize.getWidth();
+            const margin = 14;
+            let y = 20;
+
+            // Header
+            doc.setFontSize(22).setFont(undefined, 'bold');
+            doc.text("Orçamento de Projeto de Supervisório", pageW / 2, y, { align: 'center' });
+            y += 10;
+            doc.setFontSize(10).setFont(undefined, 'normal');
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, pageW - margin, y, { align: 'right' });
+            y += 8;
+
+            // Section Title Helper
+            const drawSectionTitle = (title) => {
+                doc.setFillColor(primaryColor);
+                doc.rect(margin, y, pageW - (margin * 2), 8, 'F');
+                doc.setFontSize(12).setFont(undefined, 'bold').setTextColor('#FFFFFF');
+                doc.text(title, margin + 3, y + 5.5);
+                y += 12;
+                doc.setTextColor('#000000');
+            };
             
-            requestAnimationFrame(() => {
-                const rootStyle = getComputedStyle(body);
-                const primaryColorValue = rootStyle.getPropertyValue(primaryColorVar).trim();
-                const primaryColorRGB = rgbStringToCssVar(primaryColorValue);
-                body.style.setProperty(isDarkMode ? '--primary-color-rgb-dark' : '--primary-color-rgb', primaryColorRGB);
-            });
+            // Client/Project Info
+            drawSectionTitle("Dados do Projeto");
+            doc.setFontSize(10).setFont(undefined, 'normal');
+            doc.text(`Empresa: ${companyName}`, margin, y);
+            doc.text(`Local: ${city}, ${state}`, pageW / 2, y);
+            y += 6;
+            doc.text(`Projeto: ${projectName}`, margin, y);
+            y += 10;
+            
+            // Summary Cards
+            const drawSummaryCard = (x, width, title, value, subtext = null) => {
+                doc.setFillColor(244, 247, 249);
+                doc.setDrawColor(222, 226, 230);
+                doc.roundedRect(x, y, width, 22, 3, 3, 'FD');
+                doc.setFontSize(10).setTextColor(secondaryColor);
+                doc.text(title, x + width / 2, y + 7, { align: 'center' });
+                doc.setFontSize(18).setFont(undefined, 'bold').setTextColor('#000000');
+                doc.text(value, x + width / 2, y + 14, { align: 'center' });
+                 if (subtext) {
+                    doc.setFontSize(8).setFont(undefined, 'normal').setTextColor(secondaryColor);
+                    doc.text(subtext, x + width / 2, y + 19, { align: 'center' });
+                }
+            };
 
+            const cardWidth = (pageW - margin * 2 - 10) / 2;
+            drawSummaryCard(margin, cardWidth, "Total de Tags", finalTotalTags, `Projeto: ${baseTagsValue} + Reserva: ${reserveTagsValue}`);
+            drawSummaryCard(margin + cardWidth + 10, cardWidth, "Total de Horas", `${totalHoursValue}h`);
+            y += 30;
 
-            if (isDarkMode) {
-                themeSwitcherButton.textContent = 'Tema Claro';
-            } else {
-                themeSwitcherButton.textContent = 'Tema Escuro';
+            // Costs Breakdown
+            drawSectionTitle("Detalhamento de Custos");
+            const costX = margin + 5;
+            let costY = y;
+            const drawCostItem = (label, value) => {
+                doc.setFontSize(10).setFont(undefined, 'bold');
+                doc.text(label, costX, costY);
+                doc.setFont(undefined, 'normal');
+                doc.text(value, costX + 70, costY);
+                costY += 7;
             }
+            drawCostItem("Valor dos Serviços:", servicesCost);
+            drawCostItem("Custo da Licença:", licenseCost);
+            drawCostItem("Custo de Hardware:", hardwareTotal);
+            drawCostItem("Despesas de Viagem:", travelTotal);
+            
+            y = Math.max(y + 5, costY);
+
+            // Final Total
+            doc.setDrawColor(primaryColor);
+            doc.line(margin, y, pageW - margin, y);
+            y += 10;
+            doc.setFontSize(16).setFont(undefined, 'bold');
+            doc.text("Valor Total do Projeto:", margin, y);
+            doc.text(projectTotal, pageW - margin, y, { align: 'right' });
+
+
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8).setTextColor(secondaryColor);
+                doc.text(`Versão 12.0 - by Diego Karloh`, margin, 287);
+                doc.text(`Página ${i} de ${pageCount}`, pageW / 2, 287, { align: 'center' });
+            }
+
+            doc.save(`Orçamento - ${projectName || 'Novo Projeto'}.pdf`);
         }
 
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Assign DOM elements
+            grandTotalEl = document.getElementById('grand-total');
+            baseTagsEl = document.getElementById('base-tags');
+            reserveTagsEl = document.getElementById('reserve-tags');
+            totalHoursEl = document.getElementById('total-hours');
+            licenseNameEl = document.getElementById('license-name');
+            licensePriceEl = document.getElementById('license-price');
+            servicesPriceEl = document.getElementById('services-price');
+            projectTotalPriceEl = document.getElementById('project-total-price');
+            computerNameEl = document.getElementById('computer-name');
+            screensDescEl = document.getElementById('screens-desc');
+            videocardDescEl = document.getElementById('videocard-desc');
+            hardwareTotalPriceEl = document.getElementById('hardware-total-price');
+            moduleHardwarePriceEl = document.getElementById('module-hardware-price');
+            travelCostEl = document.getElementById('travel-cost');
+            lodgingCostEl = document.getElementById('lodging-cost');
+            foodCostEl = document.getElementById('food-cost');
+            travelTotalPriceEl = document.getElementById('travel-total-price');
+            clearButton = document.getElementById('clear-button');
+            pdfButton = document.getElementById('pdf-button');
+            tagsForm = document.getElementById('tags-form');
+            calculatorFieldsContainer = document.getElementById('calculator-fields-container');
+            modulesContainer = document.getElementById('modules-container');
+            calculatorProjectInputsContainer = document.getElementById('calculator-project-inputs');
+            settingsFieldsContainer = document.getElementById('settings-fields');
+            licenseSettingsContainer = document.getElementById('license-settings-fields');
+            hardwareSettingsContainer = document.getElementById('hardware-settings-fields');
+            moduleSettingsContainer = document.getElementById('module-settings-fields');
+            saveSettingsButton = document.getElementById('save-settings-button');
+            restoreDefaultsButton = document.getElementById('restore-defaults-button');
+            themeSwitcher = document.getElementById('theme-switcher');
+            sunIcon = document.getElementById('sun-icon');
+            moonIcon = document.getElementById('moon-icon');
+            ctx = document.getElementById('tagsChart')?.getContext('2d');
+            
+            loadData();
+            initializeChart();
+            rerenderAll();
+            openTab(null, 'calculadora');
 
-        // --- Inicialização ---
-        document.addEventListener('DOMContentLoaded', function() {
-            popularMarcas('clp', 'clp_marca');
-            popularMarcas('ihm', 'ihm_marca');
-            popularSelectPotencia('motor_cv');
+            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            applyTheme(savedTheme);
             
-            document.getElementById('clp_marca').addEventListener('change', function() { popularFamilias('clp', this.value, 'clp_familia'); });
-            document.getElementById('ihm_marca').addEventListener('change', function() { popularFamilias('ihm', this.value, 'ihm_familia'); });
+            // Event Listeners
+            tagsForm.addEventListener('input', calculateAndDisplayTotals);
             
-            setupConditionalInput('clp_safety', 'clp_safety_qty_div');
-            setupConditionalInput('clp_controle_eixo', 'clp_controle_eixo_qty_div');
-            setupConditionalInput('clp_entrada_rapida', 'clp_entrada_rapida_qty_div');
-            setupConditionalInput('clp_saida_rapida', 'clp_saida_rapida_qty_div');
-
-            
-            const themeSwitcherButton = document.getElementById('themeSwitcherButton');
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            const isDarkMode = document.body.classList.contains('dark-theme');
-            const initialPrimaryColorVar = isDarkMode ? '--primary-color-dark' : '--primary-color-light';
-             requestAnimationFrame(() => { 
-                const rootStyle = getComputedStyle(document.body);
-                const initialPrimaryColorValue = rootStyle.getPropertyValue(initialPrimaryColorVar).trim();
-                const initialPrimaryColorRGB = rgbStringToCssVar(initialPrimaryColorValue);
-                document.body.style.setProperty(isDarkMode ? '--primary-color-rgb-dark' : '--primary-color-rgb', initialPrimaryColorRGB);
+            clearButton.addEventListener('click', () => {
+                const defaultSettings = JSON.parse(JSON.stringify(defaultDatabase.projectSettings));
+                database.projectSettings = defaultSettings;
+                tagsForm.reset();
+                // manually update the UI from the now-reset database state
+                rerenderAll(); 
             });
-
-
-            if (isDarkMode) {
-                themeSwitcherButton.textContent = 'Tema Claro';
-            } else {
-                themeSwitcherButton.textContent = 'Tema Escuro';
-            }
-
-            openTab(null, 'ConfigProjeto');
-            preCadastrarTodosOsKits(); 
-            renderizarKits(); 
-            renderizarMotores(); 
-            renderizarInstrumentos();
-            atualizarDashboardIOs();
+            saveSettingsButton.addEventListener('click', saveSettings);
+            restoreDefaultsButton.addEventListener('click', restoreDefaults);
+            themeSwitcher.addEventListener('click', toggleTheme);
+            pdfButton.addEventListener('click', generatePDF);
         });
     </script>
-
 </body>
 </html>
