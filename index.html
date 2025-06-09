@@ -3,890 +3,2074 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>Sistema de Orçamento Técnico</title>
+    <title>Ferramenta de Orçamento Inteligente</title>
     <style>
-        /* Estilos Gerais */
+        /* Reset e Estilos Globais */
+        :root {
+            /* Tema Claro (Padrão) - Nova Paleta Verde-Azulado */
+            --primary-color-light: #20c997; 
+            --primary-hover-color-light: #1baa80;
+            --primary-darker-light: #17a278; /* Para a barra do título */
+            --secondary-color-light: #6c757d; 
+            --background-color-light: #f4f6f9; /* Fundo geral um pouco mais suave */
+            --surface-color-light: #ffffff; 
+            --text-color-light: #212529; 
+            --text-muted-light: #6c757d; 
+            --border-color-light: #dee2e6; 
+            --fieldset-bg-light: transparent; 
+            --legend-color-light: var(--primary-darker-light); /* Cor do texto do legend */
+            --input-bg-light: var(--surface-color-light);
+            --input-border-focus-light: #52d9b3; /* Tom mais claro do primary para foco */
+            --info-success-bg-light: #d1e7dd;
+            --info-success-text-light: #0f5132;
+            --info-success-border-light: #badbcc;
+            --info-error-bg-light: #f8d7da;
+            --info-error-text-light: #721c24;
+            --info-error-border-light: #f5c6cb;
+            --table-header-bg-light: #e9ecef;
+            --table-row-hover-bg-light: #f1f3f5;
+
+
+            /* Tema Escuro - Nova Paleta Verde */
+            --primary-color-dark: #28a745; 
+            --primary-hover-color-dark: #1f8333;
+            --primary-darker-dark: #196a29; /* Para a barra do título */
+            --secondary-color-dark: #adb5bd; 
+            --background-color-dark: #1c1e22; /* Fundo escuro um pouco diferente */
+            --surface-color-dark: #2a2d30;   
+            --text-color-dark: #f8f9fa;      
+            --text-muted-dark: #adb5bd;
+            --border-color-dark: #45494e;    
+            --fieldset-bg-dark: transparent;
+            --legend-color-dark: var(--primary-darker-dark); /* Cor do texto do legend */
+            --input-bg-dark: #303438;
+            --input-border-focus-dark: #34c759; /* Tom mais claro do primary para foco */
+            --info-success-bg-dark: #143620;
+            --info-success-text-dark: #a3cfbb;
+            --info-success-border-dark: #2f6d42;
+            --info-error-bg-dark: #3e1b1f;
+            --info-error-text-dark: #f1b8bd;
+            --info-error-border-dark: #842029;
+            --table-header-bg-dark: #343a40;
+            --table-row-hover-bg-dark: #3a3f44;
+
+
+            /* Variáveis dinâmicas que mudam com o tema */
+            --primary-color: var(--primary-color-light);
+            --primary-hover-color: var(--primary-hover-color-light);
+            --primary-darker: var(--primary-darker-light);
+            --secondary-color: var(--secondary-color-light);
+            --background-color: var(--background-color-light);
+            --surface-color: var(--surface-color-light);
+            --text-color: var(--text-color-light);
+            --text-muted: var(--text-muted-light);
+            --border-color: var(--border-color-light);
+            --fieldset-bg: var(--fieldset-bg-light);
+            --legend-color: var(--legend-color-light);
+            --input-bg: var(--input-bg-light);
+            --input-border-focus: var(--input-border-focus-light);
+            --info-success-bg: var(--info-success-bg-light);
+            --info-success-text: var(--info-success-text-light);
+            --info-success-border: var(--info-success-border-light);
+            --info-error-bg: var(--info-error-bg-light);
+            --info-error-text: var(--info-error-text-light);
+            --info-error-border: var(--info-error-border-light);
+            --table-header-bg: var(--table-header-bg-light);
+            --table-row-hover-bg: var(--table-row-hover-bg-light);
+
+
+            --font-family: 'Roboto', sans-serif; 
+            --border-radius: 0.3rem; 
+            --box-shadow: 0 3px 5px rgba(0, 0, 0, 0.03); 
+        }
+        
+        body.dark-theme {
+            --primary-color: var(--primary-color-dark);
+            --primary-hover-color: var(--primary-hover-color-dark);
+            --primary-darker: var(--primary-darker-dark);
+            --secondary-color: var(--secondary-color-dark);
+            --background-color: var(--background-color-dark);
+            --surface-color: var(--surface-color-dark);
+            --text-color: var(--text-color-dark);
+            --text-muted: var(--text-muted-dark);
+            --border-color: var(--border-color-dark);
+            --fieldset-bg: var(--fieldset-bg-dark);
+            --legend-color: var(--legend-color-dark);
+            --input-bg: var(--input-bg-dark);
+            --input-border-focus: var(--input-border-focus-dark);
+            --info-success-bg: var(--info-success-bg-dark);
+            --info-success-text: var(--info-success-text-dark);
+            --info-success-border: var(--info-success-border-dark);
+            --info-error-bg: var(--info-error-bg-dark);
+            --info-error-text: var(--info-error-text-dark);
+            --info-error-border: var(--info-error-border-dark);
+            --table-header-bg: var(--table-header-bg-dark);
+            --table-row-hover-bg: var(--table-row-hover-bg-dark);
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f9; /* Cinza claro de fundo */
+            font-family: var(--font-family);
             margin: 0;
-            padding: 20px;
-            color: #3a3f44; 
+            padding: 0;
+            background-color: var(--background-color); 
+            color: var(--text-color);
             line-height: 1.6;
-            font-size: 15px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .main-container {
-            background-color: #ffffff;
-            padding: 20px 30px 30px 30px;
-            border-radius: 10px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-            width: 95%;
-            max-width: 1100px; 
-            margin: 20px auto;
-        }
-
-        h1 {
-            color: #005a9c; 
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 2em;
-            font-weight: 600;
-        }
-
-        h2 {
-            color: #007bff; 
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 10px;
-            margin-top: 25px;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            font-weight: 500;
-        }
-        h3 {
-            color: #0069d9; 
-            margin-top: 20px;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-            font-weight: 500;
-        }
-         h4 {
-            color: #343a40;
-            margin-top: 15px;
-            margin-bottom: 10px;
-            font-size: 1em;
-            font-weight: 600;
-        }
-
-        /* Navegação por Abas */
-        .tab-navigation {
-            display: flex;
-            border-bottom: 1px solid #dee2e6;
-            margin-bottom: 25px;
-        }
-
-        .tab-button {
-            padding: 10px 18px;
-            cursor: pointer;
+        .container {
+            width: 100%; 
+            max-width: 1400px; 
+            margin: 1rem auto; 
+            padding: 1rem; 
+            background-color: transparent; 
+            box-shadow: none;
             border: none;
-            background-color: transparent;
-            font-size: 1em;
+            border-radius: 0;
+            box-sizing: border-box;
+        }
+        body.dark-theme .container {
+           
+        }
+
+        /* Cabeçalhos */
+        h1 {
+            text-align: center;
+            font-size: 2rem; 
+            margin-bottom: 2rem; 
             font-weight: 500;
-            color: #495057;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -1px; 
-            margin-right: 8px;
-            transition: color 0.2s ease, border-color 0.2s ease;
+            color: var(--text-color); 
+        }
+        h2 { 
+            font-size: 1.5rem; 
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid var(--primary-color);
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        h3, h4 { 
+            font-size: 1.25rem; 
+            margin-top: 1rem; 
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        h4 {
+           font-size: 1rem;
+           color: var(--text-muted);
+           margin-top: 1.25rem;
         }
 
-        .tab-button:hover {
-            color: #0056b3;
-        }
 
-        .tab-button.active {
-            color: #007bff;
-            border-bottom-color: #007bff;
+        /* Abas */
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
         }
-
+        .tab-buttons button {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 0.75rem 1rem; 
+            font-size: 0.95rem; 
+            font-weight: 500;
+            transition: color 0.3s ease, border-bottom-color 0.3s ease;
+            border-bottom: 2px solid transparent; 
+            margin-right: 0.5rem;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+        .tab-buttons button:hover {
+            color: var(--primary-color);
+        }
+        .tab-buttons button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
         .tab-content {
             display: none;
-            padding-top: 10px;
+            animation: fadeIn 0.4s ease-out;
         }
-
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.4s ease-in-out;
         }
-
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Estilos de Formulário */
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #495057;
-            font-size: 0.9em;
+        /* Formulários */
+        fieldset {
+            margin-bottom: 2rem; 
+            padding-top: 0.75rem; 
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--primary-darker); 
+            border-radius: var(--border-radius);
+            background-color: var(--surface-color); 
+            position: relative; 
+            box-shadow: var(--box-shadow); 
+            transition: background-color 0.3s ease, border-color 0.3s ease, border-top-color 0.3s ease;
+        }
+        fieldset > div:not(.no-padding), fieldset > form > div:not(.no-padding), fieldset > form > .clp-options-container,
+        fieldset > #motoresAdicionadosContainer, fieldset > #listaKitsCadastrados, .form-row, #instrumentosAdicionadosContainer {
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+        fieldset > :last-child:not(legend) { 
+             padding-bottom: 1.25rem;
+        }
+         fieldset > legend + * { 
+            padding-top: 0.5rem; 
         }
 
-        select,
+
+        legend { 
+            font-weight: 500; 
+            font-size: 0.9rem; 
+            padding: 0.3rem 0.8rem; 
+            color: #fff; 
+            background-color: var(--primary-darker); 
+            border-radius: var(--border-radius) var(--border-radius) 0 0; 
+            text-transform: uppercase; 
+            letter-spacing: 0.75px; 
+            display: inline-block; 
+            position: absolute;
+            top: 0; 
+            left: 1rem; 
+            transform: translateY(-50%); 
+            box-shadow: 0 2px 3px rgba(0,0,0,0.07);
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+        body.dark-theme legend {
+             background-color: var(--primary-darker);
+             color: var(--text-color-dark);
+        }
+
+        
+        .form-row { 
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 1rem; 
+            margin-bottom: 0.75rem; 
+        }
+        .form-row .form-group {
+            flex: 1; 
+            min-width: 150px; 
+            margin-bottom: 0; 
+        }
+        .form-row .form-group.full-width { 
+            flex-basis: 100%;
+            min-width: 100%;
+        }
+        .form-row .form-group.checkbox-item { 
+            display: flex;
+            align-items: center;
+            flex-basis: auto; 
+            min-width: auto;
+            margin-top: 1.2rem; 
+        }
+         .form-row .form-group.checkbox-item input[type="checkbox"] {
+            margin-right: 0.4rem;
+            transform: scale(0.9);
+        }
+         .form-row .form-group.checkbox-item label {
+            margin-bottom: 0;
+            font-size: 0.85em;
+        }
+
+        /* Grupo de Sensores / Opções de Instrumento */
+        .sensor-group, .instrumento-options-group {
+            flex-basis: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem; 
+            padding: 0.75rem 0; 
+            border-top: 1px dotted var(--border-color);
+            margin-top: 0.5rem;
+        }
+        .sensor-group .checkbox-item, .instrumento-options-group .checkbox-item {
+            margin-top: 0.2rem; 
+            flex-grow: 1;
+        }
+
+
+        .form-row label, 
+        .form-group label { 
+            display: block;
+            margin-bottom: 0.3rem; 
+            font-weight: 400; 
+            color: var(--text-muted); 
+            font-size: 0.875em; 
+        }
+
         input[type="text"],
         input[type="number"],
+        select,
         textarea {
             width: 100%;
-            padding: 9px 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
+            padding: 0.6rem 0.75rem; 
+            margin-bottom: 0; 
+            border: 1px solid var(--border-color); 
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border-radius: var(--border-radius);
             box-sizing: border-box;
-            font-size: 0.95em;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            font-size: 0.9rem; 
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+        input[type="text"]::placeholder,
+        input[type="number"]::placeholder,
+        textarea::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+        
+        .clp-options-container { 
+            margin-top: 1rem; 
+            padding-top: 0; 
+        }
+        .clp-options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+            gap: 0.4rem 1rem;  
         }
 
-        select:focus,
+        .form-group-checkbox-horizontal { 
+            display: flex;
+            align-items: center; 
+            margin-bottom: 0.5rem; 
+            flex-wrap: wrap; 
+        }
+
+        .form-group-checkbox-horizontal .checkbox-label-wrapper {
+            display: flex; 
+            align-items: center;
+            margin-right: 0.75rem; 
+            margin-bottom: 0.2rem; 
+        }
+        
+        .form-group-checkbox-horizontal input[type="checkbox"] { 
+            margin-right: 0.4rem;
+            vertical-align: middle;
+            flex-shrink: 0;
+            transform: scale(0.85); 
+            cursor: pointer;
+        }
+        .form-group-checkbox-horizontal .main-checkbox-label { 
+            font-weight: 400; 
+            font-size: 0.875em; 
+            margin-bottom: 0; 
+            cursor: pointer; 
+            color: var(--text-muted); 
+        }
+        
+        .conditional-input { 
+            display: none; 
+            padding: 0; 
+            background-color: transparent; 
+            border: none; 
+            margin-top: 0; 
+            margin-left: 0; 
+            display: flex; 
+            flex-wrap: wrap;
+            gap: 0.5rem; 
+        }
+        
+        .conditional-input .qty-row { 
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;  
+            margin-right: 0.5rem; 
+        }
+         .conditional-input .qty-row:last-child {
+            margin-right: 0;
+        }
+
+
+        .conditional-input .qty-row label { 
+            font-size: 0.8em; 
+            margin-bottom: 0;
+            margin-right: 0.3rem; 
+            flex-shrink: 0; 
+            color: var(--text-muted);
+            text-align: left;
+            font-weight: 400; 
+        }
+         .conditional-input .qty-row label[for="clp_di_safety_qty"],
+         .conditional-input .qty-row label[for="clp_do_safety_qty"] { flex-basis: auto; } 
+         .conditional-input .qty-row label[for="clp_controle_eixo_qty"] { flex-basis: auto; }
+         .conditional-input .qty-row label[for="clp_entrada_rapida_qty"] { flex-basis: auto;}
+         .conditional-input .qty-row label[for="clp_saida_rapida_qty"] { flex-basis: auto;}
+
+
+        .conditional-input .qty-row input[type="number"] { 
+            width: 55px; 
+            padding: 0.3rem; 
+            font-size: 0.8em; 
+            margin-bottom: 0;
+            border: 1px solid var(--border-color); 
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border-radius: calc(var(--border-radius) - 2px); 
+            box-sizing: border-box;
+        }
+        
         input[type="text"]:focus,
         input[type="number"]:focus,
+        select:focus,
         textarea:focus {
-            border-color: #007bff;
+            border-color: var(--input-border-focus); 
+            box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb, 32, 201, 151), 0.15); 
             outline: none;
-            box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.2);
         }
-        
+        body.dark-theme input[type="text"]:focus,
+        body.dark-theme input[type="number"]:focus,
+        body.dark-theme select:focus,
+        body.dark-theme textarea:focus {
+             box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb-dark, 40, 167, 69), 0.25); 
+        }
+
+        select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236c757d%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 0.65em; 
+            padding-right: 2.25rem;
+        }
+        body.dark-theme select { 
+             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23adb5bd%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+        }
         textarea {
-            min-height: 70px;
+            min-height: 80px; 
             resize: vertical;
+            margin-bottom: 0; 
         }
-        
-        .section-block { 
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            border: 1px solid #e9ecef;
+        .form-group { 
+            margin-bottom: 1rem; 
         }
 
-        .section-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-            gap: 15px 20px;
-            align-items: flex-start; 
+        /* Seção de Motores e Kits Cadastrados */
+        #motoresAdicionadosContainer, #listaKitsCadastrados, #instrumentosAdicionadosContainer {
+            margin-top: 1.5rem;
+            padding-bottom: 0.5rem; 
         }
-         .section-grid-tight { /* Para acionamentos */
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
-            gap: 10px 15px;
-            align-items: flex-end; 
-        }
-        
-        .field-group {
+        .motor-item, .kit-item, .instrumento-item { 
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-left: 3px solid var(--primary-color); 
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
             display: flex;
-            flex-direction: column;
-        }
-        
-        .checkbox-group { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 15px 25px; 
-            margin-top: 15px;
-            align-items: start; 
-        }
-
-        .checkbox-item-container { 
-            display: flex;
-            flex-direction: column; 
-            align-items: flex-start; 
-        }
-        
-        .checkbox-label-wrapper { 
-             display: flex;
-             align-items: center;
-             margin-bottom: 8px; 
-        }
-
-
-        .checkbox-item-container input[type="checkbox"] {
-            width: auto;
-            margin-right: 8px;
-            accent-color: #007bff; 
-            transform: scale(1.1); 
-        }
-        .checkbox-item-container .checkbox-label-wrapper label { 
-            margin-bottom: 0;
-            font-weight: normal;
-            color: #333;
-            font-size: 0.95em; 
-        }
-        
-        .sub-field-wrapper { 
-            display: none; 
-            margin-top: 0px; 
-            padding-left: 28px; 
-        }
-        .sub-field-wrapper label {
-            font-size: 0.8em;
-            color: #555;
-            margin-bottom: 2px;
-        }
-        .sub-field-wrapper input[type="number"] {
-            padding: 6px 8px;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-            max-width: 90px; 
-            width: auto; 
-            display: inline-block; 
-        }
-        
-        /* Botões */
-        button, .button { 
-            background-color: #007bff; 
-            color: white;
-            padding: 9px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.95em;
-            font-weight: 500;
-            transition: background-color 0.2s, transform 0.1s;
-            display: inline-flex; 
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            text-decoration: none; 
+            flex-wrap: wrap; 
+            gap: 0.5rem;
+            font-size: 0.875em; 
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
-        button:active, .button:active {
+        .motor-item span, .kit-item-info span, .instrumento-item span { 
+            margin-right: 0.75rem;
+            color: var(--text-muted);
+        }
+        .motor-item strong, .kit-item-info strong, .instrumento-item strong {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        .motor-item .motor-sensors, .instrumento-item .instrumento-options {
+            flex-basis: 100%;
+            font-size: 0.9em;
+            color: var(--text-muted);
+            margin-top: -0.25rem;
+            padding-left: 0.25rem;
+        }
+        .motor-item .remove-motor-btn, .kit-item .remove-btn, .kit-item .edit-btn, .instrumento-item .remove-instrumento-btn {
+            background-color: transparent;
+            border: 1px solid; 
+            padding: 0.2rem 0.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 0.5rem; 
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .motor-item .remove-motor-btn, .kit-item .remove-btn, .instrumento-item .remove-instrumento-btn {
+             color: var(--error-color);
+             border-color: var(--error-color);
+        }
+        .kit-item .edit-btn {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+         .motor-item .remove-motor-btn:hover, .kit-item .remove-btn:hover, .instrumento-item .remove-instrumento-btn:hover {
+            background-color: var(--error-color);
+            color: #fff;
+        }
+        .kit-item .edit-btn:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+
+        /* Botões */
+        .button-container {
+            text-align: right;
+            margin-top: 1.5rem;
+        }
+        button.button-primary, button.button-gerar, button.button-add, button.button-secondary {
+            color: #fff; 
+            padding: 0.65rem 1.25rem; 
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.95rem; 
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); 
+        }
+         button.button-primary, button.button-gerar, button.button-add {
+            background-color: var(--primary-color);
+        }
+        button.button-secondary {
+             background-color: var(--secondary-color);
+        }
+
+        button.button-primary:hover, button.button-gerar:hover, button.button-add:hover {
+            background-color: var(--primary-hover-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+         button.button-secondary:hover {
+            background-color: #5a6268; 
+             box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+        button.button-primary:active, button.button-gerar:active, button.button-add:active, button.button-secondary:active {
             transform: translateY(1px);
-        }
-
-        button:hover, .button:hover {
-            background-color: #0056b3; 
-        }
-
-        .button-final {
-            background-color: #28a745; 
-            padding: 12px 20px;
-            font-size: 1.05em;
-        }
-
-        .button-final:hover {
-            background-color: #1e7e34; 
+            box-shadow: none;
         }
         
-        /* Tabela de Acionamentos e Kits */
-        table {
+        /* Botão de Tema */
+        .theme-switcher {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.6rem; 
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 0.85em; 
+            box-shadow: var(--box-shadow);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        .theme-switcher:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-hover-color);
+        }
+
+
+        /* Seção de Resultados e Listas */
+        #resultadoOrcamento, #listaKitsCadastrados {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--surface-color); 
+        }
+        #resultadoOrcamento h3, #listaKitsCadastrados h3 {
+            margin-top: 0;
+            color: var(--primary-color); 
+        }
+        .info-message {
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: var(--border-radius);
+            font-size: 0.9375rem;
+            border: 1px solid transparent;
+        }
+        .info-message.error {
+            background-color: var(--info-error-bg);
+            color: var(--info-error-text);
+            border-color: var(--info-error-border);
+        }
+        .info-message.success {
+            background-color: var(--info-success-bg);
+            color: var(--info-success-text);
+            border-color: var(--info-success-border);
+        }
+        
+        /* Tabela para Kits de Acionamento Pré-Definidos */
+        .kits-table-container {
+            margin-top: 1rem;
+            overflow-x: auto; 
+        }
+        .kits-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            font-size: 0.875em;
+        }
+        .kits-table th, .kits-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+            white-space: nowrap; 
+        }
+        .kits-table th {
+            background-color: var(--table-header-bg);
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        .kits-table tr:hover {
+            background-color: var(--table-row-hover-bg);
+        }
+        .kits-table input[type="number"] {
+            width: 70px; 
+            padding: 0.3rem;
             font-size: 0.9em;
         }
-
-        th, td {
-            border: 1px solid #dee2e6;
-            padding: 9px 10px;
-            text-align: left;
+        .kits-table .action-column {
+            width: 80px; 
+            text-align: center;
         }
-
-        th {
-            background-color: #007bff;
-            color: white;
-            font-weight: 600;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        
-        .delete-btn {
-            background-color: #dc3545;
-            padding: 5px 8px;
+         .kits-table .action-column button {
+            padding: 0.2rem 0.4rem;
             font-size: 0.8em;
-        }
-        .delete-btn:hover {
-            background-color: #c82333;
-        }
-         .edit-btn {
-            background-color: #ffc107;
-            color: #212529;
-            padding: 5px 8px;
-            font-size: 0.8em;
-            margin-right: 5px;
-        }
-        .edit-btn:hover {
-            background-color: #e0a800;
-        }
+         }
 
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .section-grid, .section-grid-tight, .checkbox-group {
-                grid-template-columns: 1fr; 
-            }
-            .main-container { 
-                width: 95%;
-                padding: 15px;
-            }
-            h1 {
-                font-size: 1.8em;
-                margin-bottom: 20px;
-            }
-            h2 {
-                font-size: 1.4em;
-                margin-bottom: 20px;
-            }
-            button, .button, .button-final {
-                font-size: 0.9em;
-                padding: 10px 15px;
-            }
-            .button-final {
-                padding: 12px 20px;
-            }
-            .tab-navigation {
-                font-size: 0.9em;
-            }
-            .tab-button {
-                padding: 10px 15px;
-            }
-        }
-        @media (max-width: 480px) {
-            h1 { font-size: 1.6em; }
-            h2 { font-size: 1.3em; }
-            h3 { font-size: 1.1em; }
-            .tab-button { padding: 8px 10px; font-size: 0.9em; }
-        }
+         /* IO Dashboard Cards */
+         .io-dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            gap: 1rem;
+            margin-bottom: 1rem;
+         }
+         .io-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+         }
+         .io-card h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: var(--text-muted);
+         }
+         .io-card .io-count {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            display: block;
+         }
+          .io-card .io-source {
+            font-size: 0.75em;
+            color: var(--text-muted);
+            margin: 0.25rem 0 0 0;
+          }
+
+
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <h1>Sistema de Orçamento Técnico</h1>
+    <button class="theme-switcher" id="themeSwitcherButton" onclick="toggleTheme()">Mudar Tema</button>
 
-        <div class="tab-navigation">
-            <button class="tab-button active" onclick="openTab(event, 'configProjeto')">Configurar Projeto</button>
-            <button class="tab-button" onclick="openTab(event, 'cadastros')">Cadastros</button>
+    <div class="container">
+        <h1>Ferramenta de Orçamento Inteligente</h1>
+
+        <div class="tab-buttons">
+            <button class="tab-link active" onclick="openTab(event, 'ConfigProjeto')">Configurar Projeto</button>
+            <button class="tab-link" onclick="openTab(event, 'CadastroKits')">Cadastrar Kits</button>
+            <button class="tab-link" onclick="openTab(event, 'OrcamentoDetalhado')">Orçamento Detalhado</button>
         </div>
 
-        <!-- Aba 1: Configuração Detalhada do Projeto -->
-        <div id="configProjeto" class="tab-content active">
-            <h2>Configuração Detalhada do Projeto</h2>
-
-            <section id="config-automacao-principal" class="section-block">
-                <h3>1.1. Sistema de Automação Principal (CLP)</h3>
-                <div class="section-grid">
-                    <div class="field-group">
-                        <label for="proj-clp-marca">Marca do CLP:</label>
-                        <select id="proj-clp-marca">
-                            <option value="">Selecione</option>
-                            <option value="Siemens">Siemens</option>
-                            <option value="Rockwell">Rockwell</option>
-                            <option value="Schneider">Schneider Electric</option>
-                            <option value="Outra">Outra</option>
+        <div id="ConfigProjeto" class="tab-content active">
+            <h2>Configuração do Projeto</h2>
+            <form id="formProjeto">
+                <fieldset>
+                    <legend>CLP (Controlador Lógico Programável)</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="clp_marca">Marca:</label>
+                            <select id="clp_marca" name="clp_marca">
+                                <option value="">Selecione a Marca</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="clp_familia">Família:</label>
+                            <select id="clp_familia" name="clp_familia">
+                                <option value="">Selecione primeiro a Marca</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group"> 
+                        <label for="clp_protocolo_inversor">Protocolo Comunicação (Inversores):</label>
+                        <select id="clp_protocolo_inversor" name="clp_protocolo_inversor">
+                            <option value="">Nenhum / Não aplicável</option>
+                            <option value="io_link">IO-Link</option>
+                            <option value="profinet">Profinet</option>
+                            <option value="modbus_rtu">Modbus RTU</option>
+                            <option value="profibus_dp">Profibus DP</option>
+                            <option value="canopen">CANopen</option>
+                            <option value="ethernet_ip">EtherNet/IP</option> 
                         </select>
                     </div>
-                    <div class="field-group" id="proj-clp-familia-wrapper" style="display: none;">
-                        <label for="proj-clp-familia">Família/Modelo CLP:</label>
-                        <select id="proj-clp-familia"></select>
-                    </div>
-                </div>
-                <div class="checkbox-group" style="margin-top: 20px;">
-                    <div class="checkbox-item-container">
-                        <div class="checkbox-label-wrapper">
-                            <input type="checkbox" id="proj-clp-safety">
-                            <label for="proj-clp-safety">CLP com Safety?</label>
-                        </div>
-                        <div id="proj-clp-safety-di-wrapper" class="sub-field-wrapper">
-                            <label for="proj-clp-safety-di">DI Safety:</label>
-                            <input type="number" id="proj-clp-safety-di" value="0" min="0">
-                        </div>
-                         <div id="proj-clp-safety-do-wrapper" class="sub-field-wrapper">
-                            <label for="proj-clp-safety-do">DO Safety:</label>
-                            <input type="number" id="proj-clp-safety-do" value="0" min="0">
-                        </div>
-                    </div>
-                     <div class="checkbox-item-container">
-                        <div class="checkbox-label-wrapper">
-                            <input type="checkbox" id="proj-controle-eixo">
-                            <label for="proj-controle-eixo">Controle de Eixo?</label>
-                        </div>
-                        <div id="proj-num-eixos-wrapper" class="sub-field-wrapper">
-                            <label for="proj-num-eixos">Nº de Eixos:</label>
-                            <input type="number" id="proj-num-eixos" value="0" min="0">
-                        </div>
-                    </div>
-                    <div class="checkbox-item-container">
-                        <div class="checkbox-label-wrapper">
-                            <input type="checkbox" id="proj-entradas-rapidas">
-                            <label for="proj-entradas-rapidas">Entradas Rápidas (HSI)?</label>
-                        </div>
-                         <div id="proj-num-entradas-rapidas-wrapper" class="sub-field-wrapper">
-                            <label for="proj-num-entradas-rapidas">Nº de HSI:</label>
-                            <input type="number" id="proj-num-entradas-rapidas" value="0" min="0">
-                        </div>
-                    </div>
-                    <div class="checkbox-item-container">
-                        <div class="checkbox-label-wrapper">
-                            <input type="checkbox" id="proj-saidas-rapidas">
-                            <label for="proj-saidas-rapidas">Saídas Rápidas (PTO/PWM)?</label>
-                        </div>
-                        <div id="num-saidas-rapidas-wrapper" class="sub-field-wrapper">
-                            <label for="proj-num-saidas-rapidas">Nº de PTO/PWM:</label>
-                            <input type="number" id="proj-num-saidas-rapidas" value="0" min="0">
-                        </div>
-                    </div>
-                </div>
-            </section>
 
-            <section id="config-ihm" class="section-block">
-                <h3>1.2. Sistema de IHM</h3>
-                 <div class="section-grid">
-                    <div class="field-group">
-                        <label for="proj-ihm-marca">Marca da IHM:</label>
-                        <select id="proj-ihm-marca">
-                            <option value="">Selecione</option>
-                            <option value="Siemens">Siemens</option>
-                            <option value="Rockwell">Rockwell</option>
-                            <option value="WEG">WEG</option>
-                            <option value="Outra">Outra</option>
-                        </select>
-                    </div>
-                    <div class="field-group" id="proj-ihm-familia-wrapper" style="display: none;">
-                        <label for="proj-ihm-familia">Família/Modelo IHM:</label>
-                        <select id="proj-ihm-familia"></select>
-                    </div>
-                </div>
-            </section>
+                    <div class="clp-options-container">
+                        <div class="clp-options-grid">
+                            <div class="form-group-checkbox-horizontal">
+                                <div class="checkbox-label-wrapper">
+                                    <input type="checkbox" id="clp_safety" name="clp_safety">
+                                    <label for="clp_safety" class="main-checkbox-label">Safety Integrado</label>
+                                </div>
+                                <div id="clp_safety_qty_div" class="conditional-input">
+                                    <div class="qty-row">
+                                        <label for="clp_di_safety_qty">DI Safety:</label>
+                                        <input type="number" id="clp_di_safety_qty" name="clp_di_safety_qty" min="0" placeholder="Qtd" disabled>
+                                    </div>
+                                    <div class="qty-row">
+                                        <label for="clp_do_safety_qty">DO Safety:</label>
+                                        <input type="number" id="clp_do_safety_qty" name="clp_do_safety_qty" min="0" placeholder="Qtd" disabled>
+                                    </div>
+                                </div>
+                            </div>
 
+                            <div class="form-group-checkbox-horizontal">
+                                <div class="checkbox-label-wrapper">
+                                    <input type="checkbox" id="clp_controle_eixo" name="clp_controle_eixo">
+                                    <label for="clp_controle_eixo" class="main-checkbox-label">Controle de Eixo(s)</label>
+                                </div>
+                                <div id="clp_controle_eixo_qty_div" class="conditional-input">
+                                    <div class="qty-row">
+                                        <label for="clp_controle_eixo_qty">Qtd. Eixos:</label>
+                                        <input type="number" id="clp_controle_eixo_qty" name="clp_controle_eixo_qty" min="0" placeholder="Qtd" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                       
+                            <div class="form-group-checkbox-horizontal">
+                                 <div class="checkbox-label-wrapper">
+                                    <input type="checkbox" id="clp_entrada_rapida" name="clp_entrada_rapida">
+                                    <label for="clp_entrada_rapida" class="main-checkbox-label">Entrada(s) Rápida(s)</label>
+                                </div>
+                                <div id="clp_entrada_rapida_qty_div" class="conditional-input">
+                                    <div class="qty-row">
+                                        <label for="clp_entrada_rapida_qty">Qtd. Ent. Rápidas:</label>
+                                        <input type="number" id="clp_entrada_rapida_qty" name="clp_entrada_rapida_qty" min="0" placeholder="Qtd" disabled>
+                                    </div>
+                                </div>
+                            </div>
 
-            <section id="config-acionamentos" class="section-block">
-                <h3>1.3. Cadastro de Acionamentos do Projeto</h3>
-                <div class="section-grid-tight" style="align-items: flex-end;">
-                    <div class="field-group">
-                        <label for="ac-marca-proj">Marca:</label>
-                        <select id="ac-marca-proj">
-                            <option value="Siemens">Siemens</option><option value="ABB">ABB</option><option value="Rockwell">Rockwell</option><option value="WEG">WEG</option><option value="Outra">Outra</option>
-                        </select>
+                            <div class="form-group-checkbox-horizontal">
+                                <div class="checkbox-label-wrapper">
+                                    <input type="checkbox" id="clp_saida_rapida" name="clp_saida_rapida">
+                                    <label for="clp_saida_rapida" class="main-checkbox-label">Saída(s) Rápida(s)</label>
+                                </div>
+                                <div id="clp_saida_rapida_qty_div" class="conditional-input">
+                                   <div class="qty-row">
+                                        <label for="clp_saida_rapida_qty">Qtd. Saí. Rápidas:</label>
+                                        <input type="number" id="clp_saida_rapida_qty" name="clp_saida_rapida_qty" min="0" placeholder="Qtd" disabled>
+                                   </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="field-group">
-                        <label for="ac-potencia-proj">Potência (CV):</label>
-                        <input type="number" id="ac-potencia-proj" min="0.25" step="0.25" value="1">
+                </fieldset>
+
+                <fieldset>
+                    <legend>IHM (Interface Homem-Máquina)</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ihm_marca">Marca:</label>
+                            <select id="ihm_marca" name="ihm_marca">
+                                <option value="">Selecione a Marca</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ihm_familia">Família:</label>
+                            <select id="ihm_familia" name="ihm_familia">
+                                <option value="">Selecione primeiro a Marca</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="field-group">
-                        <label for="ac-tensao-proj">Tensão:</label>
-                        <select id="ac-tensao-proj"><option value="220V Trifásico">220V Trifásico</option><option value="380V Trifásico">380V Trifásico</option><option value="440V Trifásico">440V Trifásico</option><option value="Outra">Outra</option></select>
+                     <div class="form-row">
+                        <div class="form-group">
+                            <label for="ihm_polegadas">Polegadas:</label>
+                            <select id="ihm_polegadas" name="ihm_polegadas">
+                                <option value="">Selecione</option>
+                                <option value="4">4"</option>
+                                <option value="7">7"</option>
+                                <option value="9">9"</option>
+                                <option value="10">10"</option>
+                                <option value="12">12"</option>
+                                <option value="15">15"</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group checkbox-item">
+                            <input type="checkbox" id="ihm_espelhamento" name="ihm_espelhamento">
+                            <label for="ihm_espelhamento">Com Espelhamento</label>
+                        </div>
                     </div>
-                    <div class="field-group">
-                        <label for="ac-tipo-partida-proj">Tipo de Partida:</label>
-                        <select id="ac-tipo-partida-proj"><option value="Direta">Direta</option><option value="Estrela-Triângulo">Estrela-Triângulo</option><option value="Soft-Starter">Soft-Starter</option><option value="Inversor">Inversor</option></select>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Acionamentos (Motores)</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="motor_nome">Nome do Motor:</label>
+                            <input type="text" id="motor_nome" name="motor_nome" placeholder="Ex: Bomba Principal">
+                        </div>
+                        <div class="form-group">
+                            <label for="motor_tag">TAG:</label>
+                            <input type="text" id="motor_tag" name="motor_tag" placeholder="Ex: MTR-001">
+                        </div>
                     </div>
-                     <div class="field-group">
-                        <label for="ac-protecao-proj">Proteção:</label>
-                        <select id="ac-protecao-proj"><option value="Disjuntor Motor">Disjuntor Motor (TOP)</option><option value="Fusível + Contator + Relé Térmico">Fusível + Contator + Relé Térmico</option><option value="Outra">Outra</option></select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="motor_cv">Potência (CV):</label>
+                            <select id="motor_cv" name="motor_cv">
+                                </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="motor_tensao">Tensão:</label>
+                             <select id="motor_tensao" name="motor_tensao">
+                                <option value="220_tri">220V Trifásico</option>
+                                <option value="380_tri">380V Trifásico</option>
+                                <option value="440_tri">440V Trifásico</option>
+                            </select>
+                        </div>
+                         <div class="form-group">
+                            <label for="motor_tipo_acionamento">Tipo de Acionamento:</label>
+                            <select id="motor_tipo_acionamento" name="motor_tipo_acionamento">
+                                <option value="partida_direta">Partida Direta</option>
+                                <option value="softstarter">Softstarter</option>
+                                <option value="inversor">Inversor de Frequência</option>
+                            </select>
+                        </div>
+                        <div class="form-group checkbox-item">
+                            <input type="checkbox" id="motor_reversao" name="motor_reversao">
+                            <label for="motor_reversao">Com Reversão</label>
+                        </div>
                     </div>
-                    <div class="field-group">
-                        <button id="btn-add-acionamento-lista">Adicionar à Lista</button>
+                    <div class="form-row">
+                        <div class="sensor-group">
+                             <div class="form-group checkbox-item">
+                                <input type="checkbox" id="motor_sensor_embuchamento" name="motor_sensor_embuchamento">
+                                <label for="motor_sensor_embuchamento">Fim de Curso Embuchamento (1 DI)</label>
+                            </div>
+                             <div class="form-group checkbox-item">
+                                <input type="checkbox" id="motor_sensor_velocidade" name="motor_sensor_velocidade">
+                                <label for="motor_sensor_velocidade">Vigia de Velocidade (1 DI)</label>
+                            </div>
+                             <div class="form-group checkbox-item">
+                                <input type="checkbox" id="motor_sensor_fca_fcr" name="motor_sensor_fca_fcr">
+                                <label for="motor_sensor_fca_fcr">Fins de Curso Avanço/Retorno (2 DI)</label>
+                            </div>
+                             <div class="form-group checkbox-item">
+                                <input type="checkbox" id="motor_atuador_solenoide" name="motor_atuador_solenoide">
+                                <label for="motor_atuador_solenoide">Bobinas Solenoides Avanço/Retorno (2 DO)</label>
+                            </div>
+                        </div>
                     </div>
+                     <div class="button-container" style="text-align: left; margin-bottom: 1rem; margin-top:0.5rem; padding-left: 1.25rem;">
+                        <button type="button" class="button-add" onclick="adicionarMotor()">Adicionar Motor</button>
+                    </div>
+
+                    <div id="motoresAdicionadosContainer">
+                        <h4>Motores Configurados:</h4>
+                        <div id="listaMotores">
+                            <p>Nenhum motor adicionado ainda.</p>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Instrumentos</legend>
+                     <div class="form-row">
+                        <div class="form-group">
+                            <label for="instrumento_tipo_medicao">Tipo de Medição:</label>
+                            <select id="instrumento_tipo_medicao" name="instrumento_tipo_medicao">
+                                <option value="">Selecione o Tipo</option>
+                                <option value="temperatura">Temperatura</option>
+                                <option value="pressao">Pressão</option>
+                                <option value="depressao">Depressão</option>
+                                <option value="nivel">Nível</option>
+                                <option value="vazao">Vazão</option>
+                                <option value="umidade">Umidade</option>
+                                <option value="analisador">Analisador</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="instrumento_tag">TAG do Instrumento:</label>
+                            <input type="text" id="instrumento_tag" name="instrumento_tag" placeholder="Ex: TT-101, PT-205">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                         <div class="form-group">
+                            <label for="instrumento_sinal">Tipo de Sinal:</label>
+                            <select id="instrumento_sinal" name="instrumento_sinal">
+                                <option value="">Selecione o Sinal</option>
+                                <option value="4_20ma">4-20 mA</option>
+                                <option value="0_10v">0-10 V</option>
+                                <option value="pt100">PT100</option>
+                                <option value="termo_j">Termopar Tipo J</option>
+                                <option value="termo_k">Termopar Tipo K</option>
+                                <option value="digital_npn">Digital NPN</option>
+                                <option value="digital_pnp">Digital PNP</option>
+                                <option value="pulso">Pulso</option>
+                                <option value="outro_sinal">Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="instrumento-options-group">
+                            <div class="form-group checkbox-item">
+                                <input type="checkbox" id="instrumento_malha_pi" name="instrumento_malha_pi">
+                                <label for="instrumento_malha_pi">Malha de Controle PI</label>
+                            </div>
+                            <div class="form-group checkbox-item">
+                                <input type="checkbox" id="instrumento_alarme_baixo" name="instrumento_alarme_baixo">
+                                <label for="instrumento_alarme_baixo">Alarme Baixo (1 DI)</label>
+                            </div>
+                            <div class="form-group checkbox-item">
+                                <input type="checkbox" id="instrumento_alarme_alto" name="instrumento_alarme_alto">
+                                <label for="instrumento_alarme_alto">Alarme Alto (1 DI)</label>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="button-container" style="text-align: left; margin-bottom: 1rem; margin-top:0.5rem; padding-left: 1.25rem;">
+                        <button type="button" class="button-add" onclick="adicionarInstrumento()">Adicionar Instrumento</button>
+                    </div>
+                     <div id="instrumentosAdicionadosContainer">
+                        <h4>Instrumentos Configurados:</h4>
+                        <div id="listaInstrumentos">
+                            <p>Nenhum instrumento adicionado ainda.</p>
+                        </div>
+                    </div>
+                </fieldset>
+                 <div class="button-container" style="margin-top: 2rem;">
+                    <button type="button" class="button-gerar" onclick="gerarOrcamento()">
+                        Gerar Orçamento
+                    </button>
                 </div>
-                <table id="tabela-acionamentos-projeto">
-                    <thead><tr><th>Marca</th><th>Potência</th><th>Tensão</th><th>Partida</th><th>Proteção</th><th>Ação</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </section>
-            <button class="button-final" onclick="alert('Lógica de geração de itens não implementada ainda.')">Gerar Itens para Orçamento com Base na Configuração do Projeto</button>
+            </form>
         </div>
 
-        <!-- Aba 2: Cadastros -->
-        <div id="cadastros" class="tab-content">
-            <h2>Cadastros Gerais</h2>
-            <section id="cadastro-kits-tecnicos" class="section-block">
-                <h3>Cadastro de Kits Técnicos</h3>
-                <div class="section-grid">
-                    <div class="field-group">
-                        <label for="kit-nome">Nome do Kit:</label>
-                        <input type="text" id="kit-nome" placeholder="Ex: Kit CLP Básico Siemens S7-1200">
-                    </div>
-                    <div class="field-group">
-                        <label for="kit-tipo">Tipo do Kit:</label>
-                        <select id="kit-tipo">
-                            <option value="CLP">CLP</option>
-                            <option value="IHM">IHM</option>
-                            <option value="Acionamento">Acionamento (Motor+Partida)</option>
-                            <option value="Transmissor">Transmissor</option>
-                            <option value="Sensor">Sensor</option>
-                            <option value="Painel">Painel Elétrico</option>
-                            <option value="Outro">Outro</option>
+        <div id="CadastroKits" class="tab-content">
+            <h2>Cadastro de Kits</h2>
+            <fieldset>
+                <legend>Kits Genéricos</legend>
+                <form id="formCadastroKit">
+                     <input type="hidden" id="kit_id_edicao" value=""> 
+                    <div class="form-group">
+                        <label for="kit_tipo">Tipo de Componente:</label>
+                        <select id="kit_tipo" name="kit_tipo">
+                            <option value="geral">Geral / Outro</option>
+                            <option value="instrumento">Instrumento</option>
+                            <option value="material_montagem">Material de Montagem</option>
                         </select>
                     </div>
-                </div>
-                <div class="field-group">
-                    <label for="kit-descricao">Descrição Detalhada do Kit:</label>
-                    <textarea id="kit-descricao" placeholder="Componentes principais, características..."></textarea>
-                </div>
+                    <div class="form-group">
+                        <label for="kit_nome">Nome/Modelo do Kit:</label>
+                        <input type="text" id="kit_nome" name="kit_nome" placeholder="Ex: Sensor de Nível Ultrassônico, Cabo de Comando" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="kit_descricao">Descrição (Opcional):</label>
+                        <textarea id="kit_descricao" name="kit_descricao" rows="2" placeholder="Detalhes do kit, especificações..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="kit_valor">Valor (R$):</label>
+                            <input type="number" id="kit_valor" name="kit_valor" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                         <div class="form-group">
+                            <label for="kit_icms">ICMS (%):</label>
+                            <input type="number" id="kit_icms" name="kit_icms" placeholder="0" step="0.01" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="kit_ipi">IPI (%):</label>
+                            <input type="number" id="kit_ipi" name="kit_ipi" placeholder="0" step="0.01" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="kit_tempo_montagem">Tempo de Montagem (h):</label>
+                            <input type="number" id="kit_tempo_montagem" name="kit_tempo_montagem" placeholder="0" step="0.1" min="0">
+                        </div>
+                    </div>
+                    <div class="button-container">
+                         <button type="button" class="button-primary" id="btnSalvarKit" onclick="salvarKit()">
+                            Adicionar Kit Genérico
+                        </button>
+                         <button type="button" class="button-secondary" id="btnCancelarEdicaoKit" onclick="cancelarEdicaoKit()" style="display:none; margin-right: 0.5rem;">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </fieldset>
 
-                <h4>Itens do Kit:</h4>
-                <div class="section-grid" style="align-items: flex-end;">
-                    <div class="field-group">
-                        <label for="kit-item-produto">Produto (do banco simulado):</label>
-                        <select id="kit-item-produto"> 
-                            <!-- Populado por JS a partir do bancoDeProdutos -->
-                        </select>
-                    </div>
-                    <div class="field-group">
-                        <label for="kit-item-qtd">Quantidade:</label>
-                        <input type="number" id="kit-item-qtd" value="1" min="1">
-                    </div>
-                    <div class="field-group">
-                        <button id="btn-add-item-kit">Adicionar Item ao Kit</button>
-                    </div>
-                </div>
-                <table id="tabela-itens-kit-atual">
-                    <thead><tr><th>Produto</th><th>Qtd</th><th>Ação</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-                <button onclick="salvarKitTecnico()" style="margin-top: 15px; background-color: #17a2b8;">Salvar Kit Técnico</button>
-            </section>
-
-            <section id="kits-salvos" class="section-block" style="margin-top: 30px;">
-                <h3>Kits Técnicos Salvos</h3>
-                <div class="overflow-x-auto">
-                    <table id="tabela-kits-salvos">
-                        <thead><tr><th>Nome</th><th>Tipo</th><th>Descrição</th><th>Ações</th></tr></thead>
+            <fieldset class="no-padding"> 
+                <legend>Acionamentos de Motores (Kits Pré-Definidos)</legend>
+                <div id="kitsAcionamentoContainer" class="kits-table-container">
+                    <table class="kits-table" id="tabelaKitsAcionamento">
+                        <thead>
+                            <tr>
+                                <th>Tipo Acionamento</th>
+                                <th>Potência (CV)</th>
+                                <th>Tensão</th>
+                                <th>Valor Base (R$)</th>
+                                <th>ICMS (%)</th>
+                                <th>IPI (%)</th>
+                                <th>Tempo Mont. (h)</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
                         <tbody></tbody>
                     </table>
+                     <div class="button-container" style="padding: 0 1.25rem 1.25rem;"> <button type="button" class="button-primary" onclick="salvarAlteracoesKits('Acionamento')">Salvar Alterações nos Acionamentos</button>
+                    </div>
                 </div>
-            </section>
+            </fieldset>
+
+             <fieldset class="no-padding"> 
+                <legend>CLPs (Kits Pré-Definidos)</legend>
+                <div id="kitsClpContainer" class="kits-table-container">
+                    <table class="kits-table" id="tabelaKitsClp">
+                        <thead>
+                            <tr>
+                                <th>Marca</th>
+                                <th>Família</th>
+                                <th>Valor Base (R$)</th>
+                                <th>ICMS (%)</th>
+                                <th>IPI (%)</th>
+                                <th>Tempo Mont. (h)</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                     <div class="button-container" style="padding: 0 1.25rem 1.25rem;"> <button type="button" class="button-primary" onclick="salvarAlteracoesKits('CLP')">Salvar Alterações nos CLPs</button>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="no-padding"> 
+                <legend>IHMs (Kits Pré-Definidos)</legend>
+                <div id="kitsIhmContainer" class="kits-table-container">
+                    <table class="kits-table" id="tabelaKitsIhm">
+                        <thead>
+                            <tr>
+                                <th>Marca</th>
+                                <th>Família</th>
+                                <th>Polegadas</th>
+                                <th>Valor Base (R$)</th>
+                                <th>ICMS (%)</th>
+                                <th>IPI (%)</th>
+                                <th>Tempo Mont. (h)</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                     <div class="button-container" style="padding: 0 1.25rem 1.25rem;"> <button type="button" class="button-primary" onclick="salvarAlteracoesKits('IHM')">Salvar Alterações nas IHMs</button>
+                    </div>
+                </div>
+            </fieldset>
+            
+            <fieldset class="no-padding"> 
+                <legend>Cartões de I/O (Kits Pré-Definidos)</legend>
+                <div id="kitsIoContainer" class="kits-table-container">
+                    <table class="kits-table" id="tabelaKitsIo">
+                        <thead>
+                            <tr>
+                                <th>Tipo de Cartão</th>
+                                <th>Pontos</th>
+                                <th>Valor Base (R$)</th>
+                                <th>ICMS (%)</th>
+                                <th>IPI (%)</th>
+                                <th>Tempo Mont. (h)</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                     <div class="button-container" style="padding: 0 1.25rem 1.25rem;"> <button type="button" class="button-primary" onclick="salvarAlteracoesKits('IO')">Salvar Alterações nos Cartões de I/O</button>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Outros Kits Cadastrados</legend>
+                <div id="listaKitsCadastrados">
+                    <h3>Kits Genéricos/Outros:</h3>
+                    <div id="kitsListContainer">
+                        <p>Nenhum kit genérico cadastrado ainda.</p>
+                    </div>
+                </div>
+            </fieldset>
         </div>
+        
+        <div id="OrcamentoDetalhado" class="tab-content">
+            <h2>Orçamento Detalhado</h2>
+            <div class="form-group">
+                 <label for="valor_hora_montagem">Valor Hora Montagem (R$):</label>
+                 <input type="number" id="valor_hora_montagem" name="valor_hora_montagem" value="75.00" step="0.01" min="0" onchange="gerarOrcamento()">
+            </div>
+            <div id="resultadoOrcamentoContainer">
+                 <div id="resultadoOrcamento">
+                    <p>Configure o projeto e os motores, depois clique em "Gerar Orçamento" na aba "Configurar Projeto" para ver os resultados aqui.</p>
+                </div>
+            </div>
+            <fieldset>
+                <legend>Relatório de I/Os</legend>
+                 <div class="io-dashboard-grid">
+                    <div class="io-card">
+                        <h4>Entradas Digitais (DI)</h4>
+                        <span class="io-count" id="total_di_count">0</span>
+                        <p class="io-source">Motores & Instrumentos</p>
+                    </div>
+                    <div class="io-card">
+                        <h4>Saídas Digitais (DO)</h4>
+                        <span class="io-count" id="total_do_count">0</span>
+                        <p class="io-source">Motores & Instrumentos</p>
+                    </div>
+                    <div class="io-card">
+                        <h4>Entradas Analógicas (AI)</h4>
+                        <span class="io-count" id="total_ai_count">0</span>
+                        <p class="io-source">Motores & Instrumentos</p>
+                    </div>
+                    <div class="io-card">
+                        <h4>Saídas Analógicas (AO)</h4>
+                        <span class="io-count" id="total_ao_count">0</span>
+                        <p class="io-source">Motores & Instrumentos</p>
+                    </div>
+                </div>
+                <div class="form-group"> 
+                    <label for="relatorio_ios_base">Outras I/Os / Observações Manuais:</label>
+                    <textarea id="relatorio_ios_base" name="relatorio_ios_base" rows="4" placeholder="Descreva outras I/Os ou observações..."></textarea>
+                </div>
+            </fieldset>
+        </div>
+
     </div>
 
     <script>
-        // --- DADOS SIMULADOS (Globais) ---
-        const familiasPLC = {
-            Siemens: ["S7-1200", "S7-1500", "S7-300", "LOGO!"],
-            Rockwell: ["CompactLogix", "ControlLogix", "MicroLogix"],
-            Schneider: ["Modicon M221", "Modicon M241", "Modicon M251"],
-            Outra: ["Genérico/Outro"]
-        };
-        const familiasIHM = {
-            Siemens: ["Basic Panel (KTP)", "Comfort Panel (TP)", "Unified Comfort Panel"],
-            Rockwell: ["PanelView 5000", "PanelView 5310", "PanelView Plus 7"],
-            WEG: ["OptiView", "MT Series"],
-            Outra: ["Genérica/Outra"]
-        };
-        const bancoDeProdutos = [ 
-            { id: "prod1", nome: "CLP Siemens S7-1200 CPU 1214C", tipo: "CLP" },
-            { id: "prod2", nome: "IHM Siemens KTP700 Basic", tipo: "IHM" },
-            { id: "prod3", nome: "Fonte Siemens 24V 5A", tipo: "Componente" },
-            { id: "prod4", nome: "Contator WEG CWB9", tipo: "Componente" },
-            { id: "prod5", nome: "Disjuntor Motor Siemens 3RV", tipo: "Componente" },
-            { id: "prod6", nome: "Inversor Siemens G120C 1.5kW", tipo: "Drive" },
-        ];
-        let acionamentosDoProjeto = [];
-        let kitsSalvos = [];
-        let itensKitAtual = [];
-
-        // --- FUNÇÕES AUXILIARES DE UI (Definidas Primeiro) ---
+        // --- Lógica das Abas ---
         function openTab(evt, tabName) {
-            let i, tabcontent, tablinks;
+            var i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
             for (i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].style.display = "none";
                 tabcontent[i].classList.remove("active");
             }
-            tablinks = document.getElementsByClassName("tab-button");
+            tablinks = document.getElementsByClassName("tab-link");
             for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
             }
-            const currentTabContent = document.getElementById(tabName);
-            if (currentTabContent) {
-                currentTabContent.style.display = "block";
-                currentTabContent.classList.add("active");
+            const currentTab = document.getElementById(tabName);
+            if (currentTab) {
+                 currentTab.style.display = "block";
+                 currentTab.classList.add("active");
             }
-            let clickedButton = evt ? evt.currentTarget : null;
-            if (!clickedButton && tabName) {
-                 clickedButton = Array.from(tablinks).find(btn => btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`openTab(event, '${tabName}')`));
+            if (evt && evt.currentTarget) {
+                evt.currentTarget.className += " active";
             }
-            if(clickedButton) clickedButton.classList.add("active");
         }
 
-        function popularDropdown(selectId, opcoes, placeholder = "Selecione") {
+        // --- Dados e Lógica para Selects Dinâmicos (Configuração do Projeto) ---
+        const dadosMarcasFamilias = {
+            clp: {
+                "Siemens": ["S7-1200", "S7-1500", "S7-300", "LOGO!"],
+                "Rockwell": ["MicroLogix", "CompactLogix", "ControlLogix", "SLC 500"],
+                "Schneider": ["Modicon M221", "Modicon M241", "Modicon M251", "Modicon M340"],
+                "WEG": ["CLIC-02", "PLC300", "PLC400"],
+                "Delta": ["DVP Series", "AS Series", "AH Series"]
+            },
+            ihm: {
+                "Siemens": ["Basic Panels", "Comfort Panels", "Mobile Panels"],
+                "Rockwell": ["PanelView 5000", "PanelView Plus", "VersaView"],
+                "Schneider": ["Magelis STO/STU", "Magelis GTO", "Magelis Easy GXU"],
+                "WEG": ["MT600iE Series", "MT800iE Series", "cMT Series"],
+                "Pro-face": ["GP4000 Series", "SP5000 Series", "LT4000M Series"]
+            }
+        };
+        const potenciasCV = ["0.75", "1", "1.5", "2", "3", "5", "7.5", "10", "15", "20", "25", "30", "40", "50", "60", "75", "100"];
+        const tensoesMotor = [
+            { value: "220_tri", text: "220V Trifásico" },
+            { value: "380_tri", text: "380V Trifásico" },
+            { value: "440_tri", text: "440V Trifásico" }
+        ];
+        const polegadasIHM = ["4", "7", "9", "10", "12", "15"];
+
+
+        function popularSelectPotencia(selectId){
             const select = document.getElementById(selectId);
-            if (!select) {
-                // console.error("Dropdown com ID '" + selectId + "' não encontrado."); // Comentado para reduzir logs
-                return;
-            }
-            select.innerHTML = `<option value="">${placeholder}</option>`;
-            opcoes.forEach(opcao => {
-                const optionEl = document.createElement('option');
-                optionEl.value = opcao;
-                optionEl.textContent = opcao;
-                select.appendChild(optionEl);
-            });
-        }
-        
-        function toggleConditionalFields() { 
-            toggleNumericInput('proj-clp-safety', 'proj-clp-safety-di-wrapper', 'proj-clp-safety-di');
-            toggleNumericInput('proj-clp-safety', 'proj-clp-safety-do-wrapper', 'proj-clp-safety-do');
-            toggleNumericInput('proj-controle-eixo', 'proj-num-eixos-wrapper', 'proj-num-eixos');
-            toggleNumericInput('proj-entradas-rapidas', 'proj-num-entradas-rapidas-wrapper', 'proj-num-entradas-rapidas');
-            toggleNumericInput('proj-saidas-rapidas', 'num-saidas-rapidas-wrapper', 'proj-num-saidas-rapidas'); 
-        }
-
-        function toggleNumericInput(checkboxId, wrapperId, inputId) {
-            const checkbox = document.getElementById(checkboxId);
-            const wrapper = document.getElementById(wrapperId);
-            const input = document.getElementById(inputId);
-            if (checkbox && wrapper && input) { 
-                wrapper.style.display = checkbox.checked ? 'block' : 'none';
-                if (!checkbox.checked) {
-                    input.value = '0';
-                }
-            }
-        }
-
-        // --- ABA: CONFIGURAR PROJETO ---
-        function setupConfigProjetoListeners() {
-            const clpMarcaSelect = document.getElementById('proj-clp-marca');
-            if (clpMarcaSelect) {
-                clpMarcaSelect.addEventListener('change', function() {
-                    const marca = this.value;
-                    const familiaSelect = document.getElementById('proj-clp-familia');
-                    const familiaWrapper = document.getElementById('proj-clp-familia-wrapper');
-                    if (!familiaSelect || !familiaWrapper) return;
-                    familiaSelect.innerHTML = '<option value="">Selecione a Família</option>';
-                    if (marca && familiasPLC[marca]) {
-                        familiasPLC[marca].forEach(familia => {
-                            const option = document.createElement('option');
-                            option.value = familia;
-                            option.textContent = familia;
-                            familiaSelect.appendChild(option);
-                        });
-                        familiaWrapper.style.display = 'block';
-                    } else {
-                        familiaWrapper.style.display = 'none';
-                    }
-                });
-            }
-
-            const ihmMarcaSelect = document.getElementById('proj-ihm-marca');
-            if (ihmMarcaSelect) {
-                ihmMarcaSelect.addEventListener('change', function() {
-                    const marca = this.value;
-                    const familiaSelect = document.getElementById('proj-ihm-familia');
-                    const familiaWrapper = document.getElementById('proj-ihm-familia-wrapper');
-                    if (!familiaSelect || !familiaWrapper) return;
-                    familiaSelect.innerHTML = '<option value="">Selecione a Família</option>';
-                    if (marca && familiasIHM[marca]) {
-                        familiasIHM[marca].forEach(familia => {
-                            const option = document.createElement('option');
-                            option.value = familia;
-                            option.textContent = familia;
-                            familiaSelect.appendChild(option);
-                        });
-                        familiaWrapper.style.display = 'block';
-                    } else {
-                        familiaWrapper.style.display = 'none';
-                    }
-                });
-            }
-            
-            ['proj-clp-safety', 'proj-controle-eixo', 'proj-entradas-rapidas', 'proj-saidas-rapidas'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('change', toggleConditionalFields);
-            });
-
-
-            const btnAddAcionamentoLista = document.getElementById('btn-add-acionamento-lista');
-            if(btnAddAcionamentoLista) btnAddAcionamentoLista.addEventListener('click', addAcionamentoToProjectList);
-        }
-        
-        function addAcionamentoToProjectList() {
-            const marcaEl = document.getElementById('ac-marca-proj');
-            const potenciaEl = document.getElementById('ac-potencia-proj');
-            const tensaoEl = document.getElementById('ac-tensao-proj');
-            const tipoPartidaEl = document.getElementById('ac-tipo-partida-proj');
-            const protecaoEl = document.getElementById('ac-protecao-proj');
-
-            if (!marcaEl || !potenciaEl || !tensaoEl || !tipoPartidaEl || !protecaoEl) {
-                console.error("Elementos do formulário de acionamento não encontrados.");
-                return;
-            }
-
-            const marca = marcaEl.value;
-            const potencia = potenciaEl.value;
-            const tensao = tensaoEl.value;
-            const tipoPartida = tipoPartidaEl.value;
-            const protecao = protecaoEl.value;
-
-
-            if (!potencia) {
-                alert("Por favor, insira a potência do motor.");
-                return;
-            }
-            const acionamento = { id: Date.now(), marca, potencia, tensao, tipoPartida, protecao };
-            acionamentosDoProjeto.push(acionamento);
-            renderAcionamentosProjeto();
-        }
-
-        function renderAcionamentosProjeto() {
-            const tbody = document.getElementById('tabela-acionamentos-projeto')?.getElementsByTagName('tbody')[0];
-            if (!tbody) return;
-            tbody.innerHTML = ""; 
-            acionamentosDoProjeto.forEach(ac => {
-                const row = tbody.insertRow();
-                row.insertCell().textContent = ac.marca;
-                row.insertCell().textContent = ac.potencia + " CV";
-                row.insertCell().textContent = ac.tensao;
-                row.insertCell().textContent = ac.tipoPartida;
-                row.insertCell().textContent = ac.protecao;
-                const cellAcao = row.insertCell();
-                const btnExcluir = document.createElement('button');
-                btnExcluir.textContent = "Excluir";
-                btnExcluir.className = "delete-btn";
-                btnExcluir.onclick = function() { removerAcionamentoProjeto(ac.id); };
-                cellAcao.appendChild(btnExcluir);
-            });
-        }
-        function removerAcionamentoProjeto(id) {
-            acionamentosDoProjeto = acionamentosDoProjeto.filter(ac => ac.id !== id);
-            renderAcionamentosProjeto();
-        }
-        
-        // --- ABA: CADASTROS ---
-        function popularProdutosParaKit() {
-            const select = document.getElementById('kit-item-produto');
             if(!select) return;
-            select.innerHTML = '<option value="">Selecione um produto</option>';
-            bancoDeProdutos.forEach(prod => {
+            const firstOptionIsPlaceholder = select.options[0] && select.options[0].value === "";
+            select.innerHTML = firstOptionIsPlaceholder ? `<option value="">${select.options[0].textContent}</option>` : '';
+
+            potenciasCV.forEach(cv => {
                 const option = document.createElement('option');
-                option.value = prod.id;
-                option.textContent = `${prod.nome} (${prod.tipo})`;
+                option.value = cv;
+                option.textContent = cv + " CV";
                 select.appendChild(option);
             });
         }
 
-        function adicionarItemAoKitAtual() {
-            const produtoSelect = document.getElementById('kit-item-produto');
-            const produtoId = produtoSelect.value;
-            const qtd = parseInt(document.getElementById('kit-item-qtd').value, 10);
 
-            if (!produtoId || isNaN(qtd) || qtd < 1) {
-                alert("Selecione um produto e informe uma quantidade válida.");
-                return;
-            }
-            const produtoExistente = itensKitAtual.find(item => item.produtoId === produtoId);
-            if (produtoExistente) {
-                produtoExistente.qtd += qtd;
-            } else {
-                itensKitAtual.push({ produtoId, qtd });
-            }
-            renderItensKitAtual();
-            document.getElementById('kit-item-qtd').value = 1; 
-            produtoSelect.value = ""; 
-        }
-
-        function renderItensKitAtual() {
-            const tbody = document.getElementById('tabela-itens-kit-atual')?.getElementsByTagName('tbody')[0];
-            if(!tbody) return;
-            tbody.innerHTML = "";
-            itensKitAtual.forEach((item, index) => {
-                const produtoInfo = bancoDeProdutos.find(p => p.id === item.produtoId);
-                const row = tbody.insertRow();
-                row.insertCell().textContent = produtoInfo ? produtoInfo.nome : 'Produto Desconhecido';
-                row.insertCell().textContent = item.qtd;
-                const cellAcao = row.insertCell();
-                const btnExcluir = document.createElement('button');
-                btnExcluir.textContent = "Remover";
-                btnExcluir.className = "delete-btn";
-                btnExcluir.onclick = function() { removerItemDoKitAtual(index); };
-                cellAcao.appendChild(btnExcluir);
+        function popularMarcas(tipoComponente, selectId) {
+            const selectMarca = document.getElementById(selectId);
+            if (!selectMarca) return;
+            selectMarca.innerHTML = '<option value="">Selecione a Marca</option>';
+            const marcas = Object.keys(dadosMarcasFamilias[tipoComponente] || {});
+            marcas.forEach(marca => {
+                const option = document.createElement('option');
+                option.value = marca;
+                option.textContent = marca;
+                selectMarca.appendChild(option);
             });
         }
-        function removerItemDoKitAtual(index) {
-            itensKitAtual.splice(index, 1);
-            renderItensKitAtual();
+
+        function popularFamilias(tipoComponente, marcaSelecionada, selectFamiliaId) {
+            const selectFamilia = document.getElementById(selectFamiliaId);
+            if (!selectFamilia) return;
+            selectFamilia.innerHTML = '<option value="">Selecione primeiro a Marca</option>';
+            if (marcaSelecionada && dadosMarcasFamilias[tipoComponente] && dadosMarcasFamilias[tipoComponente][marcaSelecionada]) {
+                selectFamilia.innerHTML = '<option value="">Selecione a Família</option>';
+                const familias = dadosMarcasFamilias[tipoComponente][marcaSelecionada];
+                familias.forEach(familia => {
+                    const option = document.createElement('option');
+                    option.value = familia;
+                    option.textContent = familia;
+                    selectFamilia.appendChild(option);
+                });
+            }
         }
 
-        function salvarKitTecnico() {
-            const nome = document.getElementById('kit-nome').value.trim();
-            const tipo = document.getElementById('kit-tipo').value;
-            const descricao = document.getElementById('kit-descricao').value.trim();
+        // --- Lógica para Checkboxes Condicionais CLP ---
+        function setupConditionalInput(checkboxId, inputDivId) {
+            const checkbox = document.getElementById(checkboxId);
+            const inputDiv = document.getElementById(inputDivId);
+            if (checkbox && inputDiv) {
+                const inputFields = inputDiv.querySelectorAll('input[type="number"]');
 
-            if (!nome || !tipo) {
-                alert("Nome e Tipo do Kit são obrigatórios.");
+                const updateState = () => {
+                    const isChecked = checkbox.checked;
+                    inputDiv.style.display = isChecked ? 'flex' : 'none';
+                    inputFields.forEach(field => {
+                        field.disabled = !isChecked;
+                        if (!isChecked) {
+                            field.value = '';
+                        }
+                    });
+                };
+                
+                updateState(); 
+                
+                checkbox.addEventListener('change', updateState);
+                 
+                const label = document.querySelector(`label[for="${checkboxId}"]`);
+                if (label) {
+                    label.addEventListener('click', function(event) {
+                        if(event.target === label) { 
+                            checkbox.checked = !checkbox.checked;
+                            const changeEvent = new Event('change', { bubbles: true });
+                            checkbox.dispatchEvent(changeEvent);
+                        }
+                    });
+                }
+            }
+        }
+        
+        // --- Lógica para Acionamentos (Motores) ---
+        let motoresConfigurados = [];
+        let proximoMotorId = 0;
+
+        function adicionarMotor() {
+            const nome = document.getElementById('motor_nome').value.trim();
+            const tag = document.getElementById('motor_tag').value.trim();
+            const cv = document.getElementById('motor_cv').value;
+            const tensao = document.getElementById('motor_tensao').value;
+            const tipoAcionamento = document.getElementById('motor_tipo_acionamento').value;
+            const reversao = document.getElementById('motor_reversao').checked;
+            const sensorEmbuchamento = document.getElementById('motor_sensor_embuchamento').checked;
+            const sensorVelocidade = document.getElementById('motor_sensor_velocidade').checked;
+            const sensorFcaFcr = document.getElementById('motor_sensor_fca_fcr').checked;
+            const atuadorSolenoide = document.getElementById('motor_atuador_solenoide').checked;
+
+            if (!nome || !tag ) { 
+                exibirMensagemTemporaria("Preencha Nome e TAG do motor.", "error", document.getElementById('formProjeto').querySelector('fieldset legend:contains("Acionamentos")').closest('fieldset')); 
+                return;
+            }
+
+            const motor = { id: proximoMotorId++, nome, tag, cv, tensao, tipoAcionamento, reversao, sensorEmbuchamento, sensorVelocidade, sensorFcaFcr, atuadorSolenoide };
+            motoresConfigurados.push(motor);
+            renderizarMotores();
+            atualizarDashboardIOs();
+            
+            document.getElementById('motor_nome').value = '';
+            document.getElementById('motor_tag').value = '';
+            document.getElementById('motor_cv').value = '0.75'; 
+            document.getElementById('motor_tensao').value = '220_tri';
+            document.getElementById('motor_tipo_acionamento').value = 'partida_direta';
+            document.getElementById('motor_reversao').checked = false;
+            document.getElementById('motor_sensor_embuchamento').checked = false;
+            document.getElementById('motor_sensor_velocidade').checked = false;
+            document.getElementById('motor_sensor_fca_fcr').checked = false;
+            document.getElementById('motor_atuador_solenoide').checked = false;
+            document.getElementById('motor_nome').focus();
+            exibirMensagemTemporaria("Motor adicionado!", "success", "motoresAdicionadosContainer");
+        }
+
+        function removerMotor(id) {
+            motoresConfigurados = motoresConfigurados.filter(motor => motor.id !== id);
+            renderizarMotores();
+            atualizarDashboardIOs();
+        }
+
+        function renderizarMotores() {
+            const listaMotoresDiv = document.getElementById('listaMotores');
+            if (motoresConfigurados.length === 0) {
+                listaMotoresDiv.innerHTML = "<p>Nenhum motor adicionado ainda.</p>";
+                return;
+            }
+            listaMotoresDiv.innerHTML = '';
+            motoresConfigurados.forEach(motor => {
+                const div = document.createElement('div');
+                div.className = 'motor-item';
+                let sensoresHtml = [];
+                if(motor.sensorEmbuchamento) sensoresHtml.push("FC Emb.");
+                if(motor.sensorVelocidade) sensoresHtml.push("V. Vel.");
+                if(motor.sensorFcaFcr) sensoresHtml.push("FCs Av/Rt");
+                if(motor.atuadorSolenoide) sensoresHtml.push("Sol. Av/Rt");
+                let sensoresDisplay = sensoresHtml.length > 0 ? `<div class="motor-sensors">Sensores: ${sensoresHtml.join(', ')}</div>` : '';
+
+                div.innerHTML = `
+                    <div>
+                        <span>TAG: <strong>${motor.tag}</strong></span>
+                        <span>Nome: <strong>${motor.nome}</strong></span>
+                        <span>CV: <strong>${motor.cv}</strong></span>
+                        <span>Tensão: <strong>${motor.tensao.replace('_tri', 'V Tri')}</strong></span>
+                        <span>Acion.: <strong>${motor.tipoAcionamento.replace(/_/g, ' ')}</strong></span>
+                        <span>Reversão: <strong>${motor.reversao ? 'Sim' : 'Não'}</strong></span>
+                    </div>
+                    <div> <button class="remove-motor-btn" onclick="removerMotor(${motor.id})">Remover</button> </div>
+                    ${sensoresDisplay}
+                `;
+                listaMotoresDiv.appendChild(div);
+            });
+        }
+        
+        document.getElementById('clp_protocolo_inversor')?.addEventListener('change', atualizarDashboardIOs);
+
+        // --- Lógica para Instrumentos ---
+        let instrumentosConfigurados = [];
+        let proximoInstrumentoId = 0;
+
+        function adicionarInstrumento() {
+            const tipoMedicao = document.getElementById('instrumento_tipo_medicao').value;
+            const tag = document.getElementById('instrumento_tag').value.trim();
+            const tipoSinal = document.getElementById('instrumento_sinal').value;
+            const malhaPI = document.getElementById('instrumento_malha_pi').checked;
+            const alarmeBaixo = document.getElementById('instrumento_alarme_baixo').checked;
+            const alarmeAlto = document.getElementById('instrumento_alarme_alto').checked;
+
+            if (!tipoMedicao || !tag || !tipoSinal) {
+                exibirMensagemTemporaria("Preencha Tipo, TAG e Sinal do instrumento.", "error", document.getElementById('formProjeto').querySelector('fieldset legend:contains("Instrumentos")').closest('fieldset'));
+                return;
+            }
+            const instrumento = { id: proximoInstrumentoId++, tipoMedicao, tag, tipoSinal, malhaPI, alarmeBaixo, alarmeAlto };
+            instrumentosConfigurados.push(instrumento);
+            renderizarInstrumentos();
+            atualizarDashboardIOs();
+
+            document.getElementById('instrumento_tipo_medicao').value = '';
+            document.getElementById('instrumento_tag').value = '';
+            document.getElementById('instrumento_sinal').value = '';
+            document.getElementById('instrumento_malha_pi').checked = false;
+            document.getElementById('instrumento_alarme_baixo').checked = false;
+            document.getElementById('instrumento_alarme_alto').checked = false;
+            document.getElementById('instrumento_tipo_medicao').focus();
+            exibirMensagemTemporaria("Instrumento adicionado!", "success", "instrumentosAdicionadosContainer");
+        }
+
+        function removerInstrumento(id) {
+            instrumentosConfigurados = instrumentosConfigurados.filter(inst => inst.id !== id);
+            renderizarInstrumentos();
+            atualizarDashboardIOs();
+        }
+
+        function renderizarInstrumentos() {
+            const listaInstrumentosDiv = document.getElementById('listaInstrumentos');
+            if (instrumentosConfigurados.length === 0) {
+                listaInstrumentosDiv.innerHTML = "<p>Nenhum instrumento adicionado ainda.</p>";
+                return;
+            }
+            listaInstrumentosDiv.innerHTML = '';
+            instrumentosConfigurados.forEach(inst => {
+                const div = document.createElement('div');
+                div.className = 'instrumento-item'; 
+                let opcoesHtml = [];
+                if (inst.malhaPI) opcoesHtml.push("Malha PI");
+                if (inst.alarmeBaixo) opcoesHtml.push("Al. Baixo");
+                if (inst.alarmeAlto) opcoesHtml.push("Al. Alto");
+                let opcoesDisplay = opcoesHtml.length > 0 ? `<div class="instrumento-options">Opções: ${opcoesHtml.join(', ')}</div>` : '';
+
+                div.innerHTML = `
+                    <div>
+                        <span>TAG: <strong>${inst.tag}</strong></span>
+                        <span>Tipo: <strong>${inst.tipoMedicao.charAt(0).toUpperCase() + inst.tipoMedicao.slice(1)}</strong></span>
+                        <span>Sinal: <strong>${inst.tipoSinal.replace('_','-')}</strong></span>
+                    </div>
+                    <div>
+                        <button class="remove-instrumento-btn" onclick="removerInstrumento(${inst.id})">Remover</button>
+                    </div>
+                    ${opcoesDisplay}
+                `;
+                listaInstrumentosDiv.appendChild(div);
+            });
+        }
+        
+        function atualizarDashboardIOs() {
+            const protocoloCLP = document.getElementById('clp_protocolo_inversor').value;
+            
+            // Cálculos para motores
+            let motorDI = 0, motorDO = 0, motorAO = 0;
+            if (!protocoloCLP || protocoloCLP === "") {
+                motoresConfigurados.forEach(motor => {
+                    if (motor.tipoAcionamento === 'partida_direta' || motor.tipoAcionamento === 'softstarter') {
+                        motorDI++; motorDO++;
+                        if (motor.reversao) motorDO++;
+                    } else if (motor.tipoAcionamento === 'inversor') {
+                        motorDI++; motorDO++; motorAO++;
+                        if (motor.reversao) motorDI++;
+                    }
+                    if (motor.sensorEmbuchamento) motorDI++;
+                    if (motor.sensorVelocidade) motorDI++;
+                    if (motor.sensorFcaFcr) motorDI += 2;
+                    if (motor.atuadorSolenoide) motorDO += 2;
+                });
+            }
+
+            // Cálculos para instrumentos
+            let instAI = 0, instDI = 0;
+            instrumentosConfigurados.forEach(inst => {
+                if (['4_20ma', '0_10v', 'pt100', 'termo_j', 'termo_k'].includes(inst.tipoSinal)) {
+                    instAI++;
+                }
+                if (inst.alarmeBaixo) instDI++;
+                if (inst.alarmeAlto) instDI++;
+            });
+
+            // Atualiza os cards do dashboard
+            document.getElementById('total_di_count').textContent = motorDI + instDI;
+            document.getElementById('total_do_count').textContent = motorDO;
+            document.getElementById('total_ai_count').textContent = instAI; 
+            document.getElementById('total_ao_count').textContent = motorAO; 
+        }
+
+
+        // --- Lógica para Cadastro de Kits ---
+        let kitsCadastrados = []; 
+        let kitsAcionamentoPreDefinidos = [];
+        let kitsClpPreDefinidos = [];
+        let kitsIhmPreDefinidos = [];
+        let kitsIoPreDefinidos = [];
+        let editandoKitId = null; 
+
+        function preCadastrarTodosOsKits() {
+            preCadastrarKitsAcionamento();
+            preCadastrarKitsClp();
+            preCadastrarKitsIhm();
+            preCadastrarKitsIo();
+        }
+
+        function preCadastrarKitsAcionamento() {
+            const tiposAcionamento = ['partida_direta', 'softstarter', 'inversor'];
+            const icmsPadrao = 18; 
+            const ipiPadrao = 5;  
+            
+            kitsAcionamentoPreDefinidos = []; 
+
+            tiposAcionamento.forEach(tipo => {
+                tensoesMotor.forEach(tensaoObj => {
+                    let valorBase;
+                    let tempoBase;
+                    if (tipo === 'partida_direta') { valorBase = 200; tempoBase = 0.5; }
+                    else if (tipo === 'softstarter') { valorBase = 450; tempoBase = 1.0; }
+                    else { valorBase = 700; tempoBase = 1.5; } 
+
+                    if(tensaoObj.value === '380_tri') valorBase *= 1.05;
+                    else if(tensaoObj.value === '440_tri') valorBase *= 1.10;
+
+                    potenciasCV.forEach((cv, index) => {
+                        const fatorPotencia = Math.pow(1.2 + (index * 0.02) , index * 0.3 + 1); 
+                        let valorFinal = Math.round((valorBase * fatorPotencia) / 10) * 10; 
+                        if (parseFloat(cv) > 20) valorFinal = Math.round(valorBase * fatorPotencia / 50) * 50; 
+                        if (parseFloat(cv) > 50) valorFinal = Math.round(valorBase * fatorPotencia / 100) * 100;
+
+                        const tempo = Math.round((tempoBase + (index * 0.1) + (parseFloat(cv)/20 * 0.2) ) * 10) / 10; 
+
+                        kitsAcionamentoPreDefinidos.push({
+                            id: `acionamento_${tipo}_${cv.replace('.', '_')}_${tensaoObj.value}`, 
+                            tipo: tipo,
+                            potenciaCV: cv,
+                            tensao: tensaoObj.value,
+                            nome: `${tipo.replace(/_/g, ' ')} ${cv}CV ${tensaoObj.text.split(' ')[0]}`,
+                            valor: valorFinal,
+                            icms: icmsPadrao,
+                            ipi: ipiPadrao,
+                            tempoMontagem: tempo,
+                            isPreDefinido: true 
+                        });
+                    });
+                });
+            });
+            renderizarKitsAcionamentoPreDefinidos();
+        }
+        
+        function preCadastrarKitsClp() {
+             const icmsPadrao = 18; 
+             const ipiPadrao = 10;
+             kitsClpPreDefinidos = [];
+             Object.keys(dadosMarcasFamilias.clp).forEach((marca, marcaIndex) => {
+                dadosMarcasFamilias.clp[marca].forEach((familia, familiaIndex) => {
+                    kitsClpPreDefinidos.push({
+                        id: `clp_${marca}_${familia}`.replace(/\s+/g, '_').toLowerCase(),
+                        tipo: 'clp', marca: marca, familia: familia,
+                        nome: `${marca} ${familia}`,
+                        valor: 1000 + (marcaIndex * 500) + (familiaIndex * 350), 
+                        icms: icmsPadrao, ipi: ipiPadrao, tempoMontagem: 1.5 + (familiaIndex * 0.5), isPreDefinido: true
+                    });
+                });
+            });
+            renderizarKitsClpPreDefinidos();
+        }
+
+         function preCadastrarKitsIhm() {
+             const icmsPadrao = 18; 
+             const ipiPadrao = 10;
+             kitsIhmPreDefinidos = [];
+             Object.keys(dadosMarcasFamilias.ihm).forEach((marca, marcaIndex) => {
+                dadosMarcasFamilias.ihm[marca].forEach((familia, familiaIndex) => {
+                     polegadasIHM.forEach((pol, polIndex) => {
+                        kitsIhmPreDefinidos.push({
+                            id: `ihm_${marca}_${familia}_${pol}`.replace(/\s+/g, '_').toLowerCase(),
+                            tipo: 'ihm', marca: marca, familia: familia, polegadas: pol,
+                            nome: `${marca} ${familia} ${pol}"`,
+                            valor: 600 + (familiaIndex * 150) + (polIndex * 200),
+                            icms: icmsPadrao, ipi: ipiPadrao, tempoMontagem: 0.5 + (polIndex * 0.2), isPreDefinido: true
+                        });
+                     });
+                });
+            });
+            renderizarKitsIhmPreDefinidos();
+        }
+        
+        function preCadastrarKitsIo() {
+            const icmsPadrao = 18; 
+            const ipiPadrao = 15;
+            kitsIoPreDefinidos = [
+                { tipo: 'DI', pontos: 16, nome: 'Cartão 16 Entradas Digitais', valor: 350, tempo: 0.2 },
+                { tipo: 'DO', pontos: 16, nome: 'Cartão 16 Saídas Digitais', valor: 400, tempo: 0.2 },
+                { tipo: 'DI/DO', pontos: '16/16', nome: 'Cartão Misto 16DI/16DO', valor: 650, tempo: 0.3 },
+                { tipo: 'AI', pontos: 4, nome: 'Cartão 4 Entradas Analógicas', valor: 700, tempo: 0.2 },
+                { tipo: 'AO', pontos: 4, nome: 'Cartão 4 Saídas Analógicas', valor: 850, tempo: 0.2 },
+                { tipo: 'AI/AO', pontos: '4/2', nome: 'Cartão Misto 4AI/2AO', valor: 950, tempo: 0.3 },
+            ].map(k => ({
+                ...k,
+                id: `io_${k.tipo.replace('/','')}_${k.pontos}`.replace('/','_'),
+                icms: icmsPadrao, ipi: ipiPadrao, tempoMontagem: k.tempo, isPreDefinido: true
+            }));
+            renderizarKitsIoPreDefinidos();
+        }
+
+        function renderizarLinhaKitPredefinido(tbody, kit) {
+            const row = tbody.insertRow();
+            if(kit.tipo === 'clp') {
+                row.insertCell().textContent = kit.marca;
+                row.insertCell().textContent = kit.familia;
+            } else if(kit.tipo === 'ihm') {
+                row.insertCell().textContent = kit.marca;
+                row.insertCell().textContent = kit.familia;
+                row.insertCell().textContent = kit.polegadas + '"';
+            } else if (['DI','DO','AI','AO','DI/DO','AI/AO'].includes(kit.tipo)) {
+                 row.insertCell().textContent = kit.tipo;
+                 row.insertCell().textContent = kit.pontos;
+            }
+             else { // acionamento
+                row.insertCell().textContent = kit.tipo.replace(/_/g, ' ');
+                row.insertCell().textContent = kit.potenciaCV + " CV";
+                row.insertCell().textContent = kit.tensao.replace('_tri', 'V Tri');
+            }
+
+            row.insertCell().textContent = kit.nome; 
+
+             ['valor', 'icms', 'ipi', 'tempoMontagem'].forEach(field => {
+                const cell = row.insertCell();
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.step = (field === 'tempoMontagem') ? '0.1' : '0.01';
+                if (field === 'icms' || field === 'ipi') input.max = '100';
+                input.min = '0';
+                input.value = kit[field].toFixed((field === 'tempoMontagem') ? 1 : 2);
+                input.dataset.kitid = kit.id;
+                input.dataset.field = field;
+                input.addEventListener('change', (e) => atualizarKitPreDefinido(e, kit.tipo));
+                cell.appendChild(input);
+            });
+            
+            const acaoCell = row.insertCell();
+            acaoCell.className = 'action-column';
+             acaoCell.innerHTML = `<span style="font-size:0.8em; color:var(--text-muted)">(Editável)</span>`;
+        }
+
+        function renderizarKitsAcionamentoPreDefinidos() {
+            const tbody = document.getElementById('tabelaKitsAcionamento').getElementsByTagName('tbody')[0];
+            if (!tbody) return;
+            tbody.innerHTML = ''; 
+            kitsAcionamentoPreDefinidos.forEach(kit => renderizarLinhaKitPredefinido(tbody, kit));
+        }
+
+        function renderizarKitsClpPreDefinidos() {
+            const tbody = document.getElementById('tabelaKitsClp').getElementsByTagName('tbody')[0];
+            if (!tbody) return;
+            tbody.innerHTML = ''; 
+            kitsClpPreDefinidos.forEach(kit => renderizarLinhaKitPredefinido(tbody, kit));
+        }
+        
+        function renderizarKitsIhmPreDefinidos() {
+            const tbody = document.getElementById('tabelaKitsIhm').getElementsByTagName('tbody')[0];
+            if (!tbody) return;
+            tbody.innerHTML = ''; 
+            kitsIhmPreDefinidos.forEach(kit => renderizarLinhaKitPredefinido(tbody, kit));
+        }
+
+        function renderizarKitsIoPreDefinidos() {
+            const tbody = document.getElementById('tabelaKitsIo').getElementsByTagName('tbody')[0];
+            if (!tbody) return;
+            tbody.innerHTML = ''; 
+            kitsIoPreDefinidos.forEach(kit => renderizarLinhaKitPredefinido(tbody, kit));
+        }
+
+        function atualizarKitPreDefinido(event, tipoKit) {
+            const input = event.target;
+            const kitId = input.dataset.kitid;
+            const field = input.dataset.field;
+            let value = parseFloat(input.value);
+            
+            let kitArray;
+            if(tipoKit === 'clp') kitArray = kitsClpPreDefinidos;
+            else if(tipoKit === 'ihm') kitArray = kitsIhmPreDefinidos;
+            else if(['DI','DO','AI','AO','DI/DO','AI/AO'].includes(tipoKit)) kitArray = kitsIoPreDefinidos;
+            else kitArray = kitsAcionamentoPreDefinidos;
+
+            if (isNaN(value) || value < 0) {
+                exibirMensagemTemporaria("Valor inválido.", "error", input.closest('.kits-table-container'));
+                const kitOriginal = kitArray.find(k => k.id === kitId);
+                if(kitOriginal) input.value = kitOriginal[field].toFixed(field === 'tempoMontagem' ? 1 : 2);
                 return;
             }
             
-            const novoKit = {
-                id: 'kit' + Date.now(),
-                nome, tipo, descricao,
-                itens: [...itensKitAtual] 
+            const kitIndex = kitArray.findIndex(k => k.id === kitId);
+            if (kitIndex > -1) {
+                kitArray[kitIndex][field] = value;
+            }
+        }
+        
+        function salvarAlteracoesKits(tipo) {
+            exibirMensagemTemporaria(`Alterações nos kits de ${tipo} foram aplicadas (salvas na sessão atual).`, "success", `kits${tipo}Container`);
+        }
+
+
+        function salvarKit() { 
+            const nomeKit = document.getElementById('kit_nome').value.trim();
+            const tipoKit = document.getElementById('kit_tipo').value;
+            const descricaoKit = document.getElementById('kit_descricao').value.trim();
+            const valorKitInput = document.getElementById('kit_valor');
+            const valorKit = parseFloat(valorKitInput.value);
+            const icmsKit = parseFloat(document.getElementById('kit_icms').value) || 0;
+            const ipiKit = parseFloat(document.getElementById('kit_ipi').value) || 0;
+            const tempoMontagemKit = parseFloat(document.getElementById('kit_tempo_montagem').value) || 0;
+
+            if (!nomeKit || !tipoKit) {
+                exibirMensagemTemporaria("Preencha Nome e Tipo do kit.", "error", "formCadastroKit");
+                return;
+            }
+            if (isNaN(valorKit) || valorKit < 0) {
+                 exibirMensagemTemporaria("Valor inválido.", "error", "formCadastroKit");
+                 return;
+            }
+            
+            const kitData = {
+                nome: nomeKit, tipo: tipoKit, potenciaCV: '', 
+                descricao: descricaoKit, valor: valorKit, icms: icmsKit, ipi: ipiKit, tempoMontagem: tempoMontagemKit,
+                isPreDefinido: false
             };
-            kitsSalvos.push(novoKit);
-            alert(`Kit "${nome}" salvo com sucesso!`);
+
+            if (editandoKitId !== null) { 
+                const kitIndex = kitsCadastrados.findIndex(k => k.id === editandoKitId);
+                if (kitIndex > -1) {
+                    kitsCadastrados[kitIndex] = { ...kitsCadastrados[kitIndex], ...kitData };
+                    exibirMensagemTemporaria("Kit atualizado!", "success", "formCadastroKit");
+                }
+            } else { 
+                const novoKit = { id: Date.now(), ...kitData };
+                kitsCadastrados.push(novoKit);
+                exibirMensagemTemporaria("Kit adicionado!", "success", "formCadastroKit");
+            }
             
-            document.getElementById('kit-nome').value = '';
-            document.getElementById('kit-tipo').value = 'CLP';
-            document.getElementById('kit-descricao').value = '';
-            itensKitAtual = [];
-            renderItensKitAtual();
-            renderKitsSalvos();
+            renderizarKits();
+            resetFormularioKit();
+        }
+        
+        function resetFormularioKit() {
+            document.getElementById('formCadastroKit').reset();
+            document.getElementById('kit_id_edicao').value = '';
+            document.getElementById('btnSalvarKit').textContent = 'Adicionar Kit Genérico';
+            document.getElementById('btnCancelarEdicaoKit').style.display = 'none';
+            editandoKitId = null;
+            document.getElementById('kit_nome').focus();
         }
 
-        function renderKitsSalvos() {
-            const tbody = document.getElementById('tabela-kits-salvos')?.getElementsByTagName('tbody')[0];
-             if(!tbody) return;
-            tbody.innerHTML = "";
-            kitsSalvos.forEach(kit => {
-                const row = tbody.insertRow();
-                row.insertCell().textContent = kit.nome;
-                row.insertCell().textContent = kit.tipo;
-                row.insertCell().textContent = kit.descricao.substring(0, 50) + (kit.descricao.length > 50 ? '...' : '');
+        function editarKit(id) {
+            const kit = kitsCadastrados.find(k => k.id === id);
+            if (kit && !kit.isPreDefinido) { 
+                document.getElementById('kit_id_edicao').value = kit.id;
+                document.getElementById('kit_tipo').value = kit.tipo;
+                document.getElementById('kit_nome').value = kit.nome;
+                document.getElementById('kit_descricao').value = kit.descricao;
+                document.getElementById('kit_valor').value = kit.valor.toFixed(2);
+                document.getElementById('kit_icms').value = kit.icms !== undefined ? kit.icms.toFixed(2) : '0';
+                document.getElementById('kit_ipi').value = kit.ipi !== undefined ? kit.ipi.toFixed(2) : '0';
+                document.getElementById('kit_tempo_montagem').value = kit.tempoMontagem !== undefined ? kit.tempoMontagem.toFixed(1) : '0';
                 
-                const cellAcao = row.insertCell();
-                const btnUsar = document.createElement('button');
-                btnUsar.textContent = "Usar no Projeto";
-                btnUsar.className = "button";
-                btnUsar.style.marginRight = "5px";
-                btnUsar.onclick = function() { usarKitNoProjeto(kit.id); };
-                cellAcao.appendChild(btnUsar);
+                document.getElementById('btnSalvarKit').textContent = 'Salvar Alterações';
+                document.getElementById('btnCancelarEdicaoKit').style.display = 'inline-block';
+                editandoKitId = id;
+                document.getElementById('kit_nome').focus();
+                document.getElementById('formCadastroKit').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function cancelarEdicaoKit(){
+            resetFormularioKit();
+        }
+
+
+        function renderizarKits() { // Renderiza apenas kits genéricos
+            const containerKits = document.getElementById('kitsListContainer');
+            const kitsGenericos = kitsCadastrados.filter(k => !k.isPreDefinido);
+
+            if (kitsGenericos.length === 0) {
+                containerKits.innerHTML = "<p>Nenhum kit genérico cadastrado ainda.</p>";
+                return;
+            }
+
+            containerKits.innerHTML = '';
+            kitsGenericos.forEach(kit => {
+                const divKit = document.createElement('div');
+                divKit.className = 'kit-item';
+                let kitDetails = `<strong>${kit.nome}</strong> (R$ ${kit.valor.toFixed(2).replace('.',',')})`;
+                kitDetails += ` <small style="color: var(--text-muted);">- ${kit.tipo.replace(/_/g, ' ')}</small>`;
                 
-                const btnEditar = document.createElement('button');
-                btnEditar.textContent = "Editar";
-                btnEditar.className = "edit-btn";
-                btnEditar.onclick = function() { alert(`Funcionalidade "Editar Kit ${kit.nome}" não implementada.`); };
-                cellAcao.appendChild(btnEditar);
+                divKit.innerHTML = `
+                    <div class="kit-item-info">
+                        ${kitDetails}
+                        ${kit.descricao ? `<br><small style="color: var(--text-muted);"><em>${kit.descricao}</em></small>` : ''}
+                        <br><small style="color: var(--text-muted);">ICMS: ${kit.icms !== undefined ? kit.icms.toFixed(2) : '0.00'}% | IPI: ${kit.ipi !== undefined ? kit.ipi.toFixed(2) : '0.00'}% | Montagem: ${kit.tempoMontagem !== undefined ? kit.tempoMontagem.toFixed(1) : '0.0'}h</small>
+                    </div>
+                    <div>
+                        <button class="edit-btn" onclick="editarKit(${kit.id})">Editar</button>
+                        <button class="remove-btn" onclick="removerKit(${kit.id})">Remover</button>
+                    </div>
+                `;
+                containerKits.appendChild(divKit);
             });
         }
-
-        function usarKitNoProjeto(kitId) {
-            const kit = kitsSalvos.find(k => k.id === kitId);
-            if (!kit) return;
-
-            alert(`Simulando uso do kit "${kit.nome}"...\nOs campos na aba "Configurar Projeto" seriam preenchidos com os dados deste kit.`);
-            if (kit.tipo === "CLP") {
-                const marcaClpEl = document.getElementById('proj-clp-marca');
-                // Ex: if(kit.marca && marcaClpEl) marcaClpEl.value = kit.marca; 
-                // if(marcaClpEl) marcaClpEl.dispatchEvent(new Event('change')); 
-                // setTimeout(() => { 
-                //      const familiaClpEl = document.getElementById('proj-clp-familia');
-                //      if(familiaClpEl && kit.familia) familiaClpEl.value = kit.familia; 
-                // }, 100);
+        
+        function removerKit(id) {
+            kitsCadastrados = kitsCadastrados.filter(kit => kit.id !== id);
+            renderizarKits(); 
+            exibirMensagemTemporaria("Kit removido.", "success", "listaKitsCadastrados", true);
+            if (editandoKitId === id) { 
+                resetFormularioKit();
             }
-            const configButton = document.querySelector('.tab-button[data-tab="configProjeto"]');
-            if (configButton) openTab({currentTarget: configButton}, 'configProjeto'); 
         }
 
-        // --- INICIALIZAÇÃO ---
-        document.addEventListener('DOMContentLoaded', () => {
-            try {
-                setupTabs(); 
-                const initialTabButton = document.querySelector('.tab-button[data-tab="configProjeto"]');
-                if (initialTabButton) {
-                     openTab({currentTarget: initialTabButton }, 'configProjeto');
-                } else if (document.querySelectorAll('.tab-button').length > 0) {
-                    const firstButton = document.querySelectorAll('.tab-button')[0];
-                    if(firstButton) openTab({currentTarget: firstButton }, firstButton.dataset.tab);
+        // --- Lógica para Gerar Orçamento (Configuração do Projeto) ---
+        function gerarOrcamento() {
+            openTab(null, 'OrcamentoDetalhado'); 
+            const form = document.getElementById('formProjeto');
+            const resultadoDiv = document.getElementById('resultadoOrcamento');
+            
+            const clpMarca = form.clp_marca.value;
+            const clpFamilia = form.clp_familia.value;
+            const clpProtocolo = form.clp_protocolo_inversor.value; 
+            const ihmMarca = form.ihm_marca.value;
+            const ihmFamilia = form.ihm_familia.value;
+            const ihmPolegadas = form.ihm_polegadas?.value; 
+            const ihmEspelhamento = form.ihm_espelhamento?.checked; 
+            
+            const clpSafety = form.clp_safety.checked;
+            const clpDiSafetyQty = clpSafety ? parseInt(form.clp_di_safety_qty.value) || 0 : 0;
+            const clpDoSafetyQty = clpSafety ? parseInt(form.clp_do_safety_qty.value) || 0 : 0;
+            const clpControleEixo = form.clp_controle_eixo.checked;
+            const clpControleEixoQty = clpControleEixo ? parseInt(form.clp_controle_eixo_qty.value) || 0 : 0;
+            const clpEntradaRapida = form.clp_entrada_rapida.checked;
+            const clpEntradaRapidaQty = clpEntradaRapida ? parseInt(form.clp_entrada_rapida_qty.value) || 0 : 0;
+            const clpSaidaRapida = form.clp_saida_rapida.checked;
+            const clpSaidaRapidaQty = clpSaidaRapida ? parseInt(form.clp_saida_rapida_qty.value) || 0 : 0;
+
+            if (!clpMarca && !ihmMarca && motoresConfigurados.length === 0 && instrumentosConfigurados.length === 0 && !clpSafety && !clpControleEixo && !clpEntradaRapida && !clpSaidaRapida && !clpProtocolo) {
+                 resultadoDiv.innerHTML = `<p class="info-message error">Por favor, preencha pelo menos um campo na aba "Configurar Projeto" para gerar o orçamento.</p>`;
+                 return;
+            }
+
+            let custoTotalMaterial = 0;
+            let tempoMontagemTotal = 0;
+            let htmlOrcamentoItens = [];
+            const todosOsKitsDisponiveis = [...kitsCadastrados, ...kitsAcionamentoPreDefinidos, ...kitsClpPreDefinidos, ...kitsIhmPreDefinidos, ...kitsIoPreDefinidos]; 
+
+            // --- Custo CLP ---
+            if (clpMarca && clpFamilia) {
+                const kitCLP = todosOsKitsDisponiveis.find(k => k.tipo === 'clp' && k.marca === clpMarca && k.familia === clpFamilia);
+                if (kitCLP) {
+                    custoTotalMaterial += kitCLP.valor * (1 + (kitCLP.icms/100) + (kitCLP.ipi/100));
+                    tempoMontagemTotal += kitCLP.tempoMontagem;
+                    htmlOrcamentoItens.push(`<li><strong>CLP:</strong> ${kitCLP.nome} - Custo Mat. (c/ imp.): R$ ${(kitCLP.valor * (1 + (kitCLP.icms/100) + (kitCLP.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${kitCLP.tempoMontagem}h</li>`);
+                } else {
+                     htmlOrcamentoItens.push(`<li><strong>CLP:</strong> ${clpMarca} ${clpFamilia} - <em style="color: var(--error-color);">Kit não cadastrado</em></li>`);
                 }
-                
-                setupConfigProjetoListeners(); 
-                toggleConditionalFields(); 
-
-                const btnAddItemKitEl = document.getElementById('btn-add-item-kit');
-                if (btnAddItemKitEl) btnAddItemKitEl.addEventListener('click', adicionarItemAoKitAtual);
-                
-                popularProdutosParaKit();
-                renderKitsSalvos(); 
-
-            } catch (error) {
-                console.error("Erro durante a inicialização:", error);
-                const appDiv = document.getElementById('app');
-                if (appDiv) {
-                    appDiv.innerHTML = `<div style="padding: 20px; background-color: #ffdddd; border: 1px solid #ffcccc; color: #D8000C; border-radius: 5px;">
-                                            <strong>Erro Crítico!</strong> A aplicação não pôde ser carregada corretamente. Verifique o console do navegador (F12) para mais detalhes técnicos.<br>
-                                            Detalhe: ${error.message}
-                                        </div>`;
+                 if (clpProtocolo) { 
+                     htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Protocolo Inversores: ${clpProtocolo.replace(/_/g, ' ')}</em></li>`); 
+                }
+                if (clpSafety && (clpDiSafetyQty > 0 || clpDoSafetyQty > 0)) {
+                     const kitSafety = todosOsKitsDisponiveis.find(k => k.tipo === 'geral' && k.nome.toLowerCase().includes('safety')); 
+                     if(kitSafety) {
+                        const custoItemSafety = kitSafety.valor * (clpDiSafetyQty + clpDoSafetyQty);
+                        custoTotalMaterial += custoItemSafety * (1 + (kitSafety.icms/100) + (kitSafety.ipi/100));
+                        tempoMontagemTotal += kitSafety.tempoMontagem * (clpDiSafetyQty + clpDoSafetyQty);
+                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Safety: ${clpDiSafetyQty} DI, ${clpDoSafetyQty} DO (Kit: ${kitSafety.nome}) - Custo Adic.: R$ ${(custoItemSafety * (1 + (kitSafety.icms/100) + (kitSafety.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${ (kitSafety.tempoMontagem * (clpDiSafetyQty + clpDoSafetyQty)).toFixed(1)}h</em></li>`);
+                     } else {
+                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Safety Integrado: ${clpDiSafetyQty} DI, ${clpDoSafetyQty} DO (<em style="color: var(--error-color);">Kit não cadastrado</em>)</em></li>`);
+                     }
+                }
+                 if (clpControleEixo && clpControleEixoQty > 0) { 
+                     const kitEixo = todosOsKitsDisponiveis.find(k => k.tipo === 'geral' && k.nome.toLowerCase().includes('eixo'));
+                     if(kitEixo){
+                        custoTotalMaterial += kitEixo.valor * clpControleEixoQty * (1 + (kitEixo.icms/100) + (kitEixo.ipi/100));
+                        tempoMontagemTotal += kitEixo.tempoMontagem * clpControleEixoQty;
+                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Controle de Eixo: ${clpControleEixoQty} (Kit: ${kitEixo.nome}) - Custo Adic.: R$ ${(kitEixo.valor * clpControleEixoQty * (1+(kitEixo.icms/100)+(kitEixo.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${(kitEixo.tempoMontagem * clpControleEixoQty).toFixed(1)}h</em></li>`);
+                     } else {
+                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Controle de Eixo: ${clpControleEixoQty} eixo(s) (<em style="color: var(--error-color);">Kit não cadastrado</em>)</em></li>`);
+                     }
                 }
             }
-        });
 
+            // --- Custo IHM ---
+            if (ihmMarca && ihmFamilia) {
+                const kitIHM = kitsIhmPreDefinidos.find(k => k.marca === ihmMarca && k.familia === ihmFamilia && k.polegadas == ihmPolegadas);
+                 if (kitIHM) {
+                    custoTotalMaterial += kitIHM.valor * (1 + (kitIHM.icms/100) + (kitIHM.ipi/100));
+                    tempoMontagemTotal += kitIHM.tempoMontagem;
+                    htmlOrcamentoItens.push(`<li><strong>IHM:</strong> ${kitIHM.nome} ${ihmEspelhamento ? 'c/ Espelhamento' : ''} - Custo Mat. (c/ imp.): R$ ${(kitIHM.valor * (1 + (kitIHM.icms/100) + (kitIHM.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${kitIHM.tempoMontagem}h</li>`);
+                } else {
+                     htmlOrcamentoItens.push(`<li><strong>IHM:</strong> ${ihmMarca} ${ihmFamilia} ${ihmPolegadas ? '('+ihmPolegadas+'")' : ''} ${ihmEspelhamento ? 'c/ Espelhamento' : ''} - <em style="color: var(--error-color);">Kit não cadastrado</em></li>`);
+                }
+                 if (ihmEspelhamento) {
+                     const kitEspelhamento = todosOsKitsDisponiveis.find(k => k.tipo === 'geral' && k.nome.toLowerCase().includes('espelhamento ihm'));
+                     if(kitEspelhamento){
+                        custoTotalMaterial += kitEspelhamento.valor * (1 + (kitEspelhamento.icms/100) + (kitEspelhamento.ipi/100));
+                        tempoMontagemTotal += kitEspelhamento.tempoMontagem;
+                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Espelhamento IHM (Kit: ${kitEspelhamento.nome}) - Custo Adic.: R$ ${(kitEspelhamento.valor * (1+(kitEspelhamento.icms/100)+(kitEspelhamento.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${kitEspelhamento.tempoMontagem.toFixed(1)}h</em></li>`);
+                     } else {
+                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Espelhamento de IHM (<em style="color: var(--error-color);">Kit não cadastrado</em>)</em></li>`);
+                     }
+                }
+            }
+            
+            // --- Custo Motores ---
+            if (motoresConfigurados.length > 0) {
+                htmlOrcamentoItens.push(`<li><strong>Acionamentos (${motoresConfigurados.length}):</strong></li>`);
+                motoresConfigurados.forEach(motor => {
+                    const tipoAcionamentoKit = motor.tipoAcionamento; 
+                    const potenciaKit = motor.cv; 
+                    const tensaoMotor = motor.tensao;
+
+                    const kitMotor = kitsAcionamentoPreDefinidos.find(k => 
+                        k.tipo === tipoAcionamentoKit && 
+                        k.potenciaCV == potenciaKit &&
+                        k.tensao === tensaoMotor
+                    );
+
+                    if (kitMotor) {
+                        custoTotalMaterial += kitMotor.valor * (1 + (kitMotor.icms/100) + (kitMotor.ipi/100));
+                        tempoMontagemTotal += kitMotor.tempoMontagem;
+                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Motor ${motor.tag || motor.nome} (${motor.cv}CV ${tensaoMotor.replace('_tri','V')}, ${motor.tipoAcionamento.replace(/_/g,' ')}):</em> ${kitMotor.nome} - Custo Mat. (c/ imp.): R$ ${(kitMotor.valor * (1 + (kitMotor.icms/100) + (kitMotor.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${kitMotor.tempoMontagem}h</li>`);
+                    } else {
+                        htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Motor ${motor.tag || motor.nome} (${motor.cv}CV ${tensaoMotor.replace('_tri','V')}, ${motor.tipoAcionamento.replace(/_/g,' ')}):</em> <em style="color: var(--error-color);">Kit de acionamento não encontrado</em></li>`);
+                    }
+                });
+            }
+
+            // --- Custo Instrumentos ---
+             instrumentosConfigurados.forEach(instrumento => {
+                let kitInstrumento = todosOsKitsDisponiveis.find(k => k.tipo === 'instrumento' && (k.nome.toLowerCase().includes(instrumento.tag.toLowerCase()) || k.nome.toLowerCase().includes(instrumento.tipoMedicao.toLowerCase()) ) );
+                
+                if (kitInstrumento) {
+                    custoTotalMaterial += kitInstrumento.valor * (1 + (kitInstrumento.icms/100) + (kitInstrumento.ipi/100));
+                    tempoMontagemTotal += kitInstrumento.tempoMontagem;
+                    htmlOrcamentoItens.push(`<li><strong>Instrumento (${instrumento.tag}):</strong> ${kitInstrumento.nome} - Custo Mat. (c/ imp.): R$ ${(kitInstrumento.valor * (1 + (kitInstrumento.icms/100) + (kitInstrumento.ipi/100))).toFixed(2).replace('.',',')} | Montagem: ${kitInstrumento.tempoMontagem}h</li>`);
+                } else {
+                     htmlOrcamentoItens.push(`<li><strong>Instrumento (${instrumento.tag}):</strong> ${instrumento.tipoMedicao} ${instrumento.tipoSinal.replace('_','-')} - <em style="color: var(--error-color);">Kit não cadastrado</em></li>`);
+                }
+                 if(instrumento.malhaPI) {
+                    htmlOrcamentoItens.push(`<li>&nbsp;&nbsp;&nbsp;<em>Opção: Malha de Controle PI (Custo/Tempo a definir via Kit)</em></li>`);
+                }
+            });
+
+
+            let htmlFinal = "<h3>Resumo do Orçamento Estimado:</h3><ul>" + htmlOrcamentoItens.join('') + "</ul>";
+            htmlFinal += `<hr>`;
+            htmlFinal += `<p><strong>Custo Total Material (com impostos): R$ ${custoTotalMaterial.toFixed(2).replace('.',',')}</strong></p>`;
+            htmlFinal += `<p><strong>Tempo Estimado Montagem: ${tempoMontagemTotal.toFixed(1).replace('.',',')} horas</strong></p>`;
+            
+            const valorHoraMontagem = parseFloat(document.getElementById('valor_hora_montagem')?.value) || 75; 
+            const custoMaoDeObra = tempoMontagemTotal * valorHoraMontagem;
+            htmlFinal += `<p><strong>Custo Estimado Mão de Obra (Montagem @ R$ ${valorHoraMontagem.toFixed(2).replace('.',',')}/h): R$ ${custoMaoDeObra.toFixed(2).replace('.',',')}</strong></p>`;
+            htmlFinal += `<p style="font-size: 1.2em; font-weight: bold;"><strong>CUSTO TOTAL GERAL ESTIMADO: R$ ${(custoTotalMaterial + custoMaoDeObra).toFixed(2).replace('.',',')}</strong></p>`;
+            htmlFinal += `<p class="info-message success">Este é um orçamento preliminar. Verifique os kits cadastrados para precisão.</p>`;
+
+            resultadoDiv.innerHTML = htmlFinal;
+            resultadoDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function exibirMensagemTemporaria(mensagem, tipo = "info", elementoReferenciaId, antes = false) {
+            const elementoReferencia = typeof elementoReferenciaId === 'string' ? document.getElementById(elementoReferenciaId) : elementoReferenciaId;
+            if (!elementoReferencia) return;
+
+            const parentNodeForMessage = (elementoReferencia.tagName === 'FIELDSET' || antes) ? elementoReferencia : (elementoReferencia.parentNode || document.body);
+            
+            const mensagensAntigas = parentNodeForMessage.querySelectorAll(`.info-message-temp.${tipo}`);
+            mensagensAntigas.forEach(msg => msg.remove());
+
+            const divMensagem = document.createElement('div');
+            divMensagem.className = `info-message ${tipo} info-message-temp`; 
+            divMensagem.textContent = mensagem;
+            divMensagem.style.marginTop = '10px';
+            divMensagem.style.marginBottom = '10px';
+            
+            if (antes && elementoReferencia.parentNode) {
+                 elementoReferencia.parentNode.insertBefore(divMensagem, elementoReferencia);
+            } else if (elementoReferencia.tagName === 'FORM') {
+                 (elementoReferencia.parentNode || document.body).insertBefore(divMensagem, elementoReferencia.nextSibling);
+            } else if (elementoReferencia.firstChild && elementoReferencia.id !== 'kitsAcionamentoContainer' && elementoReferencia.id !== 'listaKitsCadastrados' && elementoReferencia.id !== 'instrumentosAdicionadosContainer') { 
+                 (elementoReferencia.closest('fieldset') || elementoReferencia.parentNode || document.body).insertBefore(divMensagem, (elementoReferencia.closest('fieldset') || elementoReferencia).nextSibling);
+
+            } else if (elementoReferencia.id === 'kitsAcionamentoContainer' || elementoReferencia.id === 'listaKitsCadastrados' || elementoReferencia.id === 'instrumentosAdicionadosContainer' ) {
+                 (elementoReferencia.parentNode || document.body).insertBefore(divMensagem, elementoReferencia);
+            }
+             else {
+                elementoReferencia.appendChild(divMensagem);
+            }
+
+
+            setTimeout(() => {
+                divMensagem.style.transition = 'opacity 0.5s ease';
+                divMensagem.style.opacity = '0';
+                setTimeout(() => {
+                    if (divMensagem.parentNode) {
+                        divMensagem.parentNode.removeChild(divMensagem);
+                    }
+                }, 500);
+            }, 3000);
+        }
+
+        // --- Lógica para o botão de Tema ---
+        function rgbStringToCssVar(rgbString) { 
+            if (!rgbString) return '0, 123, 255'; 
+            const match = rgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+            return match ? `${match[1]}, ${match[2]}, ${match[3]}` : '0, 123, 255';
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('dark-theme');
+            const themeSwitcherButton = document.getElementById('themeSwitcherButton');
+            
+            const isDarkMode = body.classList.contains('dark-theme');
+            const primaryColorVar = isDarkMode ? '--primary-color-dark' : '--primary-color-light';
+            
+            requestAnimationFrame(() => {
+                const rootStyle = getComputedStyle(body);
+                const primaryColorValue = rootStyle.getPropertyValue(primaryColorVar).trim();
+                const primaryColorRGB = rgbStringToCssVar(primaryColorValue);
+                body.style.setProperty(isDarkMode ? '--primary-color-rgb-dark' : '--primary-color-rgb', primaryColorRGB);
+            });
+
+
+            if (isDarkMode) {
+                themeSwitcherButton.textContent = 'Tema Claro';
+            } else {
+                themeSwitcherButton.textContent = 'Tema Escuro';
+            }
+        }
+
+
+        // --- Inicialização ---
+        document.addEventListener('DOMContentLoaded', function() {
+            popularMarcas('clp', 'clp_marca');
+            popularMarcas('ihm', 'ihm_marca');
+            popularSelectPotencia('motor_cv');
+            
+            document.getElementById('clp_marca').addEventListener('change', function() { popularFamilias('clp', this.value, 'clp_familia'); });
+            document.getElementById('ihm_marca').addEventListener('change', function() { popularFamilias('ihm', this.value, 'ihm_familia'); });
+            
+            setupConditionalInput('clp_safety', 'clp_safety_qty_div');
+            setupConditionalInput('clp_controle_eixo', 'clp_controle_eixo_qty_div');
+            setupConditionalInput('clp_entrada_rapida', 'clp_entrada_rapida_qty_div');
+            setupConditionalInput('clp_saida_rapida', 'clp_saida_rapida_qty_div');
+
+            
+            const themeSwitcherButton = document.getElementById('themeSwitcherButton');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            const isDarkMode = document.body.classList.contains('dark-theme');
+            const initialPrimaryColorVar = isDarkMode ? '--primary-color-dark' : '--primary-color-light';
+             requestAnimationFrame(() => { 
+                const rootStyle = getComputedStyle(document.body);
+                const initialPrimaryColorValue = rootStyle.getPropertyValue(initialPrimaryColorVar).trim();
+                const initialPrimaryColorRGB = rgbStringToCssVar(initialPrimaryColorValue);
+                document.body.style.setProperty(isDarkMode ? '--primary-color-rgb-dark' : '--primary-color-rgb', initialPrimaryColorRGB);
+            });
+
+
+            if (isDarkMode) {
+                themeSwitcherButton.textContent = 'Tema Claro';
+            } else {
+                themeSwitcherButton.textContent = 'Tema Escuro';
+            }
+
+            openTab(null, 'ConfigProjeto');
+            preCadastrarTodosOsKits(); 
+            renderizarKits(); 
+            renderizarMotores(); 
+            renderizarInstrumentos();
+            atualizarDashboardIOs();
+        });
     </script>
+
 </body>
 </html>
