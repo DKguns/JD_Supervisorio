@@ -213,6 +213,9 @@
             color: var(--total-card-text);
             opacity: 0.8;
         }
+        #project-total-card .project-total-price {
+            color: var(--total-card-text);
+        }
 
         .action-button { width: 100%; padding: 0.75rem; border: none; border-radius: 0.75rem; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
         .save-button { background-color: var(--success-color); box-shadow: 0 4px 20px -5px color-mix(in srgb, var(--success-color) 40%, transparent); }
@@ -301,6 +304,7 @@
 
             <aside class="md:col-span-1">
                  <div class="pt-[52px]">
+                    <h2 class="text-xl font-bold mb-2 text-center text-[var(--text-secondary)]">Dashboard</h2>
                     <div class="summary-panel">
                         <div id="total-card" class="glass-card text-center">
                             <span class="summary-label">Total de Tags</span>
@@ -528,9 +532,9 @@
             let moduleHtml = `<div class="glass-card"><fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">Módulos Opcionais</legend>`;
             for(const key in database.modules) {
                 const module = database.modules[key];
-                 moduleHtml += `<div class="project-input-row">
+                 moduleHtml += `<div class="project-input-row !grid-cols-2">
                                 <label for="module_${key}">${module.label}</label>
-                                <div class="flex justify-center">
+                                <div class="flex justify-end">
                                     <label class="toggle-switch">
                                         <input type="checkbox" id="module_${key}" data-module-key="${key}">
                                         <span class="slider"></span>
@@ -547,20 +551,20 @@
             projectHtml += `<div class="project-input-row"><label for="calc_company_name">Nome da Empresa</label><input class="!text-left" type="text" id="calc_company_name" data-prop="companyName" value="${database.projectSettings.companyName}"></div>`;
             projectHtml += `<div class="project-input-row"><label for="calc_project_name">Nome do Projeto</label><input class="!text-left" type="text" id="calc_project_name" data-prop="projectName" value="${database.projectSettings.projectName}"></div>`;
             projectHtml += `<div class="project-input-row two-col-row"><div class="flex flex-col"><label for="calc_city">Cidade</label><input class="!text-left" type="text" id="calc_city" data-prop="city" value="${database.projectSettings.city}"></div><div class="flex flex-col"><label for="calc_state">Estado</label><input class="!text-left" type="text" id="calc_state" data-prop="state" value="${database.projectSettings.state}"></div></div>`;
-            projectHtml += `<div class="project-input-row"><label for="calc_reserve">Percentual de Reserva de Tags (%)</label><input type="number" min="0" id="calc_reserve" data-prop="reservePercentage" value="${database.projectSettings.reservePercentage}"></div>`;
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_reserve">Percentual de Reserva de Tags (%)</label><input type="number" min="0" id="calc_reserve" data-prop="reservePercentage" value="${database.projectSettings.reservePercentage}"></div>`;
             projectHtml += `<hr class="my-2 border-[var(--border-color)]">`
-            projectHtml += `<div class="project-input-row"><label for="calc_distance">Distância até Cliente (KM) (Calcula ida e volta)</label><input type="number" min="0" id="calc_distance" data-prop="distance" value="${database.projectSettings.distance}"></div>`;
-            projectHtml += `<div class="project-input-row"><label for="calc_lodging">Número de Hospedagens</label><input type="number" min="0" id="calc_lodging" data-prop="lodgingCount" value="${database.projectSettings.lodgingCount}"></div>`;
-            projectHtml += `<div class="project-input-row"><label for="calc_food">Número de Diárias (Alimentação)</label><input type="number" min="0" id="calc_food" data-prop="foodDays" value="${database.projectSettings.foodDays}"></div>`;
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_distance">Distância até Cliente (KM) (Calcula ida e volta)</label><input type="number" min="0" id="calc_distance" data-prop="distance" value="${database.projectSettings.distance}"></div>`;
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_lodging">Número de Hospedagens</label><input type="number" min="0" id="calc_lodging" data-prop="lodgingCount" value="${database.projectSettings.lodgingCount}"></div>`;
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_food">Número de Diárias (Alimentação)</label><input type="number" min="0" id="calc_food" data-prop="foodDays" value="${database.projectSettings.foodDays}"></div>`;
             projectHtml += `<hr class="my-2 border-[var(--border-color)]">`
-            projectHtml += `<div class="project-input-row"><label for="calc_screen_count">Número de Monitores</label><input type="number" min="0" id="calc_screen_count" data-prop="screenCount" value="${database.projectSettings.screenCount}"></div>`;
-            projectHtml += `<div class="project-input-row"><label for="calc_screen_model">Modelo da Tela</label><select id="calc_screen_model" data-prop="screenModelIndex">`;
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_screen_count">Número de Monitores</label><input type="number" min="0" id="calc_screen_count" data-prop="screenCount" value="${database.projectSettings.screenCount}"></div>`;
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_screen_model">Modelo da Tela</label><select id="calc_screen_model" data-prop="screenModelIndex">`;
             database.hardware.screens.forEach((screen, index) => {
                 const selected = index === database.projectSettings.screenModelIndex ? 'selected' : '';
                 projectHtml += `<option value="${index}" ${selected}>${screen.name}</option>`;
             });
             projectHtml += `</select></div>`;
-            projectHtml += `<div class="project-input-row"><label for="calc_include_computer">Incluir Computador?</label><div class="flex justify-center"><label class="toggle-switch">
+            projectHtml += `<div class="project-input-row !grid-cols-2"><label for="calc_include_computer">Incluir Computador?</label><div class="flex justify-end"><label class="toggle-switch">
                                     <input type="checkbox" id="calc_include_computer" data-prop="includeComputer" ${database.projectSettings.includeComputer ? 'checked' : ''}>
                                     <span class="slider"></span>
                                 </label></div></div>`;
@@ -842,7 +846,7 @@
             });
 
             // Save hardware settings
-            const hardwareInputs = hardwareSettingsContainer.querySelectorAll('input');
+            const hardwareInputs = hardwareSettingsContainer.querySelectorAll('input, select');
             hardwareInputs.forEach(input => {
                 const type = input.dataset.type;
                 const index = input.dataset.index;
@@ -1057,6 +1061,7 @@
             applyTheme(savedTheme);
             
             // Event Listeners
+            tagsForm.addEventListener('input', calculateAndDisplayTotals);
             clearButton.addEventListener('click', () => {
                 tagsForm.reset();
                 rerenderAll(); // Rerender to reset inputs to default values from DB
