@@ -391,10 +391,10 @@
                 lodgingPrice: 350,
                 foodPrice: 100,
                 reservePercentage: 10,
-                screenCount: 1,
+                screenCount: 0,
                 screenModelIndex: 0,
                 hourPrice: 150,
-                includeComputer: true,
+                includeComputer: false,
             },
             tags: {
                 'motores': {
@@ -1062,21 +1062,12 @@
             
             // Event Listeners
             tagsForm.addEventListener('input', calculateAndDisplayTotals);
+            calculatorProjectInputsContainer.addEventListener('input', calculateAndDisplayTotals);
             clearButton.addEventListener('click', () => {
+                const defaultSettings = JSON.parse(JSON.stringify(defaultDatabase.projectSettings));
+                database.projectSettings = defaultSettings;
                 tagsForm.reset();
-                // Also reset the project settings to their default values in the UI
-                const defaultSettings = defaultDatabase.projectSettings;
-                for (const key in defaultSettings) {
-                    const el = document.getElementById(`calc_${key}`) || document.querySelector(`[data-prop="${key}"]`);
-                     if (el) {
-                         if (el.type === 'checkbox') {
-                             el.checked = defaultSettings[key];
-                         } else {
-                            el.value = defaultSettings[key];
-                         }
-                    }
-                }
-                calculateAndDisplayTotals();
+                rerenderAll(); 
             });
             saveSettingsButton.addEventListener('click', saveSettings);
             restoreDefaultsButton.addEventListener('click', restoreDefaults);
