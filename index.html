@@ -969,48 +969,113 @@
             const projectName = database.projectSettings.projectName || 'N/A';
             const city = database.projectSettings.city || 'N/A';
             const state = database.projectSettings.state || 'N/A';
+            
             const finalTotalTags = grandTotalEl.textContent;
+            const baseTagsValue = baseTagsEl.textContent;
+            const reserveTagsValue = reserveTagsEl.textContent;
             const totalHoursValue = totalHoursEl.textContent;
+
             const hardwareTotal = hardwareTotalPriceEl.textContent;
             const travelTotal = travelTotalPriceEl.textContent;
             const licenseName = licenseNameEl.textContent;
             const licenseCost = licensePriceEl.textContent;
             const servicesCost = servicesPriceEl.textContent;
             const projectTotal = projectTotalPriceEl.textContent;
-            
-            doc.setFontSize(22);
-            doc.text("Orçamento de Projeto de Supervisório", 105, 20, { align: 'center' });
 
-            doc.setFontSize(12);
-            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 190, 30, { align: 'right' });
+            const chartBase64 = tagsChart ? tagsChart.toBase64Image() : null;
 
-            doc.setFontSize(14);
-            doc.text("Dados do Projeto", 14, 40);
-            doc.setFontSize(10);
-            doc.text(`Empresa: ${companyName}`, 14, 48);
-            doc.text(`Projeto: ${projectName}`, 14, 54);
-            doc.text(`Local: ${city}, ${state}`, 14, 60);
+            // --- PDF STYLING ---
+            const primaryColor = '#14b8a6';
+            const secondaryColor = '#4a5568';
+            const pageW = doc.internal.pageSize.getWidth();
+            const margin = 14;
+            let y = 20;
 
-            doc.setFontSize(14);
-            doc.text("Resumo Geral", 14, 75);
-            doc.setFontSize(10);
-            doc.text(`Total de Tags (com reserva): ${finalTotalTags}`, 14, 83);
-            doc.text(`Total de Horas de Serviço: ${totalHoursValue}h`, 14, 89);
+            // Header
+            doc.setFontSize(22).setFont(undefined, 'bold');
+            doc.text("Orçamento de Projeto de Supervisório", pageW / 2, y, { align: 'center' });
+            y += 10;
+            doc.setFontSize(10).setFont(undefined, 'normal');
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, pageW - margin, y, { align: 'right' });
+            y += 8;
+
+            // Section Title Helper
+            const drawSectionTitle = (title) => {
+                doc.setFillColor(primaryColor);
+                doc.rect(margin, y, pageW - (margin * 2), 8, 'F');
+                doc.setFontSize(12).setFont(undefined, 'bold').setTextColor('#FFFFFF');
+                doc.text(title, margin + 3, y + 5.5);
+                y += 12;
+                doc.setTextColor('#000000');
+            };
             
-            doc.setFontSize(14);
-            doc.text("Detalhamento de Custos", 14, 104);
-            doc.setFontSize(10);
-            let y = 112;
-            doc.text(`- Hardware: ${hardwareTotal}`, 20, y);
+            // Client/Project Info
+            drawSectionTitle("Dados do Projeto");
+            doc.setFontSize(10).setFont(undefined, 'normal');
+            doc.text(`Empresa: ${companyName}`, margin, y);
+            doc.text(`Local: ${city}, ${state}`, pageW / 2, y);
             y += 6;
-            doc.text(`- Despesas de Viagem: ${travelTotal}`, 20, y);
-            y += 6;
-            doc.text(`- Licença de Software (${licenseName}): ${licenseCost}`, 20, y);
-            y += 6;
-            doc.text(`- Serviços: ${servicesCost}`, 20, y);
+            doc.text(`Projeto: ${projectName}`, margin, y);
+            y += 10;
             
-            doc.setFontSize(16);
-            doc.text(`Valor Total do Projeto: ${projectTotal}`, 14, y + 15);
+            // Summary Cards
+            const drawSummaryCard = (x, width, title, value, subtext = null) => {
+                doc.setFillColor(244, 247, 249);
+                doc.setDrawColor(222, 226, 230);
+                doc.roundedRect(x, y, width, 22, 3, 3, 'FD');
+                doc.setFontSize(10).setTextColor(secondaryColor);
+                doc.text(title, x + width / 2, y + 7, { align: 'center' });
+                doc.setFontSize(18).setFont(undefined, 'bold').setTextColor('#000000');
+                doc.text(value, x + width / 2, y + 14, { align: 'center' });
+                 if (subtext) {
+                    doc.setFontSize(8).setFont(undefined, 'normal').setTextColor(secondaryColor);
+                    doc.text(subtext, x + width / 2, y + 19, { align: 'center' });
+                }
+            };
+
+            const cardWidth = (pageW - margin * 2 - 10) / 2;
+            drawSummaryCard(margin, cardWidth, "Total de Tags", finalTotalTags, `Projeto: ${baseTagsValue} + Reserva: ${reserveTagsValue}`);
+            drawSummaryCard(margin + cardWidth + 10, cardWidth, "Total de Horas", `${totalHoursValue}h`);
+            y += 30;
+
+            // Costs Breakdown
+            drawSectionTitle("Detalhamento de Custos");
+            const costX = margin + 5;
+            let costY = y;
+            const drawCostItem = (label, value) => {
+                doc.setFontSize(10).setFont(undefined, 'bold');
+                doc.text(label, costX, costY);
+                doc.setFont(undefined, 'normal');
+                doc.text(value, costX + 70, costY);
+                costY += 7;
+            }
+            drawCostItem("Valor dos Serviços:", servicesCost);
+            drawCostItem("Custo da Licença:", licenseCost);
+            drawCostItem("Custo de Hardware:", hardwareTotal);
+            drawCostItem("Despesas de Viagem:", travelTotal);
+            
+            // Chart
+            if(chartBase64){
+                doc.addImage(chartBase64, 'PNG', pageW - margin - 70, y - 5, 60, 60);
+            }
+            y+= 35
+
+            // Final Total
+            doc.setDrawColor(primaryColor);
+            doc.line(margin, y, pageW - margin, y);
+            y += 10;
+            doc.setFontSize(16).setFont(undefined, 'bold');
+            doc.text("Valor Total do Projeto:", margin, y);
+            doc.text(projectTotal, pageW - margin, y, { align: 'right' });
+
+
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                 doc.setFontSize(8).setTextColor(secondaryColor);
+                doc.text(`Página ${i} de ${pageCount}`, pageW / 2, 287, { align: 'center' });
+            }
 
             doc.save(`Orçamento - ${projectName || 'Novo Projeto'}.pdf`);
         }
