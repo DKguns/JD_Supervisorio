@@ -121,7 +121,7 @@
         .settings-row { grid-template-columns: 1fr 100px 100px; gap: 1rem; }
         .module-settings-row { grid-template-columns: 1fr 80px 80px 80px; gap: 1rem; }
         .project-input-row { grid-template-columns: 1fr; gap: 0.5rem; }
-        .two-col-row { grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .two-col-row { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
         .vc-settings-row { grid-template-columns: 1fr 1fr 100px; gap: 1rem; }
 
 
@@ -1064,7 +1064,19 @@
             tagsForm.addEventListener('input', calculateAndDisplayTotals);
             clearButton.addEventListener('click', () => {
                 tagsForm.reset();
-                rerenderAll(); // Rerender to reset inputs to default values from DB
+                // Also reset the project settings to their default values in the UI
+                const defaultSettings = defaultDatabase.projectSettings;
+                for (const key in defaultSettings) {
+                    const el = document.getElementById(`calc_${key}`) || document.querySelector(`[data-prop="${key}"]`);
+                     if (el) {
+                         if (el.type === 'checkbox') {
+                             el.checked = defaultSettings[key];
+                         } else {
+                            el.value = defaultSettings[key];
+                         }
+                    }
+                }
+                calculateAndDisplayTotals();
             });
             saveSettingsButton.addEventListener('click', saveSettings);
             restoreDefaultsButton.addEventListener('click', restoreDefaults);
