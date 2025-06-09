@@ -276,14 +276,8 @@
                 
                 <div id="calculadora" class="tab-content active">
                      <div id="calculator-project-inputs" class="glass-card mb-4"></div>
-                    <form id="tags-form" class="glass-card !rounded-t-none">
-                        <div id="modules-fields" class="mb-6"></div>
-                        <div class="calc-grid-header">
-                            <span>Descrição do Objeto</span>
-                            <span class="text-center">Tags</span>
-                            <span class="text-center">Horas</span>
-                            <span class="text-center">Qtd.</span>
-                        </div>
+                    <form id="tags-form">
+                        <div id="modules-container" class="mb-4"></div>
                         <div id="calculator-fields"></div>
                     </form>
                 </div>
@@ -457,7 +451,7 @@
         };
 
         // --- DOM ELEMENTS ---
-        let grandTotalEl, baseTagsEl, reserveTagsEl, totalHoursEl, licenseNameEl, licensePriceEl, servicesPriceEl, projectTotalPriceEl, computerNameEl, screensDescEl, videocardDescEl, hardwareTotalPriceEl, moduleHardwarePriceEl, clearButton, tagsForm, calculatorFieldsContainer, settingsFieldsContainer, licenseSettingsContainer, hardwareSettingsContainer, moduleSettingsContainer, calculatorProjectInputsContainer, saveSettingsButton, restoreDefaultsButton, themeSwitcher, sunIcon, moonIcon, ctx, tagsChart;
+        let grandTotalEl, baseTagsEl, reserveTagsEl, totalHoursEl, licenseNameEl, licensePriceEl, servicesPriceEl, projectTotalPriceEl, computerNameEl, screensDescEl, videocardDescEl, hardwareTotalPriceEl, moduleHardwarePriceEl, clearButton, tagsForm, calculatorFieldsContainer, settingsFieldsContainer, licenseSettingsContainer, hardwareSettingsContainer, moduleSettingsContainer, calculatorProjectInputsContainer, saveSettingsButton, restoreDefaultsButton, themeSwitcher, sunIcon, moonIcon, ctx, tagsChart, modulesContainer;
         
         // --- CHART ---
         const chartGroupColors = {
@@ -476,33 +470,35 @@
         }
         
         function renderCalculatorFields() {
-            let html = '';
+            let itemsHtml = '';
             for (const groupKey in database.tags) {
+                itemsHtml += `<div class="glass-card mb-4">`;
                 const group = database.tags[groupKey];
-                html += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">${group.label}</legend>`;
+                itemsHtml += `<fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">${group.label}</legend>`;
+                itemsHtml += `<div class="calc-grid-header"><span>Descrição do Objeto</span><span class="text-center">Tags</span><span class="text-center">Horas</span><span class="text-center">Qtd.</span></div>`;
                 for (const itemKey in group.items) {
                     const item = group.items[itemKey];
-                    html += `<div class="input-row">
+                    itemsHtml += `<div class="input-row">
                                 <label for="calc_${itemKey}">${item.label}</label>
                                 <span class="tags-per-item">${item.tags}</span>
                                 <span class="time-per-item">${item.time}h</span>
                                 <div class="flex justify-center">`;
                     if (item.max === 1) {
-                        html += `<label class="toggle-switch">
+                        itemsHtml += `<label class="toggle-switch">
                                     <input type="checkbox" id="calc_${itemKey}" data-group="${group.label}" data-item-key="${itemKey}">
                                     <span class="slider"></span>
                                 </label>`;
                     } else {
-                        html += `<input type="number" min="0" class="w-20" id="calc_${itemKey}" data-group="${group.label}" data-item-key="${itemKey}" placeholder="Qtd.">`;
+                        itemsHtml += `<input type="number" min="0" class="w-20" id="calc_${itemKey}" data-group="${group.label}" data-item-key="${itemKey}" placeholder="Qtd.">`;
                     }
-                    html += `</div></div>`;
+                    itemsHtml += `</div></div>`;
                 }
-                html += `</fieldset>`;
+                itemsHtml += `</fieldset></div>`;
             }
-            calculatorFieldsContainer.innerHTML = html;
+            calculatorFieldsContainer.innerHTML = itemsHtml;
 
             // Render Modules
-            let moduleHtml = `<fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">Módulos Opcionais</legend>`;
+            let moduleHtml = `<div class="glass-card mb-4"><fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">Módulos Opcionais</legend>`;
             for(const key in database.modules) {
                 const module = database.modules[key];
                  moduleHtml += `<div class="project-input-row">
@@ -515,8 +511,8 @@
                                 </div>
                               </div>`;
             }
-            moduleHtml += `</fieldset>`;
-            document.getElementById('modules-fields').innerHTML = moduleHtml;
+            moduleHtml += `</fieldset></div>`;
+            modulesContainer.innerHTML = moduleHtml;
 
 
             tagsForm.addEventListener('input', calculateAndDisplayTotals);
@@ -622,7 +618,7 @@
             let baseTotalTags = 0;
             let totalHours = 0;
             const groupTotals = {};
-            const inputs = tagsForm.querySelectorAll('input[type="number"], input[type="checkbox"]');
+            const inputs = document.querySelectorAll('#tags-form input, #modules-container input');
             
             const reservePercentage = parseFloat(document.getElementById('calc_reserve')?.value) || 0;
             const screenCount = parseInt(document.getElementById('calc_screen_count')?.value) || 0;
@@ -631,9 +627,9 @@
             const screenModelSelect = document.getElementById('calc_screen_model');
 
             // Calculate from core items
-            inputs.forEach(input => {
+            document.querySelectorAll('#calculator-fields input').forEach(input => {
                 let quantity = 0;
-                if(input.type === 'checkbox' && !input.id.startsWith('module_')) {
+                if(input.type === 'checkbox') {
                     quantity = input.checked ? 1 : 0;
                 } else if (input.type === 'number') {
                     quantity = parseFloat(input.value) || 0;
@@ -658,7 +654,7 @@
             
             // Calculate from optional modules
             let modulesHardwareCost = 0;
-            const moduleInputs = document.querySelectorAll('#modules-fields input[type="checkbox"]');
+            const moduleInputs = document.querySelectorAll('#modules-container input[type="checkbox"]');
             moduleInputs.forEach(input => {
                 if (input.checked) {
                     const moduleKey = input.dataset.moduleKey;
@@ -921,6 +917,7 @@
             clearButton = document.getElementById('clear-button');
             tagsForm = document.getElementById('tags-form');
             calculatorFieldsContainer = document.getElementById('calculator-fields');
+            modulesContainer = document.getElementById('modules-container');
             calculatorProjectInputsContainer = document.getElementById('calculator-project-inputs');
             settingsFieldsContainer = document.getElementById('settings-fields');
             licenseSettingsContainer = document.getElementById('license-settings-fields');
