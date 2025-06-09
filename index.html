@@ -1058,11 +1058,7 @@
             drawCostItem("Custo de Hardware:", hardwareTotal);
             drawCostItem("Despesas de Viagem:", travelTotal);
             
-            // Chart
-            if(chartBase64 && doc.internal.getNumberOfPages() === 1 && costY < 230){ // Avoid pushing content off page
-                doc.addImage(chartBase64, 'PNG', pageW - margin - 65, y - 5, 60, 60);
-            }
-            y = Math.max(y + 35, costY);
+            y = Math.max(y + 5, costY);
 
             // Final Total
             doc.setDrawColor(primaryColor);
@@ -1137,6 +1133,7 @@
                 const defaultSettings = JSON.parse(JSON.stringify(defaultDatabase.projectSettings));
                 database.projectSettings = defaultSettings;
                 tagsForm.reset();
+                // manually update the UI from the now-reset database state
                 rerenderAll(); 
             });
             saveSettingsButton.addEventListener('click', saveSettings);
