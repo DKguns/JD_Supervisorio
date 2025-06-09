@@ -191,7 +191,7 @@
         }
         #total-card { grid-column: 1 / span 1; }
         #time-card { grid-column: 2 / span 1; }
-        #hardware-card { grid-column: 1 / -1; }
+        #hardware-card, #travel-card { grid-column: 1 / -1; }
         #license-card { grid-column: 1 / -1; }
         #chart-card { grid-column: 1 / -1; }
         #actions-card { grid-column: 1 / -1; }
@@ -202,7 +202,7 @@
         .license-name { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
         .price-value { font-size: 1.25rem; font-weight: 700; color: var(--success-color); }
         .project-total-price { font-size: 1.75rem; font-weight: 700; color: var(--total-card-text); }
-        .hardware-item { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 0.25rem 0; }
+        .hardware-item, .travel-item { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 0.25rem 0; }
         #project-total-card {
             background-color: var(--total-card-bg);
             transition: background-color 0.5s ease;
@@ -324,6 +324,17 @@
                                 </div>
                              </div>
                         </div>
+                        <div id="travel-card" class="glass-card">
+                             <span class="summary-label text-center">Despesas de Viagem</span>
+                             <div class="mt-2 space-y-2">
+                                <div class="travel-item"><span>Deslocamento:</span><span id="travel-cost">R$ 0,00</span></div>
+                                <div class="travel-item"><span>Hospedagem:</span><span id="lodging-cost">R$ 0,00</span></div>
+                                <div class="travel-item"><span>Alimentação:</span><span id="food-cost">R$ 0,00</span></div>
+                                <div class="text-right mt-2 pt-2 border-t border-[var(--border-color)]">
+                                    <span class="price-value" id="travel-total-price">R$ 0,00</span>
+                                </div>
+                             </div>
+                        </div>
                         <div id="license-card" class="glass-card text-center">
                             <span class="summary-label">Licença e Serviços</span>
                             <div class="mt-2">
@@ -362,6 +373,15 @@
 
         const defaultDatabase = {
             projectSettings: {
+                companyName: '',
+                projectName: '',
+                city: '',
+                distance: 0,
+                lodgingCount: 0,
+                foodDays: 0,
+                kmPrice: 0.75,
+                lodgingPrice: 350,
+                foodPrice: 100,
                 reservePercentage: 10,
                 screenCount: 1,
                 screenModelIndex: 0,
@@ -454,7 +474,7 @@
         };
 
         // --- DOM ELEMENTS ---
-        let grandTotalEl, baseTagsEl, reserveTagsEl, totalHoursEl, licenseNameEl, licensePriceEl, servicesPriceEl, projectTotalPriceEl, computerNameEl, screensDescEl, videocardDescEl, hardwareTotalPriceEl, moduleHardwarePriceEl, clearButton, tagsForm, calculatorFieldsContainer, settingsFieldsContainer, licenseSettingsContainer, hardwareSettingsContainer, moduleSettingsContainer, calculatorProjectInputsContainer, saveSettingsButton, restoreDefaultsButton, themeSwitcher, sunIcon, moonIcon, ctx, tagsChart, modulesContainer;
+        let grandTotalEl, baseTagsEl, reserveTagsEl, totalHoursEl, licenseNameEl, licensePriceEl, servicesPriceEl, projectTotalPriceEl, computerNameEl, screensDescEl, videocardDescEl, hardwareTotalPriceEl, moduleHardwarePriceEl, travelCostEl, lodgingCostEl, foodCostEl, travelTotalPriceEl, clearButton, tagsForm, calculatorFieldsContainer, settingsFieldsContainer, licenseSettingsContainer, hardwareSettingsContainer, moduleSettingsContainer, calculatorProjectInputsContainer, saveSettingsButton, restoreDefaultsButton, themeSwitcher, sunIcon, moonIcon, ctx, tagsChart, modulesContainer;
         
         // --- CHART ---
         const chartGroupColors = {
@@ -523,8 +543,16 @@
         
         function renderProjectInputs() {
             let projectHtml = `<div class="glass-card"><fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">Configurações Iniciais do Projeto</legend>`;
+            projectHtml += `<div class="project-input-row"><label for="calc_company_name">Nome da Empresa</label><input class="!text-left" type="text" id="calc_company_name" data-prop="companyName" value="${database.projectSettings.companyName}"></div>`;
+            projectHtml += `<div class="project-input-row"><label for="calc_project_name">Nome do Projeto</label><input class="!text-left" type="text" id="calc_project_name" data-prop="projectName" value="${database.projectSettings.projectName}"></div>`;
+            projectHtml += `<div class="project-input-row"><label for="calc_city">Cidade</label><input class="!text-left" type="text" id="calc_city" data-prop="city" value="${database.projectSettings.city}"></div>`;
             projectHtml += `<div class="project-input-row"><label for="calc_reserve">Percentual de Reserva de Tags (%)</label><input type="number" min="0" id="calc_reserve" data-prop="reservePercentage" value="${database.projectSettings.reservePercentage}"></div>`;
-            projectHtml += `<div class="project-input-row"><label for="calc_screen_count">Número de Telas IHM</label><input type="number" min="0" id="calc_screen_count" data-prop="screenCount" value="${database.projectSettings.screenCount}"></div>`;
+            projectHtml += `<hr class="my-2 border-[var(--border-color)]">`
+            projectHtml += `<div class="project-input-row"><label for="calc_distance">Distância (KM)</label><input type="number" min="0" id="calc_distance" data-prop="distance" value="${database.projectSettings.distance}"></div>`;
+            projectHtml += `<div class="project-input-row"><label for="calc_lodging">Número de Hospedagens</label><input type="number" min="0" id="calc_lodging" data-prop="lodgingCount" value="${database.projectSettings.lodgingCount}"></div>`;
+            projectHtml += `<div class="project-input-row"><label for="calc_food">Número de Diárias (Alimentação)</label><input type="number" min="0" id="calc_food" data-prop="foodDays" value="${database.projectSettings.foodDays}"></div>`;
+            projectHtml += `<hr class="my-2 border-[var(--border-color)]">`
+            projectHtml += `<div class="project-input-row"><label for="calc_screen_count">Número de Monitores</label><input type="number" min="0" id="calc_screen_count" data-prop="screenCount" value="${database.projectSettings.screenCount}"></div>`;
             projectHtml += `<div class="project-input-row"><label for="calc_screen_model">Modelo da Tela</label><select id="calc_screen_model" data-prop="screenModelIndex">`;
             database.hardware.screens.forEach((screen, index) => {
                 const selected = index === database.projectSettings.screenModelIndex ? 'selected' : '';
@@ -592,13 +620,17 @@
             licenseSettingsContainer.innerHTML = licenseHtml;
             
             // Render Hardware Settings
-            let hardwareHtml = `<div class="settings-grid-header" style="grid-template-columns: 1fr 1fr 100px; gap: 1rem;"><span>Item</span><span>Especificação / Nome</span><span class="text-center">Valor (R$)</span></div>`;
-            hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Valor da Hora</legend>`;
-            hardwareHtml += `<div class="settings-row"><label for="setting_hour_price">Valor da Hora de Serviço (R$)</label><input type="number" min="0" id="setting_hour_price" data-prop="hourPrice" value="${database.projectSettings.hourPrice}"><span/></div></fieldset>`;
-            
+            let hardwareHtml = `<div class="settings-grid-header" style="grid-template-columns: 1fr 100px; gap: 1rem;"><span>Item</span><span class="text-center">Valor (R$)</span></div>`;
+            hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Custos Gerais e de Viagem</legend>`;
+            hardwareHtml += `<div class="settings-row"><label for="setting_hour_price">Valor da Hora de Serviço (R$)</label><input type="number" min="0" id="setting_hour_price" data-prop="hourPrice" value="${database.projectSettings.hourPrice}"></div>`;
+            hardwareHtml += `<div class="settings-row"><label for="setting_km_price">Valor do KM Rodado (R$)</label><input type="number" min="0" id="setting_km_price" data-prop="kmPrice" value="${database.projectSettings.kmPrice}"></div>`;
+            hardwareHtml += `<div class="settings-row"><label for="setting_lodging_price">Valor da Hospedagem (Diária)</label><input type="number" min="0" id="setting_lodging_price" data-prop="lodgingPrice" value="${database.projectSettings.lodgingPrice}"></div>`;
+            hardwareHtml += `<div class="settings-row"><label for="setting_food_price">Valor da Alimentação (Diária)</label><input type="number" min="0" id="setting_food_price" data-prop="foodPrice" value="${database.projectSettings.foodPrice}"></div>`;
+            hardwareHtml += `</fieldset>`;
+
             hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Computadores</legend>`;
             database.hardware.computers.forEach((computer, index) => {
-                 hardwareHtml += `<div class="settings-row vc-settings-row"><label>${computer.name}</label><input type="text" value="${computer.spec}" class="!text-left px-2" id="computer_spec_${index}" data-type="computers" data-index="${index}" data-prop="spec"><input type="number" min="0" id="computer_price_${index}" data-type="computers" data-index="${index}" data-prop="price" value="${computer.price}"></div>`;
+                 hardwareHtml += `<div class="settings-row vc-settings-row" style="grid-template-columns: 0.5fr 1.5fr 100px"><label>${computer.name}</label><input type="text" value="${computer.spec}" class="!text-left px-2" id="computer_spec_${index}" data-type="computers" data-index="${index}" data-prop="spec"><input type="number" min="0" id="computer_price_${index}" data-type="computers" data-index="${index}" data-prop="price" value="${computer.price}"></div>`;
             });
             hardwareHtml += `</fieldset>`;
             
@@ -621,12 +653,29 @@
             let baseTotalTags = 0;
             let totalHours = 0;
             const groupTotals = {};
-            const inputs = document.querySelectorAll('#tags-form input');
             
-            const reservePercentage = parseFloat(document.getElementById('calc_reserve')?.value) || 0;
-            const screenCount = parseInt(document.getElementById('calc_screen_count')?.value) || 0;
-            const screenModelIndex = parseInt(document.getElementById('calc_screen_model')?.value) || 0;
-            const includeComputer = document.getElementById('calc_include_computer')?.checked;
+            // Get values from Project Settings
+            const projectInputs = document.querySelectorAll('#calculator-project-inputs input, #calculator-project-inputs select');
+            let tempProjectSettings = {};
+             projectInputs.forEach(input => {
+                const prop = input.dataset.prop;
+                if (input.type === 'checkbox') {
+                    tempProjectSettings[prop] = input.checked;
+                } else if(input.type === 'text') {
+                     tempProjectSettings[prop] = input.value;
+                } else {
+                    tempProjectSettings[prop] = parseFloat(input.value) || 0;
+                }
+            });
+
+            const reservePercentage = tempProjectSettings.reservePercentage;
+            const screenCount = tempProjectSettings.screenCount;
+            const screenModelIndex = tempProjectSettings.screenModelIndex;
+            const includeComputer = tempProjectSettings.includeComputer;
+            const distance = tempProjectSettings.distance;
+            const lodgingCount = tempProjectSettings.lodgingCount;
+            const foodDays = tempProjectSettings.foodDays;
+
             const screenModelSelect = document.getElementById('calc_screen_model');
 
             // Calculate from core items
@@ -711,11 +760,23 @@
             videocardDescEl.textContent = videoCard.name;
             moduleHardwarePriceEl.textContent = formatCurrency(modulesHardwareCost);
             hardwareTotalPriceEl.textContent = formatCurrency(hardwareTotalCost);
+            
+            // Calculate Travel Expenses
+            const travelCost = distance * 2 * database.projectSettings.kmPrice;
+            const lodgingCost = lodgingCount * database.projectSettings.lodgingPrice;
+            const foodCost = foodDays * database.projectSettings.foodPrice;
+            const travelTotalCost = travelCost + lodgingCost + foodCost;
+
+            // Update Travel Summary
+            travelCostEl.textContent = formatCurrency(travelCost);
+            lodgingCostEl.textContent = formatCurrency(lodgingCost);
+            foodCostEl.textContent = formatCurrency(foodCost);
+            travelTotalPriceEl.textContent = formatCurrency(travelTotalCost);
 
             // Calculate License and Final Price
             const recommendedLicense = calculateRecommendedLicense(finalTotalTags);
             const totalServicesPrice = totalHours * database.projectSettings.hourPrice;
-            const finalProjectPrice = recommendedLicense.price + totalServicesPrice + hardwareTotalCost;
+            const finalProjectPrice = recommendedLicense.price + totalServicesPrice + hardwareTotalCost + travelTotalCost;
 
             licenseNameEl.textContent = recommendedLicense.name;
             licensePriceEl.textContent = formatCurrency(recommendedLicense.price);
@@ -790,17 +851,19 @@
 
                 if(database.hardware[type] && database.hardware[type][index]){
                      database.hardware[type][index][prop] = newValue;
-                } else if (prop === 'hourPrice') {
+                } else if (prop === 'hourPrice' || prop === 'kmPrice' || prop === 'lodgingPrice' || prop === 'foodPrice') {
                     database.projectSettings[prop] = newValue;
                 }
             });
             
-            // Save project settings from both tabs
+            // Save project settings from calculator tab
             const projectInputs = document.querySelectorAll('#calculator-project-inputs input, #calculator-project-inputs select');
             projectInputs.forEach(input => {
                 const prop = input.dataset.prop;
                 if (input.type === 'checkbox') {
                     database.projectSettings[prop] = input.checked;
+                } else if (input.type === 'text') {
+                    database.projectSettings[prop] = input.value;
                 } else {
                     const newValue = parseFloat(input.value) || 0;
                     database.projectSettings[prop] = newValue;
@@ -825,26 +888,25 @@
             const savedData = localStorage.getItem('database');
             let parsedData = savedData ? JSON.parse(savedData) : JSON.parse(JSON.stringify(defaultDatabase));
             
-            // Migration for old data structures
-            if (!parsedData.projectSettings) parsedData.projectSettings = JSON.parse(JSON.stringify(defaultDatabase.projectSettings));
-            if (!parsedData.hardware) parsedData.hardware = JSON.parse(JSON.stringify(defaultDatabase.hardware));
-            if (typeof parsedData.projectSettings.includeComputer === 'undefined') parsedData.projectSettings.includeComputer = true;
-            if (!parsedData.modules) parsedData.modules = JSON.parse(JSON.stringify(defaultDatabase.modules));
-            if (!parsedData.tags || !parsedData.licenses) parsedData = JSON.parse(JSON.stringify(defaultDatabase));
+            // Migration for old data structures and new fields
+             database = {
+                ...JSON.parse(JSON.stringify(defaultDatabase)),
+                ...parsedData,
+                projectSettings: {
+                    ...JSON.parse(JSON.stringify(defaultDatabase.projectSettings)),
+                    ...(parsedData.projectSettings || {})
+                },
+                tags: parsedData.tags || JSON.parse(JSON.stringify(defaultDatabase.tags)),
+                licenses: parsedData.licenses || JSON.parse(JSON.stringify(defaultDatabase.licenses)),
+                hardware: parsedData.hardware || JSON.parse(JSON.stringify(defaultDatabase.hardware)),
+                modules: parsedData.modules || JSON.parse(JSON.stringify(defaultDatabase.modules)),
+             };
 
-            for (const groupKey in defaultDatabase.tags) {
-                for (const itemKey in defaultDatabase.tags[groupKey].items) {
-                    if (parsedData.tags[groupKey] && parsedData.tags[groupKey].items[itemKey] && typeof parsedData.tags[groupKey].items[itemKey].time === 'undefined') {
-                       parsedData.tags[groupKey].items[itemKey].time = defaultDatabase.tags[groupKey].items[itemKey].time;
-                    }
-                }
-            }
              for (const key in defaultDatabase.hardware.videoCards) {
-                if(parsedData.hardware.videoCards[key] && !parsedData.hardware.videoCards[key].name) {
-                     parsedData.hardware.videoCards[key].name = defaultDatabase.hardware.videoCards[key].name;
+                if(database.hardware.videoCards[key] && !database.hardware.videoCards[key].name) {
+                     database.hardware.videoCards[key].name = defaultDatabase.hardware.videoCards[key].name;
                 }
             }
-            database = parsedData;
         }
         
         function rerenderAll() {
@@ -911,6 +973,10 @@
             videocardDescEl = document.getElementById('videocard-desc');
             hardwareTotalPriceEl = document.getElementById('hardware-total-price');
             moduleHardwarePriceEl = document.getElementById('module-hardware-price');
+            travelCostEl = document.getElementById('travel-cost');
+            lodgingCostEl = document.getElementById('lodging-cost');
+            foodCostEl = document.getElementById('food-cost');
+            travelTotalPriceEl = document.getElementById('travel-total-price');
             clearButton = document.getElementById('clear-button');
             tagsForm = document.getElementById('tags-form');
             calculatorFieldsContainer = document.getElementById('calculator-fields-container');
