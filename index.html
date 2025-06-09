@@ -372,6 +372,9 @@
                 </div>
             </aside>
         </div>
+        <footer class="text-center mt-12 text-sm text-[var(--text-secondary)]">
+            <p>Versão 12.0 - by Diego Karloh</p>
+        </footer>
     </div>
 
     <script>
@@ -1074,7 +1077,7 @@
             for (let i = 1; i <= pageCount; i++) {
                 doc.setPage(i);
                 doc.setFontSize(8).setTextColor(secondaryColor);
-                doc.text(`Versão 1.0 - by Diego Karloh`, margin, 287);
+                doc.text(`Versão 12.0 - by Diego Karloh`, margin, 287);
                 doc.text(`Página ${i} de ${pageCount}`, pageW / 2, 287, { align: 'center' });
             }
 
@@ -1128,6 +1131,7 @@
             
             // Event Listeners
             tagsForm.addEventListener('input', calculateAndDisplayTotals);
+            calculatorProjectInputsContainer.addEventListener('input', calculateAndDisplayTotals);
             
             clearButton.addEventListener('click', () => {
                 const defaultSettings = JSON.parse(JSON.stringify(defaultDatabase.projectSettings));
