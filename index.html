@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Tags e Tempo - v10</title>
+    <title>Calculadora de Tags e Tempo - v11</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,6 +30,9 @@
             --input-border: #cbd5e1;
             --aurora-start: var(--accent-color);
             --aurora-end: #2563eb;
+            --select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%234a5568' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            --total-card-bg: var(--accent-color);
+            --total-card-text: #ffffff;
         }
 
         body.dark-theme {
@@ -48,6 +51,9 @@
             --input-border: #525252;
             --aurora-start: #404040;
             --aurora-end: #262626;
+            --select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a3a3a3' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            --total-card-bg: var(--accent-color);
+            --total-card-text: #171717;
         }
 
         @keyframes aurora {
@@ -152,7 +158,18 @@
             color: var(--text-primary);
             transition: all 0.3s ease;
         }
-        .project-input-row select { text-align: left; }
+        .project-input-row select { 
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: var(--select-arrow);
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.25em 1.25em;
+            padding-left: 0.75rem;
+            padding-right: 2.5rem;
+            text-align: left; 
+        }
         .input-row input[type="number"]:focus, .settings-row input[type="number"]:focus, .project-input-row input[type="number"]:focus, .project-input-row select:focus {
             outline: none;
             border-color: var(--accent-color);
@@ -178,8 +195,16 @@
         .sub-value { font-size: 0.85rem; color: var(--text-secondary); }
         .license-name { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
         .price-value { font-size: 1.25rem; font-weight: 700; color: var(--success-color); }
-        .project-total-price { font-size: 1.75rem; font-weight: 700; color: var(--text-primary); }
+        .project-total-price { font-size: 1.75rem; font-weight: 700; color: var(--total-card-text); }
         .hardware-item { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 0.25rem 0; }
+        #project-total-card {
+            background-color: var(--total-card-bg);
+            transition: background-color 0.5s ease;
+        }
+        #project-total-card .summary-label {
+            color: var(--total-card-text);
+            opacity: 0.8;
+        }
 
         .action-button { width: 100%; padding: 0.75rem; border: none; border-radius: 0.75rem; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
         .save-button { background-color: var(--success-color); box-shadow: 0 4px 20px -5px color-mix(in srgb, var(--success-color) 40%, transparent); }
@@ -311,9 +336,12 @@
                             </div>
                         </div>
                     </div>
-                     <div id="project-total-card" class="glass-card text-center bg-[var(--accent-color)] text-white">
-                         <span class="summary-label !text-white/80">Valor Total do Projeto</span>
-                        <span id="project-total-price" class="project-total-price !text-white !text-4xl">R$ 0,00</span>
+                     <div id="project-total-card" class="glass-card text-center">
+                         <span class="summary-label">Valor Total do Projeto</span>
+                        <span id="project-total-price" class="project-total-price !text-4xl">R$ 0,00</span>
+                    </div>
+                     <div id="chart-card" class="glass-card">
+                         <div id="chart-container"><canvas id="tagsChart"></canvas></div>
                     </div>
                     <div id="actions-card" class="glass-card !p-4">
                         <button id="clear-button" class="action-button clear-button">Limpar Calculadora</button>
@@ -332,7 +360,8 @@
                 reservePercentage: 10,
                 screenCount: 1,
                 screenModelIndex: 0,
-                hourPrice: 150
+                hourPrice: 150,
+                includeComputer: true,
             },
             tags: {
                 'motores': {
@@ -464,6 +493,10 @@
                 projectHtml += `<option value="${index}" ${selected}>${screen.name}</option>`;
             });
             projectHtml += `</select></div>`;
+            projectHtml += `<div class="project-input-row"><label for="calc_include_computer">Incluir Computador?</label><div class="flex justify-center"><label class="toggle-switch">
+                                    <input type="checkbox" id="calc_include_computer" data-prop="includeComputer" ${database.projectSettings.includeComputer ? 'checked' : ''}>
+                                    <span class="slider"></span>
+                                </label></div></div>`;
             projectHtml += `</fieldset>`;
             calculatorProjectInputsContainer.innerHTML = projectHtml;
             calculatorProjectInputsContainer.addEventListener('input', calculateAndDisplayTotals);
@@ -509,10 +542,22 @@
             let hardwareHtml = `<div class="settings-grid-header"><span>Hardware</span><span class="text-center">Valor (R$)</span><span></span></div>`;
             hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Valor da Hora</legend>`;
             hardwareHtml += `<div class="settings-row"><label for="setting_hour_price">Valor da Hora de Serviço (R$)</label><input type="number" min="0" id="setting_hour_price" data-prop="hourPrice" value="${database.projectSettings.hourPrice}"><span/></div></fieldset>`;
+            
+            hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Computadores</legend>`;
+            database.hardware.computers.forEach((computer, index) => {
+                 hardwareHtml += `<div class="settings-row"><label>${computer.name}</label><input type="number" min="0" id="computer_price_${index}" data-type="computers" data-index="${index}" data-prop="price" value="${computer.price}"><span/></div>`;
+            });
+            hardwareHtml += `</fieldset>`;
+            
+            hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Placas de Vídeo</legend>`;
+            database.hardware.videoCards.forEach((vc, index) => {
+                 hardwareHtml += `<div class="settings-row"><label>${vc.screens} Saídas</label><input type="number" min="0" id="vc_price_${index}" data-type="videoCards" data-index="${index}" data-prop="price" value="${vc.price}"><span/></div>`;
+            });
+            hardwareHtml += `</fieldset>`;
 
             hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Telas</legend>`;
             database.hardware.screens.forEach((screen, index) => {
-                 hardwareHtml += `<div class="settings-row"><label for="screen_name_${index}">${screen.name}</label><input type="number" min="0" id="screen_price_${index}" data-type="screens" data-index="${index}" data-prop="price" value="${screen.price}"><span/></div>`;
+                 hardwareHtml += `<div class="settings-row"><label>${screen.name}</label><input type="number" min="0" id="screen_price_${index}" data-type="screens" data-index="${index}" data-prop="price" value="${screen.price}"><span/></div>`;
             });
             hardwareHtml += `</fieldset>`;
             hardwareSettingsContainer.innerHTML = hardwareHtml;
@@ -525,9 +570,12 @@
             const groupTotals = {};
             const inputs = tagsForm.querySelectorAll('input[type="number"], input[type="checkbox"]');
             
-            const reservePercentage = parseFloat(document.getElementById('calc_reserve')?.value) || database.projectSettings.reservePercentage;
-            const screenCount = parseInt(document.getElementById('calc_screen_count')?.value) || database.projectSettings.screenCount;
-            const screenModelIndex = parseInt(document.getElementById('calc_screen_model')?.value) || database.projectSettings.screenModelIndex;
+            const reservePercentage = parseFloat(document.getElementById('calc_reserve')?.value) || 0;
+            const screenCount = parseInt(document.getElementById('calc_screen_count')?.value) || 0;
+            const screenModelIndex = parseInt(document.getElementById('calc_screen_model')?.value) || 0;
+            const includeComputer = document.getElementById('calc_include_computer')?.checked;
+            const screenModelSelect = document.getElementById('calc_screen_model');
+
 
             inputs.forEach(input => {
                 let quantity = 0;
@@ -566,20 +614,31 @@
 
             // Calculate Hardware
             const computer = database.hardware.computers.find(c => finalTotalTags <= c.tagsLimit && screenCount <= c.screenLimit) || database.hardware.computers[1];
+            const computerCost = includeComputer ? computer.price : 0;
+            const computerNameText = includeComputer ? computer.name : "Fornecido pelo Cliente";
             
-            let videoCard = { price: 0, name: 'Integrada' };
+            let videoCard = { price: 0, name: 'N/A' };
             if (screenCount > 2) {
                 videoCard = database.hardware.videoCards.find(vc => screenCount <= vc.screens) || database.hardware.videoCards[database.hardware.videoCards.length - 1];
                 videoCard.name = `${videoCard.screens} Saídas`;
             }
 
-            const screen = database.hardware.screens[screenModelIndex];
-            const screensCost = screen.price * screenCount;
-            const hardwareTotalCost = computer.price + videoCard.price + screensCost;
+            let screensCost = 0;
+            let screensDescText = 'N/A (Cliente já possui)';
+            if (screenCount > 0) {
+                const screen = database.hardware.screens[screenModelIndex];
+                screensCost = screen.price * screenCount;
+                screensDescText = `${screenCount}x ${screen.name}`;
+                if (screenModelSelect) screenModelSelect.disabled = false;
+            } else {
+                 if (screenModelSelect) screenModelSelect.disabled = true;
+            }
+
+            const hardwareTotalCost = computerCost + videoCard.price + screensCost;
             
             // Update Hardware Summary
-            computerNameEl.textContent = `${computer.name}`;
-            screensDescEl.textContent = `${screenCount}x ${screen.name}`;
+            computerNameEl.textContent = computerNameText;
+            screensDescEl.textContent = screensDescText;
             videocardDescEl.textContent = videoCard.name;
             hardwareTotalPriceEl.textContent = formatCurrency(hardwareTotalCost);
 
@@ -643,22 +702,28 @@
             // Save hardware settings
             const hardwareInputs = hardwareSettingsContainer.querySelectorAll('input[type="number"]');
             hardwareInputs.forEach(input => {
-                 const type = input.dataset.type;
+                const type = input.dataset.type;
                 const index = input.dataset.index;
                 const prop = input.dataset.prop;
                 const newValue = parseFloat(input.value) || 0;
 
-                if(type === 'screens' && database.hardware.screens[index]){
-                     database.hardware.screens[index][prop] = newValue;
+                if(database.hardware[type] && database.hardware[type][index]){
+                     database.hardware[type][index][prop] = newValue;
+                } else if (prop === 'hourPrice') {
+                    database.projectSettings[prop] = newValue;
                 }
             });
             
             // Save project settings from both tabs
-            const projectInputs = document.querySelectorAll('#hardware-settings-fields input, #calculator-project-inputs input, #calculator-project-inputs select');
+            const projectInputs = document.querySelectorAll('#calculator-project-inputs input, #calculator-project-inputs select');
             projectInputs.forEach(input => {
                 const prop = input.dataset.prop;
-                const newValue = parseFloat(input.value) || 0;
-                database.projectSettings[prop] = newValue;
+                if (input.type === 'checkbox') {
+                    database.projectSettings[prop] = input.checked;
+                } else {
+                    const newValue = parseFloat(input.value) || 0;
+                    database.projectSettings[prop] = newValue;
+                }
             });
 
             localStorage.setItem('database', JSON.stringify(database));
@@ -685,6 +750,9 @@
             }
              if (!parsedData.hardware) {
                 parsedData.hardware = JSON.parse(JSON.stringify(defaultDatabase.hardware));
+            }
+             if (typeof parsedData.projectSettings.includeComputer === 'undefined') {
+                parsedData.projectSettings.includeComputer = true;
             }
             if (!parsedData.tags || !parsedData.licenses) {
                 parsedData = JSON.parse(JSON.stringify(defaultDatabase));
