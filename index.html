@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Tags e Tempo - v8</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Bento Aurora -->
+    <!-- Application Structure Plan: This version introduces project time estimation. The data structure for each item now includes a 'time' property. The "Cadastros" tab is updated with an input field to edit this time. The summary dashboard now features a new "Bento Grid" card to display the "Total de Horas Estimadas" in real-time. The calculator logic aggregates both tags and time, providing a more comprehensive project estimate. -->
+    <!-- Visualization & Content Choices: Report Info: Project Time -> Goal: Allow user input and display total -> Viz/Method: Added time input fields in the "Cadastros" tab and a new summary card in the dashboard. Justification: This is a major functional enhancement that provides a second key metric for project planning, directly addressing user needs. | Report Info: UI Layout -> Goal: Accommodate new information without clutter -> Viz/Method: The CSS grid for input rows was adjusted to include a new column for time, maintaining a clean and organized layout. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        :root {
+            /* Light Theme */
+            --bg-color: #f4f7f9;
+            --card-bg-color: rgba(255, 255, 255, 0.6);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+            --danger-color: #dc2626;
+            --success-color: #16a34a;
+            --legend-color: var(--text-primary);
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --aurora-start: var(--accent-color);
+            --aurora-end: var(--success-color);
+        }
+
+        body.dark-theme {
+            /* Dark Theme - More Grayscale */
+            --bg-color: #171717;
+            --card-bg-color: rgba(38, 38, 38, 0.6);
+            --border-color: rgba(255, 255, 255, 0.15);
+            --text-primary: #f5f5f5;
+            --text-secondary: #a3a3a3;
+            --accent-color: #e5e5e5;
+            --accent-hover: #ffffff;
+            --danger-color: #ef4444; /* Kept for semantic meaning */
+            --success-color: #22c55e; /* Kept for semantic meaning */
+            --legend-color: var(--text-primary);
+            --input-bg: #262626;
+            --input-border: #525252;
+            --aurora-start: #404040;
+            --aurora-end: #262626;
+        }
+
+        @keyframes aurora {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        .aurora-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(125deg, var(--aurora-start), var(--bg-color) 40%, var(--aurora-end));
+            background-size: 200% 200%;
+            animation: aurora 15s ease infinite;
+            opacity: 0.15;
+            transition: background 0.5s ease;
+        }
+
+        .main-container {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .glass-card {
+            background: var(--card-bg-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+        }
+
+        legend {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--legend-color);
+            transition: color 0.5s ease;
+            padding: 0 0.5rem;
+            margin-left: -0.5rem;
+        }
+
+        .input-row, .settings-row {
+            display: grid;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.5s ease;
+        }
+        .input-row { grid-template-columns: 1fr 80px 80px 100px; gap: 1rem; }
+        .settings-row { grid-template-columns: 1fr 100px 100px; gap: 1rem; }
+
+        .calc-grid-header, .settings-grid-header {
+            display: grid;
+            align-items: center;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.5s ease;
+        }
+        .calc-grid-header {
+            grid-template-columns: 1fr 80px 80px 100px;
+            gap: 1rem;
+        }
+        .settings-grid-header {
+            grid-template-columns: 1fr 100px 100px;
+            gap: 1rem;
+        }
+        
+        .input-row:last-child, .settings-row:last-child { border-bottom: none; }
+        .input-row:hover, .settings-row:hover { background-color: rgba(255, 255, 255, 0.03); }
+        .input-row label, .settings-row label { font-size: 0.95rem; color: var(--text-secondary); transition: color 0.5s ease; }
+        .input-row .tags-per-item, .input-row .time-per-item { font-weight: 600; text-align: center; color: var(--accent-color); transition: color 0.5s ease; }
+        
+        .input-row input[type="number"], .settings-row input[type="number"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--input-border);
+            border-radius: 0.5rem;
+            text-align: center;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        .input-row input[type="number"]:focus, .settings-row input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 25%, transparent);
+        }
+
+        .summary-panel {
+            position: sticky;
+            top: 2rem;
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr 1fr;
+        }
+        #total-card { grid-column: 1 / span 1; }
+        #time-card { grid-column: 2 / span 1; }
+        #license-card { grid-column: 1 / -1; }
+        #chart-card { grid-column: 1 / -1; }
+        #actions-card { grid-column: 1 / -1; }
+        
+        .summary-value { font-size: 2.5rem; font-weight: 700; line-height: 1.1; color: var(--text-primary); text-shadow: 0 0 15px color-mix(in srgb, var(--accent-color) 50%, transparent); transition: all 0.5s ease; }
+        .summary-label { display: block; font-size: 0.9rem; color: var(--text-secondary); }
+        .license-name { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+        .license-price { font-size: 1.75rem; font-weight: 700; color: var(--success-color); }
+        .project-total-price { font-size: 1.25rem; font-weight: 600; color: var(--text-secondary); }
+
+        .action-button { width: 100%; padding: 0.75rem; border: none; border-radius: 0.75rem; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .save-button { background-color: var(--success-color); box-shadow: 0 4px 20px -5px color-mix(in srgb, var(--success-color) 40%, transparent); }
+        .clear-button { background-color: var(--danger-color); box-shadow: 0 4px 20px -5px color-mix(in srgb, var(--danger-color) 40%, transparent); }
+        .action-button:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        
+        #chart-container { position: relative; height: 240px; }
+
+        .tab-button { padding: 0.75rem 1.5rem; border: none; background: transparent; color: var(--text-secondary); font-weight: 500; cursor: pointer; transition: all 0.3s ease; position: relative; }
+        .tab-button.active { color: var(--text-primary); }
+        .tab-button::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 0; height: 2px; background-color: var(--accent-color); transition: width 0.3s ease; }
+        .tab-button.active::after { width: 40%; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        #theme-switcher {
+            background: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #theme-switcher:hover { transform: scale(1.1); box-shadow: 0 0 15px color-mix(in srgb, var(--accent-color) 30%, transparent); }
+        #theme-switcher svg { width: 1.25rem; height: 1.25rem; color: var(--text-secondary); }
+
+        .main-title {
+            transition: color 0.5s ease;
+        }
+        body:not(.dark-theme) .main-title {
+            background: linear-gradient(to right, #2563eb, #1d4ed8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        /* Toggle Switch */
+        .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--input-border); transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--success-color); }
+        input:checked + .slider:before { transform: translateX(20px); }
+    </style>
+</head>
+<body class="dark-theme">
+    <div class="aurora-background"></div>
+    <div class="main-container">
+        <header class="text-center mb-12 relative">
+            <h1 class="main-title text-5xl font-bold">Calculadora de Tags</h1>
+            <p class="text-lg text-slate-400 mt-4">Uma ferramenta moderna para estimar as tags e o tempo do seu projeto de automação.</p>
+            <button id="theme-switcher" class="absolute top-0 right-0">
+                <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>
+                <svg id="moon-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25c0 5.385 4.365 9.75 9.75 9.75 2.572 0 4.92-.99 6.697-2.643z" /></svg>
+            </button>
+        </header>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <main class="md:col-span-2">
+                <div class="tabs mb-2">
+                    <button class="tab-button active" onclick="openTab(event, 'calculadora')">Calculadora</button>
+                    <button class="tab-button" onclick="openTab(event, 'cadastros')">Cadastros</button>
+                </div>
+                
+                <div id="calculadora" class="tab-content active">
+                    <form id="tags-form" class="glass-card !rounded-t-none">
+                        <div class="calc-grid-header">
+                            <span>Descrição do Objeto</span>
+                            <span class="text-center">Tags</span>
+                            <span class="text-center">Horas</span>
+                            <span class="text-center">Qtd.</span>
+                        </div>
+                        <div id="calculator-fields"></div>
+                    </form>
+                </div>
+
+                <div id="cadastros" class="tab-content">
+                    <div class="glass-card !rounded-t-none">
+                         <div id="settings-fields"></div>
+                         <div class="mt-8" id="license-settings-fields"></div>
+                         <div class="mt-8" id="project-settings-fields"></div>
+                         <div class="flex gap-4 mt-8">
+                            <button id="save-settings-button" class="action-button save-button">Salvar Alterações</button>
+                            <button id="restore-defaults-button" class="action-button clear-button">Restaurar Padrões</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <aside class="md:col-span-1">
+                <div class="summary-panel">
+                     <div id="total-card" class="glass-card text-center">
+                        <span class="summary-label">Total de Tags (c/ reserva)</span>
+                        <span class="summary-value" id="grand-total">0</span>
+                    </div>
+                    <div id="time-card" class="glass-card text-center">
+                        <span class="summary-label">Total de Horas</span>
+                        <span class="summary-value" id="total-hours">0</span>
+                    </div>
+                    <div id="license-card" class="glass-card text-center">
+                        <span class="summary-label">Licença Recomendada</span>
+                        <div class="flex justify-between items-center mt-2">
+                            <span id="license-name" class="license-name">N/A</span>
+                            <span id="license-price" class="license-price">R$ 0,00</span>
+                        </div>
+                         <div class="text-right mt-2">
+                            <span id="project-total-price" class="project-total-price"></span>
+                        </div>
+                    </div>
+                    <div id="chart-card" class="glass-card">
+                         <div id="chart-container"><canvas id="tagsChart"></canvas></div>
+                    </div>
+                    <div id="actions-card" class="glass-card !p-4">
+                        <button id="clear-button" class="action-button clear-button">Limpar Calculadora</button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        let database = {};
+
+        const defaultDatabase = {
+            projectSettings: {
+                reservePercentage: 10,
+                screenCount: 1,
+                screenSize: 15,
+                hourPrice: 150
+            },
+            tags: {
+                'motores': {
+                    label: 'Motores',
+                    items: {
+                        'motor_hidr_inversor': { label: 'Motor c/ unid. hidráulica e inversor', tags: 24, time: 2.5 },
+                        'motor_hidr_direta': { label: 'Motor c/ unid. hidráulica e partida direta', tags: 22, time: 2 },
+                        'motor_direta_sensor': { label: 'Motor c/ partida direta e sensor', tags: 18, time: 1.5 },
+                        'motor_direta_simples': { label: 'Motor com partida direta simples', tags: 17, time: 1 },
+                        'motor_inversor_simples': { label: 'Motor com partida inversor simples', tags: 20, time: 1.5 },
+                        'motor_inversor_reversao': { label: 'Motor c/ partida inversor e reversão', tags: 21, time: 2 }
+                    }
+                },
+                'instrumentos': {
+                    label: 'Instrumentos',
+                    items: {
+                        'instr_digital': { label: 'Instrumentação Digital', tags: 2, time: 0.25 },
+                        'instr_analogico': { label: 'Instrumentação Analógica', tags: 4, time: 0.5 }
+                    }
+                },
+                'valvulas': {
+                    label: 'Válvulas e Dampers',
+                    items: {
+                        'valvula_descarga_fundo': { label: 'Válvula descarga fundo', tags: 4, time: 0.75 },
+                        'sensor_valvula_incendio': { label: 'Config. por sensor válvula incêndio', tags: 3, time: 1 },
+                        'damper': { label: 'Damper', tags: 4, time: 0.5 },
+                        'valvulas_geral': { label: 'Válvulas (Geral)', tags: 4, time: 0.5 }
+                    }
+                },
+                'controles': {
+                    label: 'Configurações e Controles',
+                    items: {
+                        'cfg_descarga_fundo': { label: 'Config. padrão válvula descarga', tags: 10, time: 2, max: 1 },
+                        'cfg_soprador_fuligem': { label: 'Config. padrão soprador de fuligem', tags: 6, time: 3, max: 1 },
+                        'cfg_valvula_incendio': { label: 'Config. padrão válvula incêndio', tags: 3, time: 2, max: 1 },
+                        'cfg_controle_2_elementos': { label: 'Controle dois elementos', tags: 9, time: 4, max: 1 },
+                        'cfg_valvula_modulante': { label: 'Válvula modulante nível (PID)', tags: 16, time: 3, max: 1 },
+                        'cfg_pi_exaustor': { label: 'Configurações PI exaustor', tags: 12, time: 2.5, max: 1 },
+                        'cfg_pi_combustao': { label: 'Configurações PI combustão', tags: 14, time: 2.5, max: 1 },
+                        'cfg_acendimento_auto': { label: 'Acendimento Automático', tags: 42, time: 8, max: 1 },
+                        'cfg_silo_cavaco': { label: 'Operação silo Cavaco', tags: 10, time: 4, max: 1 }
+                    }
+                },
+                'ajustes': {
+                    label: 'Outros Ajustes',
+                    items: {
+                        'ajuste_alarme': { label: 'Configurações alarme', tags: 5, time: 1 },
+                        'ajuste_receitas': { label: 'Ajuste padrão (nº de receitas)', tags: 4, time: 1.5 },
+                        'ajuste_motores_receita': { label: 'Motores que fazem parte da receita', tags: 3, time: 0.5 },
+                        'ajuste_partida_direta': { label: 'Nº de partidas direta (Dados Placa)', tags: 3, time: 0.25 },
+                        'ajuste_unid_hidraulica': { label: 'Nº de partidas com unid. hidráulica', tags: 10, time: 0.5 },
+                        'ajuste_patio_movel': { label: 'Configurações pátio móvel', tags: 3, time: 2 },
+                        'tags_adicionais': { label: 'Tags Adicionais', tags: 1, time: 0.1 }
+                    }
+                }
+            },
+            licenses: {
+                'Lite': [
+                    { tags: 100, price: 2000 },
+                    { tags: 250, price: 3500 },
+                    { tags: 500, price: 5500 },
+                    { tags: 750, price: 6500 },
+                    { tags: 950, price: 8000 }
+                ],
+                'Server': [
+                    { tags: 1000, price: 16000 },
+                    { tags: 2500, price: 22000 },
+                    { tags: 5000, price: 32000 },
+                    { tags: 10000, price: 45000 }
+                ]
+            }
+        };
+
+        // --- DOM ELEMENTS ---
+        let grandTotalEl, totalHoursEl, licenseNameEl, licensePriceEl, projectTotalPriceEl, clearButton, tagsForm, calculatorFieldsContainer, settingsFieldsContainer, licenseSettingsContainer, projectSettingsContainer, saveSettingsButton, restoreDefaultsButton, themeSwitcher, sunIcon, moonIcon, ctx, tagsChart;
+        
+        // --- CHART ---
+        const chartGroupColors = {
+            'Motores': '#3b82f6', 'Instrumentos': '#10b981',
+            'Válvulas e Dampers': '#ef4444', 'Configurações e Controles': '#f97316',
+            'Outros Ajustes': '#a855f7'
+        };
+
+        // --- FUNCTIONS ---
+        function openTab(evt, tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            if(evt) evt.currentTarget.classList.add('active');
+            else document.querySelector(`[onclick="openTab(event, '${tabName}')"]`).classList.add('active');
+        }
+        
+        function renderCalculatorFields() {
+            let html = '';
+            for (const groupKey in database.tags) {
+                const group = database.tags[groupKey];
+                html += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">${group.label}</legend>`;
+                for (const itemKey in group.items) {
+                    const item = group.items[itemKey];
+                    html += `<div class="input-row">
+                                <label for="calc_${itemKey}">${item.label}</label>
+                                <span class="tags-per-item">${item.tags}</span>
+                                <span class="time-per-item">${item.time}h</span>
+                                <div class="flex justify-center">`;
+                    if (item.max === 1) {
+                        html += `<label class="toggle-switch">
+                                    <input type="checkbox" id="calc_${itemKey}" data-group="${group.label}" data-item-key="${itemKey}">
+                                    <span class="slider"></span>
+                                </label>`;
+                    } else {
+                        html += `<input type="number" min="0" class="w-20" id="calc_${itemKey}" data-group="${group.label}" data-item-key="${itemKey}" placeholder="Qtd.">`;
+                    }
+                    html += `</div></div>`;
+                }
+                html += `</fieldset>`;
+            }
+            calculatorFieldsContainer.innerHTML = html;
+            tagsForm.addEventListener('input', calculateAndDisplayTotals);
+        }
+
+        function renderSettingsFields() {
+            let tagHtml = `<div class="settings-grid-header"><span>Descrição do Objeto</span><span class="text-center">Tags</span><span class="text-center">Horas</span></div>`;
+            for (const groupKey in database.tags) {
+                const group = database.tags[groupKey];
+                tagHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">${group.label}</legend>`;
+                for (const itemKey in group.items) {
+                    const item = group.items[itemKey];
+                     tagHtml += `
+                        <div class="settings-row">
+                            <label for="setting_tags_${itemKey}">${item.label}</label>
+                            <input type="number" min="0" id="setting_tags_${itemKey}" data-group-key="${groupKey}" data-item-key="${itemKey}" data-prop="tags" value="${item.tags}">
+                            <input type="number" min="0" step="0.1" id="setting_time_${itemKey}" data-group-key="${groupKey}" data-item-key="${itemKey}" data-prop="time" value="${item.time}">
+                        </div>`;
+                }
+                 tagHtml += `</fieldset>`;
+            }
+            settingsFieldsContainer.innerHTML = tagHtml;
+
+            let licenseHtml = `<div class="settings-grid-header"><span>Pacote de Licença</span><span class="text-center">Tags</span><span class="text-center">Valor (R$)</span></div>`;
+            for(const type in database.licenses) {
+                licenseHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">${type}</legend>`;
+                database.licenses[type].forEach((license, index) => {
+                    licenseHtml += `
+                        <div class="settings-row">
+                            <label for="license_${type}_${index}">Pacote ${type} ${index + 1}</label>
+                            <input type="number" min="0" id="license_tags_${type}_${index}" data-type="${type}" data-index="${index}" data-prop="tags" value="${license.tags}">
+                            <input type="number" min="0" id="license_price_${type}_${index}" data-type="${type}" data-index="${index}" data-prop="price" value="${license.price}">
+                        </div>
+                    `;
+                });
+                licenseHtml += `</fieldset>`;
+            }
+            licenseSettingsContainer.innerHTML = licenseHtml;
+
+            let projectHtml = `<fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-4">Configurações Gerais do Projeto</legend>`;
+            projectHtml += `<div class="settings-row"><label for="setting_reserve">Percentual de Reserva de Tags (%)</label><input type="number" min="0" id="setting_reserve" data-prop="reservePercentage" value="${database.projectSettings.reservePercentage}"><span/></div>`;
+            projectHtml += `<div class="settings-row"><label for="setting_hour_price">Valor da Hora de Serviço (R$)</label><input type="number" min="0" id="setting_hour_price" data-prop="hourPrice" value="${database.projectSettings.hourPrice}"><span/></div>`;
+            projectHtml += `<div class="settings-row"><label for="setting_screen_count">Número de Telas IHM</label><input type="number" min="0" id="setting_screen_count" data-prop="screenCount" value="${database.projectSettings.screenCount}"><span/></div>`;
+            projectHtml += `<div class="settings-row"><label for="setting_screen_size">Tamanho da Tela (polegadas)</label><input type="number" min="0" id="setting_screen_size" data-prop="screenSize" value="${database.projectSettings.screenSize}"><span/></div>`;
+            projectHtml += `</fieldset>`;
+            projectSettingsContainer.innerHTML = projectHtml;
+        }
+
+        function calculateAndDisplayTotals() {
+            let baseTotalTags = 0;
+            let totalHours = 0;
+            const groupTotals = {};
+            const inputs = tagsForm.querySelectorAll('input[type="number"], input[type="checkbox"]');
+
+            inputs.forEach(input => {
+                let quantity = 0;
+                if(input.type === 'checkbox') {
+                    quantity = input.checked ? 1 : 0;
+                } else {
+                    quantity = parseFloat(input.value) || 0;
+                }
+
+                if (quantity > 0) {
+                    const itemKey = input.dataset.itemKey;
+                    const groupLabel = input.dataset.group;
+                    const groupKey = Object.keys(database.tags).find(key => database.tags[key].label === groupLabel);
+                    
+                    if (groupKey && database.tags[groupKey].items[itemKey]) {
+                        const itemData = database.tags[groupKey].items[itemKey];
+                        const itemTotalTags = quantity * (itemData.tags || 0);
+                        baseTotalTags += itemTotalTags;
+                        totalHours += quantity * (itemData.time || 0);
+                        
+                        if (!groupTotals[groupLabel]) groupTotals[groupLabel] = 0;
+                        groupTotals[groupLabel] += itemTotalTags;
+                    }
+                }
+            });
+
+            const reserve = database.projectSettings.reservePercentage / 100;
+            const finalTotalTags = Math.ceil(baseTotalTags * (1 + reserve));
+
+            grandTotalEl.textContent = finalTotalTags;
+            totalHoursEl.textContent = totalHours.toFixed(1);
+            updateChart(groupTotals);
+
+            const recommendedLicense = calculateRecommendedLicense(finalTotalTags);
+            const totalServicesPrice = totalHours * database.projectSettings.hourPrice;
+            const finalProjectPrice = recommendedLicense.price + totalServicesPrice;
+
+            licenseNameEl.textContent = recommendedLicense.name;
+            licensePriceEl.textContent = formatCurrency(recommendedLicense.price);
+            projectTotalPriceEl.textContent = `Total Projeto: ${formatCurrency(finalProjectPrice)}`;
+        }
+        
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        }
+
+        function calculateRecommendedLicense(totalTags) {
+            if (totalTags === 0) {
+                return { name: 'N/A', price: 0 };
+            }
+
+            const allLicenses = [...database.licenses.Lite, ...database.licenses.Server].sort((a,b) => a.tags - b.tags);
+            const suitableLicense = allLicenses.find(l => l.tags >= totalTags);
+
+            if (!suitableLicense) {
+                const largestLicense = allLicenses[allLicenses.length - 1];
+                return { name: `Acima de ${largestLicense.tags} Tags`, price: largestLicense.price };
+            }
+            
+            const type = database.licenses.Lite.includes(suitableLicense) ? 'Lite' : 'Server';
+            return { name: `${type} - ${suitableLicense.tags} Tags`, price: suitableLicense.price };
+        }
+
+        function saveSettings() {
+            // Save tag and time settings
+            const settingsInputs = settingsFieldsContainer.querySelectorAll('input[type="number"]');
+            settingsInputs.forEach(input => {
+                const groupKey = input.dataset.groupKey;
+                const itemKey = input.dataset.itemKey;
+                const prop = input.dataset.prop;
+                const newValue = parseFloat(input.value) || 0;
+                if (database.tags[groupKey] && database.tags[groupKey].items[itemKey]) {
+                    database.tags[groupKey].items[itemKey][prop] = newValue;
+                }
+            });
+
+            // Save license settings
+            const licenseInputs = licenseSettingsContainer.querySelectorAll('input[type="number"]');
+            licenseInputs.forEach(input => {
+                const type = input.dataset.type;
+                const index = input.dataset.index;
+                const prop = input.dataset.prop;
+                const newValue = parseInt(input.value) || 0;
+                if(database.licenses[type] && database.licenses[type][index]) {
+                    database.licenses[type][index][prop] = newValue;
+                }
+            });
+
+            // Save project settings
+            const projectInputs = projectSettingsContainer.querySelectorAll('input[type="number"]');
+            projectInputs.forEach(input => {
+                const prop = input.dataset.prop;
+                const newValue = parseFloat(input.value) || 0;
+                database.projectSettings[prop] = newValue;
+            });
+
+            localStorage.setItem('database', JSON.stringify(database));
+            alert('Configurações salvas com sucesso!');
+            rerenderAll();
+        }
+        
+        function restoreDefaults() {
+            if (confirm('Tem certeza que deseja restaurar os valores padrão? Todas as suas alterações serão perdidas.')) {
+                localStorage.removeItem('database');
+                loadData();
+                rerenderAll();
+                alert('Valores padrão restaurados.');
+            }
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem('database');
+            let parsedData = savedData ? JSON.parse(savedData) : JSON.parse(JSON.stringify(defaultDatabase));
+            
+            if (!parsedData.projectSettings) {
+                parsedData.projectSettings = defaultDatabase.projectSettings;
+            }
+            if (!parsedData.tags || !parsedData.licenses) {
+                parsedData = JSON.parse(JSON.stringify(defaultDatabase));
+            }
+
+            for (const groupKey in defaultDatabase.tags) {
+                for (const itemKey in defaultDatabase.tags[groupKey].items) {
+                    if (parsedData.tags[groupKey] && parsedData.tags[groupKey].items[itemKey] && typeof parsedData.tags[groupKey].items[itemKey].time === 'undefined') {
+                       parsedData.tags[groupKey].items[itemKey].time = defaultDatabase.tags[groupKey].items[itemKey].time;
+                    }
+                }
+            }
+            database = parsedData;
+        }
+        
+        function rerenderAll() {
+            renderCalculatorFields();
+            renderSettingsFields();
+            calculateAndDisplayTotals();
+        }
+
+        function initializeChart() {
+            tagsChart = new Chart(ctx, {
+                type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: document.body.classList.contains('dark-theme') ? '#f5f5f5' : '#4a5568', font: { family: "'Inter', sans-serif" }, padding: 15, boxWidth: 12, usePointStyle: true, pointStyle: 'circle' }}}}
+            });
+        }
+
+        function updateChart(groupTotals) {
+            if (!tagsChart) return;
+            const labels = Object.keys(groupTotals);
+            const data = Object.values(groupTotals);
+            tagsChart.data.labels = labels;
+            tagsChart.data.datasets[0].data = data;
+            tagsChart.data.datasets[0].backgroundColor = labels.map(label => chartGroupColors[label] || '#9ca3af');
+            tagsChart.update();
+        }
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-theme');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                document.body.classList.remove('dark-theme');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+            if(tagsChart) {
+                tagsChart.options.plugins.legend.labels.color = theme === 'dark' ? '#f5f5f5' : '#4a5568';
+                tagsChart.update();
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Assign DOM elements
+            grandTotalEl = document.getElementById('grand-total');
+            totalHoursEl = document.getElementById('total-hours');
+            licenseNameEl = document.getElementById('license-name');
+            licensePriceEl = document.getElementById('license-price');
+            projectTotalPriceEl = document.getElementById('project-total-price');
+            clearButton = document.getElementById('clear-button');
+            tagsForm = document.getElementById('tags-form');
+            calculatorFieldsContainer = document.getElementById('calculator-fields');
+            settingsFieldsContainer = document.getElementById('settings-fields');
+            licenseSettingsContainer = document.getElementById('license-settings-fields');
+            projectSettingsContainer = document.getElementById('project-settings-fields');
+            saveSettingsButton = document.getElementById('save-settings-button');
+            restoreDefaultsButton = document.getElementById('restore-defaults-button');
+            themeSwitcher = document.getElementById('theme-switcher');
+            sunIcon = document.getElementById('sun-icon');
+            moonIcon = document.getElementById('moon-icon');
+            ctx = document.getElementById('tagsChart').getContext('2d');
+            
+            loadData();
+            initializeChart();
+            rerenderAll();
+            openTab(null, 'calculadora');
+
+            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            applyTheme(savedTheme);
+            
+            // Event Listeners
+            clearButton.addEventListener('click', () => {
+                tagsForm.reset();
+                calculateAndDisplayTotals();
+            });
+            saveSettingsButton.addEventListener('click', saveSettings);
+            restoreDefaultsButton.addEventListener('click', restoreDefaults);
+            themeSwitcher.addEventListener('click', toggleTheme);
+        });
+    </script>
+</body>
+</html>
