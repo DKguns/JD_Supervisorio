@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Tags e Tempo - v11</title>
+    <title>Ferramenta de Cálculo de Supervisório</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -120,6 +120,7 @@
         .settings-row { grid-template-columns: 1fr 100px 100px; gap: 1rem; }
         .module-settings-row { grid-template-columns: 1fr 80px 80px 80px; gap: 1rem; }
         .project-input-row { grid-template-columns: 1fr 120px; gap: 1rem; }
+        .vc-settings-row { grid-template-columns: 1fr 1fr 100px; gap: 1rem; }
 
 
         .calc-grid-header, .settings-grid-header {
@@ -153,7 +154,7 @@
         .input-row label, .settings-row label, .project-input-row label { font-size: 0.95rem; color: var(--text-secondary); transition: color 0.5s ease; }
         .input-row .tags-per-item, .input-row .time-per-item { font-weight: 600; text-align: center; color: var(--accent-color); transition: color 0.5s ease; }
         
-        .input-row input[type="number"], .settings-row input[type="number"], .project-input-row input[type="number"], .project-input-row select {
+        input[type="number"], input[type="text"], select {
             width: 100%;
             padding: 0.5rem;
             border: 1px solid var(--input-border);
@@ -163,7 +164,7 @@
             color: var(--text-primary);
             transition: all 0.3s ease;
         }
-        .project-input-row select { 
+        select { 
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -175,7 +176,7 @@
             padding-right: 2.5rem;
             text-align: left; 
         }
-        .input-row input[type="number"]:focus, .settings-row input[type="number"]:focus, .project-input-row input[type="number"]:focus, .project-input-row select:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 25%, transparent);
@@ -259,8 +260,8 @@
     <div class="aurora-background"></div>
     <div class="main-container">
         <header class="text-center mb-12 relative">
-            <h1 class="main-title text-5xl font-bold">Calculadora de Tags</h1>
-            <p class="text-lg text-slate-400 mt-4">Uma ferramenta moderna para estimar as tags e o tempo do seu projeto de automação.</p>
+            <h1 class="main-title text-5xl font-bold">Ferramenta de Cálculo de Supervisório</h1>
+            <p class="text-lg text-slate-400 mt-4">Estime com precisão as tags, horas e módulos necessários para seu projeto de supervisório.</p>
             <button id="theme-switcher" class="absolute top-0 right-0">
                 <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>
                 <svg id="moon-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25c0 5.385 4.365 9.75 9.75 9.75 2.572 0 4.92-.99 6.697-2.643z" /></svg>
@@ -275,10 +276,10 @@
                 </div>
                 
                 <div id="calculadora" class="tab-content active">
-                     <div id="calculator-project-inputs" class="glass-card mb-4"></div>
-                    <form id="tags-form">
-                        <div id="modules-container" class="mb-4"></div>
-                        <div id="calculator-fields"></div>
+                    <form id="tags-form" class="space-y-4">
+                        <div id="calculator-project-inputs"></div>
+                        <div id="modules-container"></div>
+                        <div id="calculator-fields-container" class="space-y-4"></div>
                     </form>
                 </div>
 
@@ -430,7 +431,7 @@
                     { name: 'PC Avançado (i7)', spec: 'I7, 32GB RAM, SSD 512GB + 2TB HDD', tagsLimit: Infinity, screenLimit: Infinity, price: 13500 }
                 ],
                 videoCards: [
-                    { screens: 4, price: 6500 }, { screens: 6, price: 10500 }, { screens: 8, price: 22000 }, { screens: 10, price: 35000 }
+                    { name: "Placa 4 Saídas", screens: 4, price: 6500 }, { name: "Placa 6 Saídas", screens: 6, price: 10500 }, { name: "Placa 8 Saídas", screens: 8, price: 22000 }, { name: "Placa 10 Saídas", screens: 10, price: 35000 }
                 ],
                 screens: [
                     { name: '24" Full HD', price: 1500 }, { name: '32" Full HD', price: 2000 }, { name: '40" Full HD', price: 3000 }, { name: '55" Full HD', price: 5000 }
@@ -472,7 +473,7 @@
         function renderCalculatorFields() {
             let itemsHtml = '';
             for (const groupKey in database.tags) {
-                itemsHtml += `<div class="glass-card mb-4">`;
+                itemsHtml += `<div class="glass-card">`;
                 const group = database.tags[groupKey];
                 itemsHtml += `<fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">${group.label}</legend>`;
                 itemsHtml += `<div class="calc-grid-header"><span>Descrição do Objeto</span><span class="text-center">Tags</span><span class="text-center">Horas</span><span class="text-center">Qtd.</span></div>`;
@@ -498,7 +499,7 @@
             calculatorFieldsContainer.innerHTML = itemsHtml;
 
             // Render Modules
-            let moduleHtml = `<div class="glass-card mb-4"><fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">Módulos Opcionais</legend>`;
+            let moduleHtml = `<div class="glass-card"><fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">Módulos Opcionais</legend>`;
             for(const key in database.modules) {
                 const module = database.modules[key];
                  moduleHtml += `<div class="project-input-row">
@@ -519,7 +520,7 @@
         }
         
         function renderProjectInputs() {
-            let projectHtml = `<fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">Configurações Iniciais do Projeto</legend>`;
+            let projectHtml = `<div class="glass-card"><fieldset class="border-none p-0"><legend class="text-lg font-semibold mb-2">Configurações Iniciais do Projeto</legend>`;
             projectHtml += `<div class="project-input-row"><label for="calc_reserve">Percentual de Reserva de Tags (%)</label><input type="number" min="0" id="calc_reserve" data-prop="reservePercentage" value="${database.projectSettings.reservePercentage}"></div>`;
             projectHtml += `<div class="project-input-row"><label for="calc_screen_count">Número de Telas IHM</label><input type="number" min="0" id="calc_screen_count" data-prop="screenCount" value="${database.projectSettings.screenCount}"></div>`;
             projectHtml += `<div class="project-input-row"><label for="calc_screen_model">Modelo da Tela</label><select id="calc_screen_model" data-prop="screenModelIndex">`;
@@ -532,7 +533,7 @@
                                     <input type="checkbox" id="calc_include_computer" data-prop="includeComputer" ${database.projectSettings.includeComputer ? 'checked' : ''}>
                                     <span class="slider"></span>
                                 </label></div></div>`;
-            projectHtml += `</fieldset>`;
+            projectHtml += `</fieldset></div>`;
             calculatorProjectInputsContainer.innerHTML = projectHtml;
             calculatorProjectInputsContainer.addEventListener('input', calculateAndDisplayTotals);
         }
@@ -589,25 +590,25 @@
             licenseSettingsContainer.innerHTML = licenseHtml;
             
             // Render Hardware Settings
-            let hardwareHtml = `<div class="settings-grid-header"><span>Hardware</span><span class="text-center">Valor (R$)</span><span></span></div>`;
+            let hardwareHtml = `<div class="settings-grid-header" style="grid-template-columns: 1fr 1fr 100px; gap: 1rem;"><span>Item</span><span>Especificação / Nome</span><span class="text-center">Valor (R$)</span></div>`;
             hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Valor da Hora</legend>`;
             hardwareHtml += `<div class="settings-row"><label for="setting_hour_price">Valor da Hora de Serviço (R$)</label><input type="number" min="0" id="setting_hour_price" data-prop="hourPrice" value="${database.projectSettings.hourPrice}"><span/></div></fieldset>`;
             
             hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Computadores</legend>`;
             database.hardware.computers.forEach((computer, index) => {
-                 hardwareHtml += `<div class="settings-row"><label>${computer.name}</label><input type="number" min="0" id="computer_price_${index}" data-type="computers" data-index="${index}" data-prop="price" value="${computer.price}"><span/></div>`;
+                 hardwareHtml += `<div class="settings-row vc-settings-row"><label>${computer.name}</label><input type="text" value="${computer.spec}" class="!text-left px-2" id="computer_spec_${index}" data-type="computers" data-index="${index}" data-prop="spec"><input type="number" min="0" id="computer_price_${index}" data-type="computers" data-index="${index}" data-prop="price" value="${computer.price}"></div>`;
             });
             hardwareHtml += `</fieldset>`;
             
             hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Placas de Vídeo</legend>`;
             database.hardware.videoCards.forEach((vc, index) => {
-                 hardwareHtml += `<div class="settings-row"><label>${vc.screens} Saídas</label><input type="number" min="0" id="vc_price_${index}" data-type="videoCards" data-index="${index}" data-prop="price" value="${vc.price}"><span/></div>`;
+                 hardwareHtml += `<div class="settings-row vc-settings-row"><label>${vc.screens} Saídas</label><input type="text" value="${vc.name}" id="vc_name_${index}" class="!text-left px-2" data-type="videoCards" data-index="${index}" data-prop="name"><input type="number" min="0" id="vc_price_${index}" data-type="videoCards" data-index="${index}" data-prop="price" value="${vc.price}"></div>`;
             });
             hardwareHtml += `</fieldset>`;
 
             hardwareHtml += `<fieldset class="border-none p-0 mb-4"><legend class="text-lg font-semibold mb-2">Telas</legend>`;
             database.hardware.screens.forEach((screen, index) => {
-                 hardwareHtml += `<div class="settings-row"><label>${screen.name}</label><input type="number" min="0" id="screen_price_${index}" data-type="screens" data-index="${index}" data-prop="price" value="${screen.price}"><span/></div>`;
+                 hardwareHtml += `<div class="settings-row"><label for="screen_name_${index}">${screen.name}</label><input type="number" min="0" id="screen_price_${index}" data-type="screens" data-index="${index}" data-prop="price" value="${screen.price}"><span/></div>`;
             });
             hardwareHtml += `</fieldset>`;
             hardwareSettingsContainer.innerHTML = hardwareHtml;
@@ -618,7 +619,7 @@
             let baseTotalTags = 0;
             let totalHours = 0;
             const groupTotals = {};
-            const inputs = document.querySelectorAll('#tags-form input, #modules-container input');
+            const inputs = document.querySelectorAll('#tags-form input');
             
             const reservePercentage = parseFloat(document.getElementById('calc_reserve')?.value) || 0;
             const screenCount = parseInt(document.getElementById('calc_screen_count')?.value) || 0;
@@ -687,7 +688,6 @@
             let videoCard = { price: 0, name: 'N/A' };
             if (screenCount > 2) {
                 videoCard = database.hardware.videoCards.find(vc => screenCount <= vc.screens) || database.hardware.videoCards[database.hardware.videoCards.length - 1];
-                videoCard.name = `${videoCard.screens} Saídas`;
             }
 
             let screensCost = 0;
@@ -744,12 +744,12 @@
 
         function saveSettings() {
             // Save tag and time settings
-            const settingsInputs = settingsFieldsContainer.querySelectorAll('input[type="number"]');
+            const settingsInputs = settingsFieldsContainer.querySelectorAll('input[type="number"], input[type="text"]');
             settingsInputs.forEach(input => {
                 const groupKey = input.dataset.groupKey;
                 const itemKey = input.dataset.itemKey;
                 const prop = input.dataset.prop;
-                const newValue = parseFloat(input.value) || 0;
+                const newValue = input.type === 'text' ? input.value : (parseFloat(input.value) || 0);
                 if (database.tags[groupKey] && database.tags[groupKey].items[itemKey]) {
                     database.tags[groupKey].items[itemKey][prop] = newValue;
                 }
@@ -768,23 +768,23 @@
             });
             
              // Save module settings
-            const moduleInputs = moduleSettingsContainer.querySelectorAll('input[type="number"]');
+            const moduleInputs = moduleSettingsContainer.querySelectorAll('input');
             moduleInputs.forEach(input => {
                 const key = input.dataset.key;
                 const prop = input.dataset.prop;
-                const newValue = parseFloat(input.value) || 0;
+                 const newValue = input.type === 'text' ? input.value : (parseFloat(input.value) || 0);
                 if(database.modules[key]){
                      database.modules[key][prop] = newValue;
                 }
             });
 
             // Save hardware settings
-            const hardwareInputs = hardwareSettingsContainer.querySelectorAll('input[type="number"]');
+            const hardwareInputs = hardwareSettingsContainer.querySelectorAll('input');
             hardwareInputs.forEach(input => {
                 const type = input.dataset.type;
                 const index = input.dataset.index;
                 const prop = input.dataset.prop;
-                const newValue = parseFloat(input.value) || 0;
+                const newValue = input.type === 'text' ? input.value : (parseFloat(input.value) || 0);
 
                 if(database.hardware[type] && database.hardware[type][index]){
                      database.hardware[type][index][prop] = newValue;
@@ -824,27 +824,22 @@
             let parsedData = savedData ? JSON.parse(savedData) : JSON.parse(JSON.stringify(defaultDatabase));
             
             // Migration for old data structures
-            if (!parsedData.projectSettings) {
-                parsedData.projectSettings = JSON.parse(JSON.stringify(defaultDatabase.projectSettings));
-            }
-             if (!parsedData.hardware) {
-                parsedData.hardware = JSON.parse(JSON.stringify(defaultDatabase.hardware));
-            }
-             if (typeof parsedData.projectSettings.includeComputer === 'undefined') {
-                parsedData.projectSettings.includeComputer = true;
-            }
-             if (!parsedData.modules) {
-                parsedData.modules = JSON.parse(JSON.stringify(defaultDatabase.modules));
-            }
-            if (!parsedData.tags || !parsedData.licenses) {
-                parsedData = JSON.parse(JSON.stringify(defaultDatabase));
-            }
+            if (!parsedData.projectSettings) parsedData.projectSettings = JSON.parse(JSON.stringify(defaultDatabase.projectSettings));
+            if (!parsedData.hardware) parsedData.hardware = JSON.parse(JSON.stringify(defaultDatabase.hardware));
+            if (typeof parsedData.projectSettings.includeComputer === 'undefined') parsedData.projectSettings.includeComputer = true;
+            if (!parsedData.modules) parsedData.modules = JSON.parse(JSON.stringify(defaultDatabase.modules));
+            if (!parsedData.tags || !parsedData.licenses) parsedData = JSON.parse(JSON.stringify(defaultDatabase));
 
             for (const groupKey in defaultDatabase.tags) {
                 for (const itemKey in defaultDatabase.tags[groupKey].items) {
                     if (parsedData.tags[groupKey] && parsedData.tags[groupKey].items[itemKey] && typeof parsedData.tags[groupKey].items[itemKey].time === 'undefined') {
                        parsedData.tags[groupKey].items[itemKey].time = defaultDatabase.tags[groupKey].items[itemKey].time;
                     }
+                }
+            }
+             for (const key in defaultDatabase.hardware.videoCards) {
+                if(parsedData.hardware.videoCards[key] && !parsedData.hardware.videoCards[key].name) {
+                     parsedData.hardware.videoCards[key].name = defaultDatabase.hardware.videoCards[key].name;
                 }
             }
             database = parsedData;
@@ -916,7 +911,7 @@
             moduleHardwarePriceEl = document.getElementById('module-hardware-price');
             clearButton = document.getElementById('clear-button');
             tagsForm = document.getElementById('tags-form');
-            calculatorFieldsContainer = document.getElementById('calculator-fields');
+            calculatorFieldsContainer = document.getElementById('calculator-fields-container');
             modulesContainer = document.getElementById('modules-container');
             calculatorProjectInputsContainer = document.getElementById('calculator-project-inputs');
             settingsFieldsContainer = document.getElementById('settings-fields');
