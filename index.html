@@ -967,12 +967,13 @@
         function generatePDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-
-            const companyName = database.projectSettings.companyName || 'N/A';
-            const projectName = database.projectSettings.projectName || 'N/A';
-            const city = database.projectSettings.city || 'N/A';
-            const state = database.projectSettings.state || 'N/A';
             
+            // Get current project settings from inputs
+            const companyName = document.getElementById('calc_company_name').value || 'N/A';
+            const projectName = document.getElementById('calc_project_name').value || 'N/A';
+            const city = document.getElementById('calc_city').value || 'N/A';
+            const state = document.getElementById('calc_state').value || 'N/A';
+
             const finalTotalTags = grandTotalEl.textContent;
             const baseTagsValue = baseTagsEl.textContent;
             const reserveTagsValue = reserveTagsEl.textContent;
@@ -1058,10 +1059,10 @@
             drawCostItem("Despesas de Viagem:", travelTotal);
             
             // Chart
-            if(chartBase64){
-                doc.addImage(chartBase64, 'PNG', pageW - margin - 70, y - 5, 60, 60);
+            if(chartBase64 && doc.internal.getNumberOfPages() === 1 && costY < 230){ // Avoid pushing content off page
+                doc.addImage(chartBase64, 'PNG', pageW - margin - 65, y - 5, 60, 60);
             }
-            y+= 35
+            y = Math.max(y + 35, costY);
 
             // Final Total
             doc.setDrawColor(primaryColor);
@@ -1131,7 +1132,6 @@
             
             // Event Listeners
             tagsForm.addEventListener('input', calculateAndDisplayTotals);
-            calculatorProjectInputsContainer.addEventListener('input', calculateAndDisplayTotals);
             
             clearButton.addEventListener('click', () => {
                 const defaultSettings = JSON.parse(JSON.stringify(defaultDatabase.projectSettings));
